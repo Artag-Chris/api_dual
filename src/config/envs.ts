@@ -6,9 +6,12 @@ export const envs = {
 
   PORT: get('PORT').required().asPortNumber(),
 
-  DATABASE_URL: get('DATABASE_URL').required().asString(),
+  DATABASE_URL_LEGACY: get('DATABASE_URL_LEGACY').required().asString(),
+
+  DATABASE_URL_MAIN: get('DATABASE_URL_MAIN').required().asString(),
 
 }
+
 
 
 

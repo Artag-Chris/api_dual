@@ -1,0 +1,11 @@
+generator clientLegacy {
+  provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client-legacy"
+}
+
+datasource dbLegacy {
+  provider = "mysql"
+  url      = env("DATABASE_URL_LEGACY")
+}
+
+// Los modelos se generarán automáticamente con db pull

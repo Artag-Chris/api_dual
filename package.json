@@ -6,35 +6,45 @@
   "scripts": {
     "dev": "tsnd --respawn --clear src/app.ts",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node dist/app.js",
+    "prisma:generate:legacy": "prisma generate --schema=./prisma/schema-legacy.prisma",
+    "prisma:migrate:legacy": "prisma migrate dev --schema=./prisma/schema-legacy.prisma",
+    "prisma:studio:legacy": "prisma studio --schema=./prisma/schema-legacy.prisma",
+    "prisma:push:legacy": "prisma db push --schema=./prisma/schema-legacy.prisma",
+    "prisma:generate:main": "prisma generate --schema=./prisma/schema-main.prisma",
+    "prisma:migrate:main": "prisma migrate dev --schema=./prisma/schema-main.prisma",
+    "prisma:studio:main": "prisma studio --schema=./prisma/schema-main.prisma",
+    "prisma:push:main": "prisma db push --schema=./prisma/schema-main.prisma",
+    "prisma:generate": "npm run prisma:generate:legacy && npm run prisma:generate:main",
+    "postinstall": "npm run prisma:generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/express": "^4.17.18",
-    "@types/node": "^20.8.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.5",
     "@types/uuid": "^10.0.0",
     "@types/winston": "^2.4.4",
-    "@types/ws": "^8.5.12",
-    "prisma": "^6.5.0",
-    "rimraf": "^5.0.5",
+    "@types/ws": "^8.5.13",
+    "prisma": "^6.19.2",
+    "rimraf": "^6.0.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0",
-    "axios": "^1.7.5",
+    "@prisma/client": "^6.19.2",
+    "axios": "^1.13.5",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "env-var": "^7.4.1",
-    "express": "^4.18.2",
-    "http-errors": "^2.0.0",
+    "dotenv": "^16.6.1",
+    "env-var": "^7.5.0",
+    "express": "^4.22.1",
+    "http-errors": "^2.0.1",
     "mailersend": "^2.6.0",
-    "socket.io": "^4.8.1",
+    "socket.io": "^4.8.3",
     "uuid": "^10.0.0",
-    "winston": "^3.17.0",
-    "ws": "^8.18.0"
+    "winston": "^3.19.0",
+    "ws": "^8.19.0"
   }
 }
