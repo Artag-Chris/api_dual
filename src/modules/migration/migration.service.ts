@@ -1,5 +1,7 @@
 import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service';
 import { prismaMainService } from '../../database/main/prisma-main.service';
+import LegacyDataService from '../legacy-data/legacy-data.service';
+import MainDataService from '../main-data/main-data.service';
 
 /**************************************************************************************************
  * Servicio de Migración
@@ -10,6 +12,8 @@ import { prismaMainService } from '../../database/main/prisma-main.service';
 
 class MigrationService {
   private static instance: MigrationService;
+  private legacyDataService = LegacyDataService.getInstance();
+  private mainDataService = MainDataService.getInstance();
 
   constructor() {}
 
@@ -21,62 +25,30 @@ class MigrationService {
   }
 
   /**
-   * Migra datos de la tabla 'something' de legacy a 'TransformedData' en main
-   * Aplica transformaciones necesarias durante el proceso
+   * Obtiene estadísticas generales de migración
    */
-  async migrateSomething() {
+  async getMigrationStatistics() {
     try {
-      // 1. Leer datos de la base de datos legacy
-      const legacyData = await prismaLegacyService.something.findMany();
-
-      if (legacyData.length === 0) {
-        return {
-          success: true,
-          message: 'No hay datos para migrar',
-          migrated: 0
-        };
-      }
-
-      // 2. Transformar los datos
-      const transformedData = legacyData.map(item => ({
-        id: item.id, // Usar el mismo ID o generar uno nuevo con uuid()
-        content: item.message, // Transformación: message -> content
-        // createdAt y updatedAt se generarán automáticamente
-      }));
-
-      // 3. Insertar en la base de datos principal
-      const result = await prismaMainService.transformedData.createMany({
-        data: transformedData,
-        skipDuplicates: true // Evita errores si ya existen registros con el mismo ID
-      });
+      const legacyStats = await this.legacyDataService.getEstadisticasGenerales();
+      const mainStats = await this.mainDataService.getEstadisticasGenerales();
 
       return {
         success: true,
-        message: 'Migración completada exitosamente',
-        migrated: result.count
-      };
-    } catch (error) {
-      console.error('Error durante la migración:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Obtiene estadísticas de ambas bases de datos
-   */
-  async getStatistics() {
-    try {
-      const [legacyCount, mainCount] = await Promise.all([
-        prismaLegacyService.something.count(),
-        prismaMainService.transformedData.count()
-      ]);
-
-      return {
-        legacy: {
-          something: legacyCount
-        },
-        main: {
-          transformedData: mainCount
+        legacy: legacyStats,
+        main: mainStats,
+        comparison: {
+          clientesVsUsuarios: {
+            legacy: legacyStats.clientes,
+            main: mainStats.usuarios
+          },
+          creditosVsEstudios: {
+            legacy: legacyStats.creditos,
+            main: mainStats.productos
+          },
+          pagos: {
+            legacy: legacyStats.pagos,
+            main: mainStats.pagos
+          }
         }
       };
     } catch (error) {
@@ -86,25 +58,54 @@ class MigrationService {
   }
 
   /**
-   * Compara un registro específico entre ambas bases de datos
+   * Valida consistencia de datos entre aplicaciones
    */
-  async compareRecord(id: string) {
+  async validateDataConsistency() {
     try {
-      const [legacyRecord, mainRecord] = await Promise.all([
-        prismaLegacyService.something.findUnique({ where: { id } }),
-        prismaMainService.transformedData.findUnique({ where: { id } })
+      const [legacyClientes, legacyCreditos, mainUsuarios, mainPagos] = await Promise.all([
+        this.legacyDataService.getAllClientes(0, 5),
+        this.legacyDataService.getAllCreditos(0, 5),
+        this.mainDataService.getAllUserClientes(0, 5),
+        this.mainDataService.getAllPagos(0, 5)
       ]);
 
       return {
-        legacy: legacyRecord,
-        main: mainRecord,
-        exists: {
-          inLegacy: !!legacyRecord,
-          inMain: !!mainRecord
+        success: true,
+        dataValidation: {
+          legacyClientsCount: legacyClientes.length,
+          legacyCreditosCount: legacyCreditos.length,
+          mainUsuariosCount: mainUsuarios.length,
+          mainPagosCount: mainPagos.length,
+          status: 'Data retrieved successfully'
         }
       };
     } catch (error) {
-      console.error('Error comparando registro:', error);
+      console.error('Error validando consistencia:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Pre-visualización de datos para migración
+   */
+  async previewMigration(skip: number = 0, take: number = 10) {
+    try {
+      const [clientes, creditos, usuarios] = await Promise.all([
+        this.legacyDataService.getAllClientes(skip, take),
+        this.legacyDataService.getAllCreditos(skip, take),
+        this.mainDataService.getAllUserClientes(skip, take)
+      ]);
+
+      return {
+        success: true,
+        preview: {
+          legacyClientes: clientes,
+          legacyCreditos: creditos,
+          mainUsuarios: usuarios
+        }
+      };
+    } catch (error) {
+      console.error('Error en pre-visualización:', error);
       throw error;
     }
   }

@@ -10,14 +10,14 @@ export class MigrationRoutes {
     const router = Router();
     const controller = new MigrationController();
 
-    // POST /api/migration/migrate - Inicia la migración de datos
-    router.post('/migrate', controller.migrateData);
+    // GET /api/migration/statistics - Obtiene estadísticas de migración
+    router.get('/statistics', controller.getMigrationStatistics);
 
-    // GET /api/migration/statistics - Obtiene estadísticas de ambas DBs
-    router.get('/statistics', controller.getStatistics);
+    // GET /api/migration/validate - Valida consistencia entre DBs
+    router.get('/validate', controller.validateConsistency);
 
-    // GET /api/migration/compare/:id - Compara un registro específico
-    router.get('/compare/:id', controller.compareRecord);
+    // GET /api/migration/preview - Pre-visualiza datos a migrar
+    router.get('/preview', controller.previewMigration);
 
     return router;
   }

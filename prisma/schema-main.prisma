@@ -8,4 +8,1426 @@ datasource dbMain {
   url      = env("DATABASE_URL_MAIN")
 }
 
-// Los modelos se generarán automáticamente con db pull
+model amortizacion {
+  id              Int             @id @default(autoincrement())
+  prestamoID      Int
+  documento       String          @dbMain.VarChar(50)
+  Numero_cuota    String          @dbMain.VarChar(100)
+  capital         Int?            @default(0)
+  interes         Int?            @default(0)
+  aval            Int?            @default(0)
+  IVA             Int             @default(0)
+  pablok          Int             @default(0)
+  seguro          Int?            @default(0)
+  sancion         Int?            @default(0)
+  total_cuota     Int?            @default(0)
+  saldo           String?         @default("0") @dbMain.VarChar(50)
+  fecha_pago      String          @dbMain.VarChar(50)
+  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onUpdate: Restrict, map: "amortizacion_ibfk_1")
+
+  @@index([prestamoID], map: "amortizacion_ibfk_1")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model archivo_migra {
+  documentoNumero String? @dbMain.VarChar(50)
+  documentoTipo   String? @dbMain.VarChar(50)
+  banco           String? @dbMain.VarChar(50)
+  tipoCuenta      String? @dbMain.VarChar(50)
+  numeroCuenta    String? @dbMain.VarChar(50)
+  tipoFamiliar    String? @dbMain.VarChar(50)
+  celFamiliar     String? @dbMain.VarChar(50)
+  nombreFamiliar  String? @dbMain.VarChar(50)
+  tipoPersona     String? @dbMain.VarChar(50)
+  celularPersona  String? @dbMain.VarChar(50)
+  nombrePersona   String? @dbMain.VarChar(50)
+
+  @@ignore
+}
+
+model aval {
+  id   Int @id @default(autoincrement())
+  aval Int
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model bodega {
+  almacen          Int                @id
+  nombre           String             @dbMain.VarChar(100)
+  id_sucursal      Int?
+  activo           Boolean            @default(true)
+  sucursal         sucursal?          @relation(fields: [id_sucursal], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_bodega_sucursal")
+  bodega_categoria bodega_categoria[]
+  inventario       inventario[]
+  pedido_producto  pedido_producto[]
+
+  @@index([id_sucursal], map: "fk_bodega_sucursal")
+}
+
+model bodega_categoria {
+  bodega_id    Int
+  categoria_id Int
+  bodega       bodega    @relation(fields: [bodega_id], references: [almacen], onDelete: NoAction, onUpdate: NoAction, map: "bodega_categoria_ibfk_1")
+  categoria    categoria @relation(fields: [categoria_id], references: [id], onUpdate: Restrict, map: "bodega_categoria_ibfk_2")
+
+  @@id([bodega_id, categoria_id])
+  @@index([categoria_id], map: "categoria_id")
+}
+
+model bolsas {
+  id                        Int                         @id @default(autoincrement())
+  nombre                    String                      @unique(map: "nombre") @dbMain.VarChar(50)
+  codigo                    String                      @dbMain.VarChar(50)
+  estado                    String                      @dbMain.VarChar(50)
+  fecha_registro            DateTime                    @default(now()) @dbMain.Timestamp(0)
+  historial_pagos           historial_pagos[]
+  historial_recaudo_inicial historial_recaudo_inicial[]
+  saldo_anterior            saldo_anterior[]
+
+  @@index([codigo], map: "codigo")
+}
+
+model categoria {
+  id                      Int                       @id
+  nombre                  String                    @dbMain.VarChar(100)
+  bodega_categoria        bodega_categoria[]
+  linea_credito_categoria linea_credito_categoria[]
+  sub_categoria           sub_categoria[]
+}
+
+model cifin {
+  numero_obligacion         String  @dbMain.VarChar(100)
+  estado_obligacion         String  @dbMain.VarChar(100)
+  tipo                      String  @dbMain.VarChar(20)
+  nombre                    String  @dbMain.VarChar(100)
+  fecha_pago                String  @dbMain.VarChar(20)
+  codigo_sucursal           String  @dbMain.VarChar(20)
+  estado_mora               String  @dbMain.VarChar(20)
+  fecha_inicio              String  @dbMain.VarChar(20)
+  fecha_terminar            String  @dbMain.VarChar(20)
+  fecha_exigibilidad        String? @dbMain.VarChar(20)
+  fecha_prescripcion        String? @dbMain.VarChar(20)
+  tipo_pago                 String  @dbMain.VarChar(20)
+  periodo                   String  @dbMain.VarChar(30)
+  numero_cuotas             String  @dbMain.VarChar(20)
+  valor_inicial             String  @dbMain.VarChar(20)
+  valor_cuota               String  @dbMain.VarChar(20)
+  cuotas_canceladas         String  @dbMain.VarChar(20)
+  cuotas_vencidas           String  @dbMain.VarChar(20)
+  saldo_total               String  @dbMain.VarChar(20)
+  linea_credito             String  @dbMain.VarChar(20)
+  tipo_contrato             String  @dbMain.VarChar(20)
+  estado_contrato           String  @dbMain.VarChar(20)
+  obligacion_refinanciada   String  @dbMain.VarChar(20)
+  naturaleza_refinanciacion String  @dbMain.VarChar(20)
+  numero_refinanciacion     String  @dbMain.VarChar(20)
+  direccion                 String  @dbMain.VarChar(250)
+  calidad                   String  @dbMain.VarChar(60)
+  email                     String? @dbMain.VarChar(100)
+  telefono                  String  @dbMain.VarChar(20)
+  documento                 String  @dbMain.VarChar(20)
+  estado                    String  @dbMain.VarChar(20)
+  valor                     String  @dbMain.VarChar(20)
+  valor_mora                String  @dbMain.VarChar(20)
+  origen                    String  @dbMain.VarChar(20)
+  valor_real_pagado         String  @dbMain.VarChar(20)
+  id                        Int     @default(autoincrement())
+
+  @@id([id, nombre])
+}
+
+model codeudor {
+  id             Int       @id @default(autoincrement())
+  titular        String    @dbMain.VarChar(15)
+  codeudor       String    @dbMain.VarChar(15)
+  estado         String    @dbMain.VarChar(15)
+  fecha_registro DateTime? @default(now()) @dbMain.Timestamp(0)
+}
+
+model comentarios {
+  id               Int              @id @default(autoincrement())
+  documento        String           @dbMain.VarChar(50)
+  comentario       String           @dbMain.Text
+  tipo             String           @dbMain.VarChar(50)
+  creador          String           @dbMain.VarChar(120)
+  fecha_registro   DateTime         @default(now()) @dbMain.Timestamp(0)
+  user_cliente     user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "comentarios_ibfk_1")
+  lista_comentario lista_comentario @relation(fields: [tipo], references: [tipo], onUpdate: Restrict, map: "fk_tipo_comentario")
+  user_admin       user_admin       @relation(fields: [creador], references: [nombre_completo], map: "id_nombre_creador")
+
+  @@index([documento], map: "comentarios_ibfk_1")
+  @@index([tipo], map: "id_lista_coentarios")
+  @@index([creador], map: "id_nombre_creador")
+}
+
+model comentarios_referencias {
+  id               Int              @id @default(autoincrement())
+  referencia_id    Int
+  letra            String?          @dbMain.Char(1)
+  comentario       String?          @dbMain.Text
+  tipo             String?          @dbMain.VarChar(50)
+  creador          String?          @dbMain.VarChar(50)
+  fecha_registro   DateTime?        @default(now()) @dbMain.Timestamp(0)
+  info_referencias info_referencias @relation(fields: [referencia_id], references: [id], onDelete: Cascade, map: "id_referenicas_comentarios")
+
+  @@index([referencia_id], map: "id_referenicas_comentarios")
+}
+
+model confirmar_codigo {
+  id             Int      @id @default(autoincrement())
+  documento      String   @dbMain.VarChar(50)
+  intentos       Int
+  telefono       String   @dbMain.VarChar(50)
+  tipo           String   @dbMain.VarChar(50)
+  codigo         Int
+  fecha_registro DateTime @default(now()) @dbMain.Timestamp(0)
+
+  @@index([documento], map: "documento")
+}
+
+model conyuge {
+  id                Int              @id @default(autoincrement())
+  nombres           String           @dbMain.VarChar(100)
+  apellidos         String           @dbMain.VarChar(100)
+  tipo_documento    String           @default("CC") @dbMain.VarChar(50)
+  documento_conyuge String           @dbMain.VarChar(50)
+  documento         String           @unique(map: "documento") @dbMain.VarChar(50)
+  telefono          String           @dbMain.VarChar(20)
+  fecha_registro    DateTime         @default(now()) @dbMain.DateTime(0)
+  lista_documentos  lista_documentos @relation(fields: [tipo_documento], references: [tipo], map: "id_lista_documento")
+  info_personal     info_personal    @relation(fields: [documento], references: [documento], onUpdate: Restrict, map: "id_personal_documento")
+
+  @@index([documento], map: "documento_2")
+  @@index([tipo_documento], map: "id_lista_documento")
+}
+
+model creditos_reenganche {
+  id                                                                         Int             @id @default(autoincrement())
+  id_credito_original                                                        Int
+  id_credito_reenganche                                                      Int
+  fecha_registro                                                             DateTime        @default(now()) @dbMain.Timestamp(0)
+  detalle_credito_creditos_reenganche_id_credito_originalTodetalle_credito   detalle_credito @relation("creditos_reenganche_id_credito_originalTodetalle_credito", fields: [id_credito_original], references: [prestamo_ID], onUpdate: Restrict, map: "id_original_bfk")
+  detalle_credito_creditos_reenganche_id_credito_reengancheTodetalle_credito detalle_credito @relation("creditos_reenganche_id_credito_reengancheTodetalle_credito", fields: [id_credito_reenganche], references: [prestamo_ID], onUpdate: Restrict, map: "id_reenganche_bfk")
+
+  @@index([id_credito_original], map: "id_original_bfk")
+  @@index([id_credito_reenganche], map: "id_reenganche_bfk")
+}
+
+model creditos_refinanciados {
+  id                                                                              Int             @id @default(autoincrement())
+  prestamo_id_cancelado                                                           Int
+  prestamo_id_refinaciado                                                         Int
+  fecha_creacion                                                                  DateTime        @default(now()) @dbMain.Timestamp(0)
+  detalle_credito_creditos_refinanciados_prestamo_id_canceladoTodetalle_credito   detalle_credito @relation("creditos_refinanciados_prestamo_id_canceladoTodetalle_credito", fields: [prestamo_id_cancelado], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_anterior_nfk")
+  detalle_credito_creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito detalle_credito @relation("creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito", fields: [prestamo_id_refinaciado], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_refinanciado_nfk")
+
+  @@index([prestamo_id_cancelado], map: "prestamo_anterior_nfk")
+  @@index([prestamo_id_refinaciado], map: "prestamo_refinanciado_nfk")
+}
+
+model despacho {
+  id                 Int             @id @default(autoincrement())
+  documento          String          @dbMain.VarChar(50)
+  prestamoID         Int
+  lista              String          @dbMain.VarChar(30)
+  sublista           String          @dbMain.VarChar(30)
+  tipo_producto      String          @dbMain.VarChar(30)
+  marca              String          @dbMain.VarChar(30)
+  referencia         String          @dbMain.VarChar(50)
+  cantidad           String          @dbMain.VarChar(50)
+  valor              String          @dbMain.VarChar(50)
+  asesor             String?         @dbMain.VarChar(50)
+  estado             String          @dbMain.VarChar(50)
+  estado_facturacion String          @default("") @dbMain.VarChar(50)
+  estado_despacho    String          @default("") @dbMain.VarChar(50)
+  estado_validar     String          @default("") @dbMain.VarChar(50)
+  proveedor          String?         @dbMain.VarChar(50)
+  fecha_registro     DateTime        @default(now()) @dbMain.Timestamp(0)
+  detalle_credito    detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_ibfk")
+
+  @@index([prestamoID], map: "desembolso_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model detalle_credito {
+  prestamo_ID                                                                            Int                         @id @default(autoincrement())
+  documento                                                                              String                      @dbMain.VarChar(50)
+  tipoCredito                                                                            String                      @default("CREDITO EXPRESS") @dbMain.VarChar(20)
+  valor_prestamo                                                                         String                      @dbMain.VarChar(50)
+  inicial                                                                                Int
+  plazo                                                                                  String                      @dbMain.VarChar(20)
+  numero_cuotas                                                                          String                      @dbMain.VarChar(50)
+  valor_cuota                                                                            String                      @dbMain.VarChar(50)
+  periocidad                                                                             String                      @dbMain.VarChar(50)
+  tasa                                                                                   String                      @dbMain.VarChar(50)
+  dia_pago                                                                               String                      @dbMain.VarChar(10)
+  fecha_Pago                                                                             String                      @dbMain.VarChar(50)
+  estado                                                                                 String                      @default("EN ESTUDIO") @dbMain.VarChar(50)
+  origen                                                                                 String                      @default("NUEVO") @dbMain.VarChar(20)
+  creador                                                                                String?                     @default("EN PROCESO") @dbMain.VarChar(120)
+  fecha_registro                                                                         DateTime                    @default(now()) @dbMain.Timestamp(0)
+  seguro                                                                                 Int
+  iva_aval                                                                               Decimal                     @dbMain.Decimal(10, 2)
+  pablok                                                                                 Int
+  seguro_add                                                                             Decimal                     @dbMain.Decimal(10, 2)
+  fecha_actualizacion                                                                    DateTime?                   @default(now()) @dbMain.Timestamp(0)
+  actualizado_por                                                                        Int?
+  amortizacion                                                                           amortizacion[]
+  creditos_reenganche_creditos_reenganche_id_credito_originalTodetalle_credito           creditos_reenganche[]       @relation("creditos_reenganche_id_credito_originalTodetalle_credito")
+  creditos_reenganche_creditos_reenganche_id_credito_reengancheTodetalle_credito         creditos_reenganche[]       @relation("creditos_reenganche_id_credito_reengancheTodetalle_credito")
+  creditos_refinanciados_creditos_refinanciados_prestamo_id_canceladoTodetalle_credito   creditos_refinanciados[]    @relation("creditos_refinanciados_prestamo_id_canceladoTodetalle_credito")
+  creditos_refinanciados_creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito creditos_refinanciados[]    @relation("creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito")
+  despacho                                                                               despacho[]
+  user_cliente                                                                           user_cliente                @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "detalle_credito_ibfk_1")
+  lista_estado_credito                                                                   lista_estado_credito        @relation(fields: [estado], references: [tipo], map: "id_lista_estatado_credito")
+  lista_origen_credito                                                                   lista_origen_credito        @relation(fields: [origen], references: [tipo], map: "id_lista_origen_credito")
+  lista_tipo_credito                                                                     lista_tipo_credito          @relation(fields: [tipoCredito], references: [tipo], map: "id_lista_tipo_credito")
+  gastos_cartera                                                                         gastos_cartera[]
+  gestion_cartera                                                                        gestion_cartera?
+  historial_pagos                                                                        historial_pagos[]
+  historial_pagos_detallado                                                              historial_pagos_detallado[]
+  historial_reservas                                                                     historial_reservas[]
+  pagos                                                                                  pagos[]
+  pedido                                                                                 pedido[]
+  saldo_inicial                                                                          saldo_inicial?
+  sanciones_condonadas                                                                   sanciones_condonadas[]
+
+  @@index([documento], map: "detalle_credito_ibfk_1")
+  @@index([documento], map: "documento")
+  @@index([estado], map: "id_lista_estatado_credito")
+  @@index([origen], map: "id_lista_origen_credito")
+  @@index([tipoCredito], map: "id_lista_tipo_credito")
+  @@index([documento], map: "idx_detalle_credito_documento")
+  @@index([estado], map: "idx_detalle_credito_estado")
+  @@index([creador], map: "proveedor")
+}
+
+model detalle_transferencia {
+  id            Int       @id @default(autoincrement())
+  desembolso_id Int
+  operacion     String    @dbMain.VarChar(255)
+  correo        String    @dbMain.VarChar(255)
+  nombre        String    @dbMain.VarChar(255)
+  created_at    DateTime? @default(now()) @dbMain.Timestamp(0)
+}
+
+model documentos_estudio {
+  id                 Int          @id @default(autoincrement())
+  documento          String       @dbMain.VarChar(50)
+  tipo               String       @dbMain.VarChar(255)
+  documento_guardado String       @dbMain.Text
+  creador            String       @dbMain.VarChar(120)
+  fecha_registro     DateTime     @default(now()) @dbMain.Timestamp(0)
+  user_cliente       user_cliente @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "documentos_estudio_ibfk_1")
+  user_admin         user_admin   @relation(fields: [creador], references: [nombre_completo], map: "id_lista_admin")
+
+  @@index([documento], map: "documentos_estudio_ibfk_1")
+  @@index([creador], map: "id_lista_admin")
+}
+
+model documentos_registro {
+  id                Int          @id @default(autoincrement())
+  documento         String       @dbMain.VarChar(50)
+  tipo              String       @dbMain.Text
+  documento_guardar String       @dbMain.Text
+  fecha_registro    DateTime     @default(now()) @dbMain.DateTime(0)
+  user_cliente      user_cliente @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "documentos_registro_ibfk_1")
+
+  @@index([documento], map: "documentos_registro_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model estado_cambios_log {
+  id                Int       @id @default(autoincrement())
+  tabla             String    @dbMain.VarChar(50)
+  registro_id       Int
+  estado_anterior   String    @dbMain.VarChar(50)
+  estado_nuevo      String    @dbMain.VarChar(50)
+  usuario_id        Int?
+  observacion       String?   @dbMain.Text
+  fecha_cambio      DateTime? @default(now()) @dbMain.Timestamp(0)
+  accion_inventario String?   @dbMain.VarChar(50)
+
+  @@index([fecha_cambio], map: "idx_fecha_cambio")
+  @@index([tabla, registro_id], map: "idx_tabla_registro")
+  @@index([usuario_id], map: "idx_usuario")
+}
+
+model estudio_de_credito {
+  id                   Int                  @id @default(autoincrement())
+  documento            String               @unique(map: "documento") @dbMain.VarChar(50)
+  sect_financiero      String?              @default("0") @dbMain.VarChar(50)
+  sect_real            String?              @default("0") @dbMain.VarChar(50)
+  sect_coop            String?              @default("0") @dbMain.VarChar(50)
+  sect_telco           String?              @default("0") @dbMain.VarChar(50)
+  score                String?              @default("0") @dbMain.VarChar(50)
+  edad                 String?              @default("0") @dbMain.VarChar(50)
+  observacion          String?              @dbMain.Text
+  estado               String               @dbMain.VarChar(20)
+  creador              Int?
+  fecha_registro       DateTime             @default(now()) @dbMain.Timestamp(0)
+  fecha_actualizacion  DateTime?            @default(now()) @dbMain.Timestamp(0)
+  actualizado_por      Int?
+  lista_estado_credito lista_estado_credito @relation(fields: [estado], references: [tipo], onUpdate: Restrict, map: "estado_estudio_cliente")
+  user_cliente         user_cliente         @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "estudio_de_credito_ibfk_1")
+  estudios_realizados  estudios_realizados?
+
+  @@index([documento], map: "estudio_de_credito_ibfk_1")
+  @@index([estado], map: "id_lista_estudio")
+  @@index([documento], map: "idx_estudio_credito_documento")
+  @@index([estado], map: "idx_estudio_credito_estado")
+}
+
+model estudios_realizados {
+  id                 Int                @id @default(autoincrement())
+  documento          String             @unique(map: "documento") @dbMain.VarChar(50)
+  cupo               String?            @default("0") @dbMain.VarChar(50)
+  cupoDisponible     String             @dbMain.VarChar(50)
+  tasa               Decimal            @dbMain.Decimal(11, 2)
+  plazo              Int
+  creditos_activos   Int?
+  creditos_maximos   Int                @default(2)
+  pagare             String?            @dbMain.VarChar(20)
+  desembolso         String?            @dbMain.VarChar(20)
+  observacion        String?            @dbMain.Text
+  fecha_registro     DateTime           @default(now()) @dbMain.Timestamp(0)
+  estudio_de_credito estudio_de_credito @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "id_estudio_de_credito")
+
+  @@index([documento], map: "estudios_realizados_ibfk_1")
+}
+
+model gastos {
+  id                Int      @id @default(autoincrement())
+  fecha_registro    DateTime @default(now()) @dbMain.DateTime(0)
+  documento_creador String   @default("") @dbMain.VarChar(50)
+  creador           String   @dbMain.VarChar(50)
+  valor             Decimal  @dbMain.Decimal(10, 0)
+  tipo              String   @dbMain.VarChar(50)
+  bolsa             String?  @default("") @dbMain.VarChar(50)
+  documento         String?  @dbMain.Text
+  observacion       String   @dbMain.Text
+}
+
+model gastos_cartera {
+  id                  Int             @id @default(autoincrement())
+  prestamo_id         Int
+  prejuridico         Int
+  juridico            Int
+  fecha_creacion      DateTime        @default(now()) @dbMain.Timestamp(0)
+  fecha_actualizacion DateTime        @default(now()) @dbMain.Timestamp(0)
+  detalle_credito     detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onUpdate: Restrict, map: "fk_detalle_gastos")
+
+  @@index([prestamo_id], map: "fk_detalle_gastos")
+}
+
+model geo_city {
+  id                  String   @id @dbMain.VarChar(36)
+  uuid                String   @dbMain.VarChar(36)
+  isActive            Int      @default(1) @dbMain.TinyInt
+  isArchived          Int      @default(0) @dbMain.TinyInt
+  createDateTime      DateTime @default(now()) @dbMain.DateTime(6)
+  createdBy           String?  @dbMain.VarChar(36)
+  lastChangedDateTime DateTime @default(now()) @dbMain.DateTime(6)
+  lastChangedBy       String?  @dbMain.VarChar(36)
+  ciudad              String   @dbMain.VarChar(80)
+  departamento        String   @dbMain.VarChar(36)
+  code                String   @unique(map: "IDX_697c2517f2fe4072c038bc09e3") @dbMain.VarChar(5)
+
+  @@unique([code, departamento], map: "IDX_00dbd783516ce7991f18aa9233")
+  @@index([departamento], map: "FK_d38b35fbebcdd02e4f40996f05a")
+}
+
+model geo_department {
+  id                  String   @id @dbMain.VarChar(36)
+  uuid                String   @dbMain.VarChar(36)
+  isActive            Int      @default(1) @dbMain.TinyInt
+  isArchived          Int      @default(0) @dbMain.TinyInt
+  createDateTime      DateTime @default(now()) @dbMain.DateTime(6)
+  createdBy           String?  @dbMain.VarChar(36)
+  lastChangedDateTime DateTime @default(now()) @dbMain.DateTime(6)
+  lastChangedBy       String?  @dbMain.VarChar(36)
+  name                String   @dbMain.VarChar(50)
+  code                String   @dbMain.VarChar(4)
+  codigo              String   @dbMain.VarChar(36)
+
+  @@unique([code, codigo], map: "IDX_a4fcd29529b4f0bd19865fb0f5")
+  @@index([codigo], map: "FK_30c10f1e41676404e03a1e4000d")
+}
+
+model gestion_cartera {
+  prestamo_ID     Int             @id
+  documento       String?         @dbMain.VarChar(50)
+  estado          String?         @dbMain.VarChar(50)
+  fecha_pago      DateTime?       @dbMain.DateTime(0)
+  origen          String?         @dbMain.VarChar(255)
+  ruta            String?         @dbMain.VarChar(50)
+  dias            String          @dbMain.VarChar(50)
+  valor           String          @dbMain.VarChar(50)
+  valor_mora      String          @dbMain.VarChar(50)
+  detalle_credito detalle_credito @relation(fields: [prestamo_ID], references: [prestamo_ID], onUpdate: Restrict, map: "prestamoID_bfk")
+}
+
+model historial_pagos {
+  id              Int             @id @default(autoincrement())
+  documento       String          @dbMain.VarChar(50)
+  prestamoID      Int
+  Numero_cuota    Int
+  capital         Int
+  interes         Int
+  aval            Int
+  IVA             Int
+  pablok          Int
+  sanciones       Int
+  prejuridico     Int
+  juridico        Int
+  seguro          Int?            @default(0)
+  total_pagado    Int
+  recibo          String          @dbMain.VarChar(100)
+  agente_creador  String          @dbMain.VarChar(120)
+  bolsa           String?         @default("") @dbMain.VarChar(50)
+  canal           String?         @default("") @dbMain.VarChar(50)
+  tipo_pago       String          @dbMain.VarChar(200)
+  creador         String?         @default("") @dbMain.VarChar(50)
+  fecha_registro  DateTime        @default(now()) @dbMain.Timestamp(0)
+  bolsas          bolsas?         @relation(fields: [bolsa], references: [nombre], onDelete: Restrict, onUpdate: Restrict, map: "bolsa_fk")
+  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_bfk")
+
+  @@index([prestamoID], map: "historial_pagos_ibfk_1")
+  @@index([agente_creador], map: "historial_pagos_ibfk_2")
+  @@index([bolsa], map: "id_bolsa_nombre")
+}
+
+model historial_pagos_detallado {
+  id_historial_pago  Int                                 @id @default(autoincrement())
+  id_pago            Int
+  prestamo_id        Int
+  id_cliente         Int
+  documento          String                              @dbMain.VarChar(50)
+  numero_cuota       Int?
+  capital_pagado     Int?                                @default(0)
+  interes_pagado     Int?                                @default(0)
+  aval_pagado        Int?                                @default(0)
+  iva_pagado         Int?                                @default(0)
+  pablok             Int?                                @default(0)
+  sancion_pagada     Int?                                @default(0)
+  descuento_capital  Int?                                @default(0)
+  descuento_interes  Int?                                @default(0)
+  descuento_aval     Int?                                @default(0)
+  descuento_iva      Int?                                @default(0)
+  descuento_sancion  Int?                                @default(0)
+  total_pagado       Int
+  total_descuento    Int?                                @default(0)
+  tipo_pago          historial_pagos_detallado_tipo_pago
+  id_bolsa_asignada  Int?
+  usuario_aplicacion String                              @dbMain.VarChar(50)
+  fecha_aplicacion   DateTime?                           @default(now()) @dbMain.Timestamp(0)
+  observaciones      String?                             @dbMain.Text
+  pagos              pagos                               @relation(fields: [id_pago], references: [id_pago], onDelete: NoAction, onUpdate: NoAction, map: "historial_pagos_detallado_ibfk_1")
+  detalle_credito    detalle_credito                     @relation(fields: [prestamo_id], references: [prestamo_ID], onDelete: NoAction, onUpdate: NoAction, map: "historial_pagos_detallado_ibfk_2")
+  user_cliente       user_cliente                        @relation(fields: [id_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "historial_pagos_detallado_ibfk_3")
+
+  @@index([id_bolsa_asignada], map: "historial_pagos_detallado_ibfk_4")
+  @@index([documento], map: "idx_documento")
+  @@index([fecha_aplicacion], map: "idx_fecha_aplicacion")
+  @@index([id_cliente], map: "idx_id_cliente")
+  @@index([id_pago], map: "idx_id_pago")
+  @@index([numero_cuota], map: "idx_numero_cuota")
+  @@index([prestamo_id], map: "idx_prestamo_id")
+  @@index([tipo_pago], map: "idx_tipo_pago")
+}
+
+model historial_recaudo_inicial {
+  id             Int           @id @default(autoincrement())
+  prestamoID     Int
+  creador        String        @dbMain.VarChar(100)
+  bolsa          String        @dbMain.VarChar(50)
+  tipo           String        @dbMain.VarChar(50)
+  valor          Int
+  fecha_registro DateTime      @default(now()) @dbMain.DateTime(0)
+  bolsas         bolsas        @relation(fields: [bolsa], references: [nombre], onDelete: Cascade, map: "id_saldo_recaudo_inicial")
+  saldo_inicial  saldo_inicial @relation(fields: [prestamoID], references: [prestamoID], onDelete: Cascade, map: "id_salod_inicialPagos")
+
+  @@index([bolsa], map: "id_saldo_recaudo_inicial")
+  @@index([prestamoID], map: "id_salod_inicialPagos")
+}
+
+model historial_reservas {
+  id              Int                                @id @default(autoincrement())
+  product_id      Int
+  prestamo_ID     Int?
+  estado_anterior historial_reservas_estado_anterior
+  estado_nuevo    historial_reservas_estado_nuevo
+  usuario         String?                            @dbMain.VarChar(50)
+  fecha_cambio    DateTime                           @default(now()) @dbMain.Timestamp(0)
+  motivo          String?                            @dbMain.Text
+  detalle_credito detalle_credito?                   @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: NoAction, onUpdate: NoAction, map: "fk_historial_prestamo")
+  producto        producto                           @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_historial_producto")
+
+  @@index([prestamo_ID], map: "fk_historial_prestamo")
+  @@index([product_id], map: "fk_historial_producto")
+}
+
+model info_contacto {
+  id                      Int                      @id @default(autoincrement())
+  documento               String                   @unique(map: "documento") @dbMain.VarChar(50)
+  genero                  String?                  @dbMain.VarChar(20)
+  celular                 String                   @dbMain.VarChar(50)
+  email                   String                   @dbMain.VarChar(50)
+  estado_civil            String?                  @dbMain.VarChar(20)
+  direccion               String                   @dbMain.Text
+  barrio                  String?                  @dbMain.VarChar(50)
+  ciudad                  String                   @dbMain.VarChar(50)
+  tipo_vivienda           String?                  @dbMain.VarChar(20)
+  telefono_residencial    String?                  @default("0") @dbMain.VarChar(50)
+  tiempo_vivienda         String?                  @dbMain.VarChar(30)
+  fecha_registro          DateTime                 @default(now()) @dbMain.Timestamp(0)
+  lista_civil             lista_civil?             @relation(fields: [estado_civil], references: [tipo], onDelete: Restrict, map: "id_lista_civil")
+  lista_genero            lista_genero?            @relation(fields: [genero], references: [tipo], onDelete: Restrict, map: "id_lista_genero")
+  lista_vivienda          lista_vivienda?          @relation(fields: [tipo_vivienda], references: [tipo], onDelete: Restrict, map: "id_lista_vivienda")
+  listado_tiempo_vivienda listado_tiempo_vivienda? @relation(fields: [tiempo_vivienda], references: [tipo], onDelete: Restrict, map: "id_tiempo_vivienda")
+  user_cliente            user_cliente             @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "info_contacto_ibfk_1")
+
+  @@index([estado_civil], map: "id_lista_civil")
+  @@index([genero], map: "id_lista_genero")
+  @@index([tipo_vivienda], map: "id_lista_vivienda")
+  @@index([tiempo_vivienda], map: "id_tiempo_vivienda")
+}
+
+model info_laboral {
+  id                 Int             @id @default(autoincrement())
+  documento          String          @unique(map: "documento") @dbMain.VarChar(30)
+  ocupacion_oficio   String          @dbMain.VarChar(50)
+  empresa            String          @default("N/A") @dbMain.VarChar(100)
+  direccion_empresa  String          @dbMain.VarChar(100)
+  nit                String          @dbMain.VarChar(50)
+  tipo_contrato      String          @default("N/A") @dbMain.VarChar(50)
+  cargo              String          @default("N/A") @dbMain.VarChar(50)
+  actividadEconomica String          @dbMain.VarChar(50)
+  telefono           String          @default("0") @dbMain.VarChar(30)
+  fecha_vinculacion  DateTime        @dbMain.Date
+  descripcion        String          @dbMain.Text
+  fecha_registro     DateTime        @default(now()) @dbMain.Timestamp(0)
+  id_rango           Int
+  lista_salario      lista_salario   @relation(fields: [id_rango], references: [id], onUpdate: Restrict, map: "fk_info_laboral_id_rango")
+  lista_contrato     lista_contrato  @relation(fields: [tipo_contrato], references: [tipo], map: "id_lista_contrato")
+  lista_ocupacion    lista_ocupacion @relation(fields: [ocupacion_oficio], references: [tipo], map: "id_lista_ocupacion_u_oficio")
+  user_cliente       user_cliente    @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "info_laboral_ibfk_1")
+
+  @@index([id_rango], map: "fk_info_laboral_id_rango")
+  @@index([cargo], map: "id_lista_cargo")
+  @@index([tipo_contrato], map: "id_lista_contrato")
+  @@index([ocupacion_oficio], map: "id_lista_ocupacion_u_oficio")
+}
+
+model info_personal {
+  id               Int              @id @default(autoincrement())
+  nombre           String           @dbMain.VarChar(60)
+  apellido         String           @dbMain.VarChar(60)
+  tipoDocumento    String           @dbMain.VarChar(30)
+  documento        String           @unique(map: "documento") @dbMain.VarChar(50)
+  fecha_nacimiento String           @dbMain.VarChar(250)
+  fecha_expedicion String           @dbMain.VarChar(250)
+  lugar_expedicion String           @dbMain.VarChar(100)
+  estudios         String           @dbMain.VarChar(20)
+  estrato          String           @dbMain.VarChar(20)
+  fecha_registro   DateTime         @default(now()) @dbMain.Timestamp(0)
+  conyuge          conyuge?
+  user_cliente     user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "documento_user_personas")
+  lista_documentos lista_documentos @relation(fields: [tipoDocumento], references: [tipo], map: "id_lista_docuemntos")
+  lista_estrato    lista_estrato    @relation(fields: [estrato], references: [tipo], map: "id_lista_estrato")
+  lista_estudios   lista_estudios   @relation(fields: [estudios], references: [tipo], map: "id_lista_estudios")
+
+  @@index([tipoDocumento], map: "id_lista_docuemntos")
+  @@index([estrato], map: "id_lista_estrato")
+  @@index([estudios], map: "id_lista_estudios")
+}
+
+model info_referencias {
+  id                                                                      Int                       @id @default(autoincrement())
+  documento                                                               String                    @unique(map: "documento") @dbMain.VarChar(50)
+  nombreFamiliar                                                          String?                   @default("") @dbMain.VarChar(100)
+  parentescoFamiliar                                                      String?                   @dbMain.VarChar(30)
+  telefonoFamiliar                                                        String?                   @default("0") @dbMain.VarChar(100)
+  direccion_familiar                                                      String                    @dbMain.VarChar(150)
+  nombreFamiliar2                                                         String?                   @default("") @dbMain.VarChar(100)
+  parentescoFamiliar2                                                     String?                   @dbMain.VarChar(30)
+  celularFamiliar2                                                        String?                   @default("0") @dbMain.VarChar(100)
+  direccion_familiar_2                                                    String                    @dbMain.VarChar(150)
+  nombrePersonal                                                          String?                   @default("") @dbMain.VarChar(100)
+  parentescoPersonal                                                      String?                   @dbMain.VarChar(30)
+  telefonoPersonal                                                        String?                   @default("0") @dbMain.VarChar(100)
+  direcion_personal                                                       String                    @dbMain.VarChar(150)
+  nombrePersonal2                                                         String?                   @default("") @dbMain.VarChar(100)
+  parentescoPersonal2                                                     String?                   @dbMain.VarChar(30)
+  celularPersonal2                                                        String?                   @default("0") @dbMain.VarChar(100)
+  direccion_personal_2                                                    String                    @dbMain.VarChar(150)
+  fecha_registro                                                          DateTime                  @default(now()) @dbMain.Timestamp(0)
+  comentarios_referencias                                                 comentarios_referencias[]
+  lista_parentesco_info_referencias_parentescoFamiliarTolista_parentesco  lista_parentesco?         @relation("info_referencias_parentescoFamiliarTolista_parentesco", fields: [parentescoFamiliar], references: [tipo], onDelete: Restrict, map: "id_parentesco")
+  user_cliente                                                            user_cliente              @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "info_referencias_ibfk_1")
+  lista_parentesco_info_referencias_parentescoFamiliar2Tolista_parentesco lista_parentesco?         @relation("info_referencias_parentescoFamiliar2Tolista_parentesco", fields: [parentescoFamiliar2], references: [tipo], onDelete: Restrict, map: "lista_parentesco_2")
+  lista_parentesco_info_referencias_parentescoPersonalTolista_parentesco  lista_parentesco?         @relation("info_referencias_parentescoPersonalTolista_parentesco", fields: [parentescoPersonal], references: [tipo], onDelete: Restrict, map: "lista_parentesco_3")
+  lista_parentesco_info_referencias_parentescoPersonal2Tolista_parentesco lista_parentesco?         @relation("info_referencias_parentescoPersonal2Tolista_parentesco", fields: [parentescoPersonal2], references: [tipo], onDelete: Restrict, map: "lista_parentesco_4")
+
+  @@index([parentescoFamiliar], map: "id_parentesco")
+  @@index([parentescoFamiliar2], map: "lista_parentesco_2")
+  @@index([parentescoPersonal], map: "lista_parentesco_3")
+  @@index([parentescoPersonal2], map: "lista_parentesco_4")
+}
+
+model inventario {
+  product_id          Int
+  almacen             Int
+  saldo               Int
+  saldo_reservado     Int       @default(0)
+  fecha_actualizacion DateTime? @default(now()) @dbMain.Timestamp(0)
+  producto            producto  @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "inventario_ibfk_1")
+  bodega              bodega    @relation(fields: [almacen], references: [almacen], onDelete: Cascade, onUpdate: Restrict, map: "inventario_ibfk_2")
+
+  @@id([product_id, almacen])
+  @@index([almacen], map: "inventario_ibfk_2")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model inventario_movimientos {
+  id               Int                                    @id @default(autoincrement())
+  product_id       Int
+  almacen          String                                 @default("PRINCIPAL") @dbMain.VarChar(50)
+  tipo_movimiento  inventario_movimientos_tipo_movimiento
+  cantidad         Int
+  saldo_anterior   Int?
+  saldo_nuevo      Int?
+  reserva_anterior Int?
+  reserva_nueva    Int?
+  pedido_id        Int?
+  prestamo_id      Int?
+  usuario_id       Int?
+  observacion      String?                                @dbMain.Text
+  fecha_movimiento DateTime?                              @default(now()) @dbMain.Timestamp(0)
+
+  @@index([fecha_movimiento], map: "idx_fecha_movimiento")
+  @@index([pedido_id], map: "idx_pedido")
+  @@index([prestamo_id], map: "idx_prestamo")
+  @@index([product_id, almacen], map: "idx_product_almacen")
+  @@index([tipo_movimiento], map: "idx_tipo_movimiento")
+}
+
+model inversiones {
+  id                Int      @id @default(autoincrement())
+  fecha_registro    DateTime @default(now()) @dbMain.DateTime(0)
+  documento_creador String?  @default("") @dbMain.VarChar(50)
+  creador           String?  @default("") @dbMain.VarChar(50)
+  valor             Decimal  @dbMain.Decimal(50, 0)
+  tipo              String   @dbMain.VarChar(50)
+  observacion       String   @dbMain.Text
+  bolsa             String?  @default("") @dbMain.VarChar(50)
+}
+
+model linea_credito {
+  id                      Int                       @id @default(autoincrement())
+  nombre                  String                    @dbMain.VarChar(100)
+  linea_credito_categoria linea_credito_categoria[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model linea_credito_categoria {
+  linea_credito_id    Int
+  categoria_id        Int
+  margen              Decimal                        @default(0.00) @dbMain.Decimal(5, 2)
+  transporte          Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  plazo_maximo        Int                            @default(0)
+  tasa                Decimal                        @default(0.00) @dbMain.Decimal(5, 2)
+  aval                Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  iva_aval            Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  inicial             Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  seguro              Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  pablok              Decimal                        @default(0.00) @dbMain.Decimal(10, 2)
+  estado              linea_credito_categoria_estado
+  fecha_creacion      DateTime                       @default(now()) @dbMain.DateTime(0)
+  fecha_actualizacion DateTime                       @default(now()) @dbMain.DateTime(0)
+  actualizado_por     Int?
+  user_admin          user_admin?                    @relation(fields: [actualizado_por], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_act_por_user_admin")
+  categoria           categoria                      @relation(fields: [categoria_id], references: [id], onDelete: Cascade, map: "fk_linea_credito_categoria_categoria")
+  linea_credito       linea_credito                  @relation(fields: [linea_credito_id], references: [id], onDelete: Cascade, map: "fk_linea_credito_categoria_linea_credito")
+
+  @@id([linea_credito_id, categoria_id])
+  @@index([actualizado_por], map: "fk_act_por_user_admin")
+  @@index([categoria_id], map: "idx_categoria_id")
+  @@index([linea_credito_id], map: "idx_linea_credito_id")
+}
+
+model lista_civil {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(20)
+  tipo           String          @unique(map: "tipo_2") @dbMain.VarChar(20)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_contacto  info_contacto[]
+
+  @@index([tipo], map: "tipo")
+}
+
+model lista_comentario {
+  id             Int           @id @default(autoincrement())
+  nombre         String        @dbMain.VarChar(50)
+  tipo           String        @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro DateTime      @default(now()) @dbMain.Timestamp(0)
+  comentarios    comentarios[]
+}
+
+model lista_contrato {
+  id             Int            @id @default(autoincrement())
+  nombre         String         @dbMain.VarChar(50)
+  tipo           String         @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro DateTime       @default(now()) @dbMain.Timestamp(0)
+  info_laboral   info_laboral[]
+}
+
+model lista_documentos {
+  id             Int             @id @default(autoincrement())
+  tipoDocumento  String          @dbMain.VarChar(100)
+  tipo           String          @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro DateTime        @default(now()) @dbMain.DateTime(0)
+  conyuge        conyuge[]
+  info_personal  info_personal[]
+  user_cliente   user_cliente[]
+}
+
+model lista_estado_credito {
+  id                 Int                  @id @default(autoincrement())
+  tipo               String               @unique(map: "tipo") @dbMain.VarChar(50)
+  detalle_credito    detalle_credito[]
+  estudio_de_credito estudio_de_credito[]
+}
+
+model lista_estado_estudio {
+  id             Int      @id @default(autoincrement())
+  nombre         String   @dbMain.VarChar(50)
+  tipo           String   @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro DateTime @default(now()) @dbMain.DateTime(0)
+
+  @@index([tipo], map: "tipo_2")
+}
+
+model lista_estado_mercancia {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(20)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro  DateTime          @default(now()) @dbMain.DateTime(0)
+  lista_mercancia lista_mercancia[]
+}
+
+model lista_estrato {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(20)
+  tipo           String          @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_personal  info_personal[]
+
+  @@index([tipo], map: "tipo_2")
+}
+
+model lista_estudios {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(20)
+  tipo           String          @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_personal  info_personal[]
+}
+
+model lista_gastos {
+  id             Int      @id @default(autoincrement())
+  nombre         String   @dbMain.VarChar(50)
+  codigo         String?  @default("") @dbMain.VarChar(50)
+  tipoGasto      String   @dbMain.VarChar(50)
+  fecha_registro DateTime @default(now()) @dbMain.Timestamp(0)
+}
+
+model lista_genero {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(20)
+  tipo           String          @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_contacto  info_contacto[]
+}
+
+model lista_lista {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(30)
+  tipo           String          @unique(map: "tipo") @dbMain.VarChar(30)
+  zona           String          @dbMain.VarChar(50)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  lista_zona     lista_zona      @relation(fields: [zona], references: [tipo], map: "ID_ZONA_lista")
+  pre_productos  pre_productos[]
+
+  @@index([zona], map: "ID_ZONA_lista")
+}
+
+model lista_marca {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(30)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(30)
+  fecha_registro  DateTime          @default(now()) @dbMain.DateTime(0)
+  lista_mercancia lista_mercancia[]
+  pre_productos   pre_productos[]
+}
+
+model lista_mercancia {
+  id                     Int                    @id @default(autoincrement())
+  producto               String                 @dbMain.VarChar(30)
+  marca                  String                 @dbMain.VarChar(30)
+  referencia             String                 @dbMain.VarChar(50)
+  valor                  String                 @dbMain.VarChar(50)
+  estado                 String                 @dbMain.VarChar(20)
+  fecha_registro         DateTime               @default(now()) @dbMain.DateTime(0)
+  lista_marca            lista_marca            @relation(fields: [marca], references: [tipo], map: "Lista_marca_id")
+  lista_estado_mercancia lista_estado_mercancia @relation(fields: [estado], references: [tipo], map: "id_lista_estado_mercancia")
+  lista_producto         lista_producto         @relation(fields: [producto], references: [tipo], map: "lista_producto_id")
+  lista_referencia       lista_referencia       @relation(fields: [referencia], references: [tipo], map: "lista_referencia_id")
+
+  @@index([marca], map: "Lista_marca_id")
+  @@index([estado], map: "id_lista_estado_mercancia")
+  @@index([producto], map: "lista_producto_id")
+  @@index([referencia], map: "lista_referencia_id")
+}
+
+model lista_ocupacion {
+  id             Int            @id @default(autoincrement())
+  nombre         String         @dbMain.VarChar(50)
+  tipo           String         @unique(map: "tipo_2") @dbMain.VarChar(50)
+  fecha_registro DateTime       @default(now()) @dbMain.Timestamp(0)
+  info_laboral   info_laboral[]
+
+  @@index([tipo], map: "tipo")
+}
+
+model lista_origen_credito {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(20)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro  DateTime          @default(now()) @dbMain.DateTime(0)
+  detalle_credito detalle_credito[]
+}
+
+model lista_parentesco {
+  id                                                                      Int                @id @default(autoincrement())
+  nombre                                                                  String             @dbMain.VarChar(30)
+  tipo                                                                    String             @unique(map: "tipo") @dbMain.VarChar(30)
+  fecha_registro                                                          DateTime           @default(now()) @dbMain.Timestamp(0)
+  info_referencias_info_referencias_parentescoFamiliarTolista_parentesco  info_referencias[] @relation("info_referencias_parentescoFamiliarTolista_parentesco")
+  info_referencias_info_referencias_parentescoFamiliar2Tolista_parentesco info_referencias[] @relation("info_referencias_parentescoFamiliar2Tolista_parentesco")
+  info_referencias_info_referencias_parentescoPersonalTolista_parentesco  info_referencias[] @relation("info_referencias_parentescoPersonalTolista_parentesco")
+  info_referencias_info_referencias_parentescoPersonal2Tolista_parentesco info_referencias[] @relation("info_referencias_parentescoPersonal2Tolista_parentesco")
+}
+
+model lista_permisos {
+  id         Int          @id @default(autoincrement())
+  nombre     String       @dbMain.VarChar(50)
+  user_admin user_admin[]
+}
+
+model lista_producto {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(30)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(30)
+  fecha_registro  DateTime          @default(now()) @dbMain.DateTime(0)
+  lista_mercancia lista_mercancia[]
+  pre_productos   pre_productos[]
+}
+
+model lista_proveedor {
+  id             Int      @id @default(autoincrement())
+  nombre         String   @dbMain.VarChar(100)
+  tipo           String   @dbMain.VarChar(100)
+  fecha_registro DateTime @default(now()) @dbMain.DateTime(0)
+}
+
+model lista_referencia {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(50)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro  DateTime          @default(now()) @dbMain.DateTime(0)
+  lista_mercancia lista_mercancia[]
+  pre_productos   pre_productos[]
+}
+
+model lista_salario {
+  id           Int            @id @default(autoincrement())
+  rango        String         @dbMain.VarChar(50)
+  info_laboral info_laboral[]
+}
+
+model lista_sublista {
+  id             Int      @id @default(autoincrement())
+  nombre         String   @dbMain.VarChar(30)
+  tipo           String   @unique(map: "tipo") @dbMain.VarChar(30)
+  formula        Decimal  @dbMain.Decimal(10, 2)
+  aumento        Int
+  fecha_registro DateTime @default(now()) @dbMain.Timestamp(0)
+}
+
+model lista_tasa {
+  id             Int       @id @default(autoincrement())
+  tasa           Decimal?  @dbMain.Decimal(10, 2)
+  plazo          Int
+  fecha_registro DateTime? @default(now()) @dbMain.DateTime(0)
+}
+
+model lista_tipo_credito {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(20)
+  tipo            String            @unique(map: "tipo") @dbMain.VarChar(20)
+  fecha_registro  DateTime          @default(now()) @dbMain.Timestamp(0)
+  detalle_credito detalle_credito[]
+}
+
+model lista_vivienda {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(20)
+  tipo           String          @unique(map: "tipo_3") @dbMain.VarChar(20)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_contacto  info_contacto[]
+
+  @@index([tipo], map: "tipo")
+  @@index([tipo], map: "tipo_2")
+}
+
+model lista_zona {
+  id             Int           @id @default(autoincrement())
+  nombre         String        @dbMain.VarChar(50)
+  tipo           String        @unique(map: "tipo") @dbMain.VarChar(50)
+  fecha_registro DateTime      @default(now()) @dbMain.DateTime(0)
+  lista_lista    lista_lista[]
+}
+
+model listado_tiempo_vivienda {
+  id             Int             @id @default(autoincrement())
+  nombre         String          @dbMain.VarChar(30)
+  tipo           String          @unique(map: "tipo_2") @dbMain.VarChar(30)
+  fecha_registro DateTime        @default(now()) @dbMain.Timestamp(0)
+  info_contacto  info_contacto[]
+
+  @@index([tipo], map: "tipo")
+}
+
+model marca {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String                @dbMain.VarChar(100)
+  referencia          referencia[]
+  sub_categoria_marca sub_categoria_marca[]
+}
+
+model mi_ruta {
+  id               Int      @id @default(autoincrement())
+  tipo             String   @dbMain.VarChar(50)
+  creador          String   @dbMain.VarChar(50)
+  comentario       String   @dbMain.Text
+  documento        String   @dbMain.VarChar(50)
+  fecha_compromiso String   @dbMain.VarChar(50)
+  fecha_registro   DateTime @default(now()) @dbMain.Timestamp(0)
+  userData         String   @dbMain.VarChar(50)
+}
+
+model pagos {
+  id_pago                   Int                         @id @default(autoincrement())
+  prestamo_id               Int
+  valor_pago                Int
+  fecha_pago                DateTime                    @dbMain.Date
+  hora_pago                 DateTime                    @dbMain.Time(0)
+  canal_pago                pagos_canal_pago
+  medio_pago                pagos_medio_pago
+  tipo_pago                 pagos_tipo_pago
+  numero_cuota              Int?
+  origen                    String                      @dbMain.VarChar(100)
+  id_bolsa_asignada         Int?
+  referencia_id_transaccion String?                     @dbMain.VarChar(100)
+  estado_pago               pagos_estado_pago?          @default(PENDIENTE)
+  observacion               String?                     @dbMain.Text
+  usuario_aplicacion        String                      @dbMain.VarChar(50)
+  fecha_aplicacion          DateTime?                   @dbMain.Timestamp(0)
+  fecha_creacion            DateTime?                   @default(now()) @dbMain.Timestamp(0)
+  historial_pagos_detallado historial_pagos_detallado[]
+  detalle_credito           detalle_credito             @relation(fields: [prestamo_id], references: [prestamo_ID], onUpdate: NoAction, map: "pagos_ibfk_1")
+
+  @@index([id_bolsa_asignada], map: "idx_bolsa")
+  @@index([canal_pago, tipo_pago], map: "idx_canal_tipo")
+  @@index([estado_pago], map: "idx_estado")
+  @@index([numero_cuota], map: "idx_numero_cuota")
+  @@index([prestamo_id, fecha_pago], map: "idx_prestamo_fecha")
+  @@index([usuario_aplicacion], map: "idx_usuario")
+}
+
+model pagos_payvalida {
+  id        Int      @id @default(autoincrement())
+  orden     String   @unique(map: "orden") @dbMain.VarChar(250)
+  estado    String   @dbMain.VarChar(20)
+  monto     String   @dbMain.VarChar(10)
+  fecha     DateTime @default(now()) @dbMain.DateTime(0)
+  documento String   @dbMain.VarChar(20)
+}
+
+model pedido {
+  id                  Int               @id @default(autoincrement())
+  user_cliente_id     Int
+  fecha               DateTime          @default(now()) @dbMain.Timestamp(0)
+  id_asesor           Int?
+  estado              pedido_estado     @default(CREADO)
+  cuota_inicial       Int
+  valor_total         Int
+  prestamo_ID         Int?
+  fecha_actualizacion DateTime?         @default(now()) @dbMain.Timestamp(0)
+  actualizado_por     Int?
+  user_admin          user_admin?       @relation(fields: [id_asesor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_asesor")
+  detalle_credito     detalle_credito?  @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_prestamo")
+  user_cliente        user_cliente      @relation(fields: [user_cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_1")
+  pedido_producto     pedido_producto[]
+
+  @@index([id_asesor], map: "fk_pedido_asesor")
+  @@index([user_cliente_id], map: "idx_pedido_cliente")
+  @@index([estado], map: "idx_pedido_estado")
+  @@index([prestamo_ID], map: "idx_pedido_prestamo")
+  @@index([user_cliente_id], map: "user_cliente_id")
+}
+
+model pedido_producto {
+  pedido_id      Int
+  product_id     Int
+  cantidad_selec Int
+  costo_final    Decimal  @dbMain.Decimal(10, 2)
+  almacen        Int      @default(100)
+  pedido         pedido   @relation(fields: [pedido_id], references: [id], onUpdate: Restrict, map: "pedido_producto_ibfk_1")
+  producto       producto @relation(fields: [product_id], references: [id], onUpdate: Restrict, map: "pedido_producto_ibfk_2")
+  bodega         bodega   @relation(fields: [almacen], references: [almacen], onDelete: NoAction, onUpdate: NoAction, map: "pedido_producto_ibfk_3")
+
+  @@id([pedido_id, product_id])
+  @@index([almacen], map: "almacen")
+  @@index([product_id], map: "pedido_producto_ibfk_2")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model porcentaje_inicial {
+  id             Int         @id @default(autoincrement()) @dbMain.UnsignedInt
+  valor          Decimal     @dbMain.Decimal(5, 2)
+  modificado_por Int?
+  creado         DateTime?   @default(now()) @dbMain.DateTime(0)
+  modificado     DateTime?   @default(now()) @dbMain.DateTime(0)
+  user_admin     user_admin? @relation(fields: [modificado_por], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "modificado_id_usuario")
+
+  @@index([modificado_por], map: "modificado_id_usuario")
+}
+
+model pre_productos {
+  id               Int              @id @default(autoincrement())
+  lista            String           @dbMain.VarChar(30)
+  sublista         String           @dbMain.VarChar(30)
+  tipo_producto    String           @dbMain.VarChar(30)
+  marca            String           @dbMain.VarChar(30)
+  referencia       String           @dbMain.VarChar(50)
+  cantidad         String           @dbMain.VarChar(20)
+  valor            String           @dbMain.VarChar(50)
+  documento        String           @dbMain.VarChar(50)
+  asesor           String           @dbMain.VarChar(100)
+  fecha_registro   DateTime         @default(now()) @dbMain.DateTime(0)
+  user_cliente     user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "id_documento")
+  lista_lista      lista_lista      @relation(fields: [lista], references: [tipo], map: "id_lista_lista")
+  lista_marca      lista_marca      @relation(fields: [marca], references: [tipo], map: "id_lista_marca")
+  lista_referencia lista_referencia @relation(fields: [referencia], references: [tipo], map: "id_lista_referencia")
+  lista_producto   lista_producto   @relation(fields: [tipo_producto], references: [tipo], map: "lista_productos_id")
+
+  @@index([documento], map: "id_documento")
+  @@index([lista], map: "id_lista_lista")
+  @@index([marca], map: "id_lista_marca")
+  @@index([referencia], map: "id_lista_referencia")
+  @@index([sublista], map: "id_lista_sublista")
+  @@index([tipo_producto], map: "lista_productos_id")
+}
+
+model producto {
+  id                     Int                  @id @default(autoincrement())
+  nombre                 String               @dbMain.VarChar(100)
+  costo_unitario         Int
+  referencia_id          Int
+  descripcion            String?              @dbMain.VarChar(255)
+  activo                 Boolean?             @default(true)
+  iva                    Int
+  costo_unitario_con_iva Int
+  fecha_creacion         DateTime?            @default(now()) @dbMain.Timestamp(0)
+  historial_reservas     historial_reservas[]
+  inventario             inventario[]
+  pedido_producto        pedido_producto[]
+  referencia             referencia           @relation(fields: [referencia_id], references: [id], onUpdate: Restrict, map: "producto_ibfk_1")
+
+  @@index([referencia_id], map: "referencia_id")
+}
+
+model redes_sociales {
+  id              Int           @id @default(autoincrement())
+  nombre          String        @dbMain.VarChar(50)
+  url             String        @dbMain.VarChar(500)
+  id_user_cliente Int?
+  user_cliente    user_cliente? @relation(fields: [id_user_cliente], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_redes_sociales_user")
+
+  @@index([id_user_cliente], map: "fk_redes_sociales_user")
+}
+
+model referencia {
+  id       Int        @id @default(autoincrement())
+  nombre   String     @dbMain.VarChar(100)
+  marca_id Int
+  producto producto[]
+  marca    marca      @relation(fields: [marca_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "referencia_ibfk_1")
+
+  @@index([marca_id], map: "marca_id")
+}
+
+model saldo_anterior {
+  id             Int      @id @default(autoincrement())
+  bolsa          String   @dbMain.VarChar(50)
+  documento      String   @dbMain.VarChar(50)
+  saldo          String   @dbMain.VarChar(50)
+  fecha_registro DateTime @default(now()) @dbMain.DateTime(0)
+  bolsas         bolsas   @relation(fields: [bolsa], references: [nombre], onDelete: NoAction, map: "saldo_anterior_ibfk_1")
+
+  @@index([bolsa], map: "saldo_anterior_ibfk_1")
+}
+
+model saldo_anterior_proveedor {
+  id             Int        @id @default(autoincrement())
+  proveedor      String     @dbMain.VarChar(50)
+  documento      String     @dbMain.VarChar(50)
+  saldo          String     @dbMain.VarChar(50)
+  fecha_registro DateTime   @default(now()) @dbMain.Timestamp(0)
+  user_admin     user_admin @relation(fields: [documento], references: [documento], onDelete: NoAction, map: "saldo_anterior_proveedor_ibfk_1")
+
+  @@index([documento], map: "saldo_anterior_proveedor_ibfk_1")
+}
+
+model saldo_inicial {
+  id                        Int                         @id @default(autoincrement())
+  prestamoID                Int                         @unique(map: "prestamoID")
+  documento                 String                      @dbMain.VarChar(50)
+  saldo_Inicial             Int
+  saldo_actual              Int                         @default(0)
+  fecha_registro            DateTime                    @default(now()) @dbMain.DateTime(0)
+  historial_recaudo_inicial historial_recaudo_inicial[]
+  detalle_credito           detalle_credito             @relation(fields: [prestamoID], references: [prestamo_ID], onDelete: Cascade, map: "id_detalle_credito_inicial")
+}
+
+model sanciones_condonadas {
+  id               Int             @id @default(autoincrement())
+  prestamo_id      Int
+  dia_condonado    Int
+  monto_condonado  Int
+  usuario_autoriza Int
+  actualizado      DateTime        @default(now()) @dbMain.Timestamp(0)
+  fecha_registro   DateTime        @default(now()) @dbMain.Timestamp(0)
+  detalle_credito  detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_ibfk_")
+  user_admin       user_admin      @relation(fields: [usuario_autoriza], references: [id], onUpdate: Restrict, map: "user_Admin_ibfk")
+
+  @@index([prestamo_id], map: "prestamo_ibfk_")
+  @@index([usuario_autoriza], map: "user_Admin_ibfk")
+}
+
+model sub_categoria {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String                @dbMain.VarChar(100)
+  categoria_id        Int
+  categoria           categoria             @relation(fields: [categoria_id], references: [id], onUpdate: Restrict, map: "sub_categoria_ibfk_1")
+  sub_categoria_marca sub_categoria_marca[]
+
+  @@index([categoria_id], map: "categoria_id")
+}
+
+model sub_categoria_marca {
+  sub_cat_id    Int
+  marca_id      Int
+  sub_categoria sub_categoria @relation(fields: [sub_cat_id], references: [id], onDelete: Cascade, map: "sub_categoria_marca_ibfk_1")
+  marca         marca         @relation(fields: [marca_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "sub_categoria_marca_ibfk_2")
+
+  @@id([sub_cat_id, marca_id])
+  @@index([marca_id], map: "marca_id")
+}
+
+model sucursal {
+  id      Int      @id @default(autoincrement())
+  nombre  String   @dbMain.VarChar(100)
+  zona_id Int
+  bodega  bodega[]
+  zonas   zonas    @relation(fields: [zona_id], references: [id], onUpdate: Restrict, map: "ifk_zona_id_sucursal")
+
+  @@index([zona_id], map: "ifk_zona_id_sucursal")
+}
+
+model talonario_recibo {
+  id     Int    @id @default(autoincrement())
+  recibo Int
+  nombre String @dbMain.VarChar(100)
+}
+
+model tareasprogramadas {
+  id             Int      @id @default(autoincrement())
+  tarea          String   @dbMain.VarChar(50)
+  fecha_registro DateTime @default(now()) @dbMain.Timestamp(0)
+}
+
+model transferencias {
+  id                Int      @id @default(autoincrement())
+  fecha_registro    DateTime @default(now()) @dbMain.DateTime(0)
+  documento_creador String?  @default("") @dbMain.VarChar(50)
+  creador           String?  @default("") @dbMain.VarChar(50)
+  valor             Decimal  @dbMain.Decimal(10, 0)
+  observacion       String   @dbMain.Text
+  documento_salida  String?  @default("") @dbMain.VarChar(50)
+  salida            String   @dbMain.VarChar(50)
+  documento_ingreso String?  @default("") @dbMain.VarChar(50)
+  ingreso           String   @dbMain.VarChar(50)
+  bolsa             String?  @default("") @dbMain.VarChar(50)
+}
+
+model user_admin {
+  id                       Int                        @id @default(autoincrement())
+  nombre                   String                     @dbMain.VarChar(50)
+  apellido                 String                     @dbMain.VarChar(30)
+  tipo                     String                     @dbMain.VarChar(20)
+  documento                String                     @unique(map: "documento") @dbMain.VarChar(50)
+  telefono                 String                     @dbMain.VarChar(20)
+  email                    String                     @dbMain.Text
+  password                 String                     @dbMain.Text
+  fecha_reistro            DateTime                   @default(now()) @dbMain.Timestamp(0)
+  estado                   user_admin_estado          @default(ACTIVO)
+  nombre_completo          String?                    @unique(map: "nombre_completo") @dbMain.VarChar(120)
+  id_permiso               Int                        @default(5)
+  zona_id                  Int?
+  comentarios              comentarios[]
+  documentos_estudio       documentos_estudio[]
+  linea_credito_categoria  linea_credito_categoria[]
+  pedido                   pedido[]
+  porcentaje_inicial       porcentaje_inicial[]
+  saldo_anterior_proveedor saldo_anterior_proveedor[]
+  sanciones_condonadas     sanciones_condonadas[]
+  lista_permisos           lista_permisos             @relation(fields: [id_permiso], references: [id], map: "fk_useradmin_permiso")
+  zonas                    zonas?                     @relation(fields: [zona_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_useradmin_zona")
+
+  @@index([id_permiso], map: "fk_useradmin_permiso")
+  @@index([zona_id], map: "fk_useradmin_zona")
+}
+
+model user_cliente {
+  id                        Int                           @id @default(autoincrement())
+  nombre                    String                        @dbMain.VarChar(50)
+  apellido                  String                        @dbMain.VarChar(50)
+  tipo                      String                        @dbMain.VarChar(50)
+  documento                 String                        @unique(map: "documento") @dbMain.VarChar(50)
+  telefono                  String                        @dbMain.VarChar(50)
+  email                     String                        @dbMain.VarChar(50)
+  password                  String                        @dbMain.Text
+  fecha_registro            DateTime                      @default(now()) @dbMain.Timestamp(0)
+  nombre_completo           String                        @dbMain.VarChar(100)
+  estado_registro           user_cliente_estado_registro? @default(incompleto)
+  comentarios               comentarios[]
+  detalle_credito           detalle_credito[]
+  documentos_estudio        documentos_estudio[]
+  documentos_registro       documentos_registro[]
+  estudio_de_credito        estudio_de_credito?
+  historial_pagos_detallado historial_pagos_detallado[]
+  info_contacto             info_contacto?
+  info_laboral              info_laboral?
+  info_personal             info_personal?
+  info_referencias          info_referencias?
+  pedido                    pedido[]
+  pre_productos             pre_productos[]
+  redes_sociales            redes_sociales[]
+  lista_documentos          lista_documentos              @relation(fields: [tipo], references: [tipo], map: "id_tipo_documento")
+
+  @@index([tipo], map: "id_tipo_documento")
+}
+
+model zonas {
+  id          Int           @id @default(autoincrement())
+  nombre      String        @dbMain.VarChar(100)
+  descripcion String?       @dbMain.Text
+  estado      zonas_estado? @default(ACTIVA)
+  sucursal    sucursal[]
+  user_admin  user_admin[]
+}
+
+enum historial_reservas_estado_anterior {
+  DISPONIBLE
+  RESERVADO
+  VENDIDO
+  INACTIVO
+}
+
+enum inventario_movimientos_tipo_movimiento {
+  RESERVA
+  LIBERACION
+  DESCUENTO
+}
+
+enum zonas_estado {
+  ACTIVA
+  INACTIVA
+}
+
+enum historial_reservas_estado_nuevo {
+  DISPONIBLE
+  RESERVADO
+  VENDIDO
+  INACTIVO
+}
+
+enum pedido_estado {
+  CREADO
+  RECHAZADO
+  COODEUDOR
+  PENDIENTE_REMISIONAR @map("PENDIENTE REMISIONAR")
+  PENDIENTE_ENTREGAR   @map("PENDIENTE ENTREGAR")
+  ENTREGADO
+  CANCELADO
+}
+
+enum pagos_canal_pago {
+  MANUAL
+  API_PAGOS
+}
+
+enum pagos_medio_pago {
+  EFECTIVO
+  EFECTY
+  TRANSFERENCIA
+  CARD
+}
+
+enum pagos_tipo_pago {
+  CUOTA
+  PAGO_TOTAL
+  CUOTA_INICIAL
+}
+
+enum user_admin_estado {
+  ACTIVO
+  INACTIVO
+  SUSPENDIDO
+}
+
+enum user_cliente_estado_registro {
+  completo
+  incompleto
+  contado
+}
+
+enum linea_credito_categoria_estado {
+  activo
+  inactivo
+}
+
+enum pagos_estado_pago {
+  PENDIENTE
+  APLICADO
+  REVERSADO
+}
+
+enum historial_pagos_detallado_tipo_pago {
+  CUOTA
+  PAGO_TOTAL
+  PAGO_INICIAL
+}

@@ -4,17 +4,20 @@ FROM node:22
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /usr/src/app
 
-# Copia el archivo package.json y pnpm-lock.yaml al directorio de trabajo
+# Copia el archivo package.json y package-lock.json al directorio de trabajo
 COPY package.json ./
 COPY package-lock.json ./
 
-# Instala pnpm y las dependencias del proyecto
-# Nota: Añadimos la instalación de pnpm globalmente antes de usarlo para instalar dependencias
+# Copia los archivos de Prisma necesarios para el postinstall
+COPY prisma ./prisma
+COPY tsconfig.json ./
+
+# Instala las dependencias del proyecto
 RUN npm install 
 
 # Copia el resto de los archivos del proyecto al directorio de trabajo
 COPY . .
 
 # Expone el puerto 35715
-EXPOSE 4000
+EXPOSE 6199
 

@@ -8,4 +8,2032 @@ datasource dbLegacy {
   url      = env("DATABASE_URL_LEGACY")
 }
 
-// Los modelos se generarán automáticamente con db pull
+model acuerdos {
+  id                               Int             @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  fecha                            DateTime        @dbLegacy.Date
+  descripcion                      String          @dbLegacy.LongText
+  estado                           acuerdos_estado @default(Abierto)
+  credito_id                       Int             @dbLegacy.UnsignedInt
+  created_by                       Int             @dbLegacy.UnsignedInt
+  updated_by                       Int?            @dbLegacy.UnsignedInt
+  created_at                       DateTime?       @dbLegacy.Timestamp(0)
+  updated_at                       DateTime?       @dbLegacy.Timestamp(0)
+  users_acuerdos_created_byTousers users           @relation("acuerdos_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "acuerdos_created_by_foreign")
+  creditos                         creditos        @relation(fields: [credito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "acuerdos_credito_id_foreign")
+  users_acuerdos_updated_byTousers users?          @relation("acuerdos_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "acuerdos_updated_by_foreign")
+
+  @@index([created_by], map: "acuerdos_created_by_foreign")
+  @@index([credito_id], map: "acuerdos_credito_id_foreign")
+  @@index([updated_by], map: "acuerdos_updated_by_foreign")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model aliados {
+  id     Int             @dbLegacy.UnsignedInt
+  nombre String          @dbLegacy.VarChar(255)
+  estado aliados_estado? @default(Activo)
+
+  @@ignore
+}
+
+model amortizaciones {
+  id             Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  porc_interes   Float?
+  porc_tea       Float?
+  porc_aval      Float?
+  porc_iva_aval  Float?
+  porc_seguro    Float?
+  cta_capital    Float?
+  cta_aval       Float?
+  cta_iva_aval   Float?
+  total_cta_aval Float?
+  total_cta      Float?
+  precredito_id  Int       @dbLegacy.UnsignedInt
+  user_create_id Int       @dbLegacy.UnsignedInt
+  created_at     DateTime  @default(now()) @dbLegacy.Timestamp(0)
+  user_update_id Int?      @dbLegacy.UnsignedInt
+  updated_at     DateTime? @dbLegacy.Timestamp(0)
+
+  @@index([precredito_id], map: "precredito_id")
+  @@index([user_create_id], map: "user_create_id")
+  @@index([user_update_id], map: "user_update_id")
+}
+
+model anotaciones {
+  id              Int                     @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  proceso_id      Int                     @dbLegacy.UnsignedInt
+  fecha_anotacion DateTime?               @dbLegacy.Date
+  asunto          String                  @dbLegacy.VarChar(255)
+  descripcion     String                  @dbLegacy.LongText
+  recordatorio    DateTime?               @dbLegacy.Date
+  notificado      anotaciones_notificado? @default(No)
+  user_create_id  Int?
+  user_update_id  Int?
+  created_at      DateTime                @default(now()) @dbLegacy.Timestamp(0)
+  updated_at      DateTime?               @dbLegacy.Timestamp(0)
+
+  @@index([proceso_id], map: "proceso_id")
+}
+
+model anuladas {
+  id                                   Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  cliente_id                           Int       @dbLegacy.UnsignedInt
+  factura_id                           Int
+  credito_id                           Int?      @dbLegacy.UnsignedInt
+  precredito_id                        Int?      @dbLegacy.UnsignedInt
+  num_fact                             String    @dbLegacy.VarChar(255)
+  fecha                                String    @dbLegacy.VarChar(255)
+  total                                Float
+  pagos                                String?   @dbLegacy.LongText
+  motivo_anulacion                     String?   @dbLegacy.Text
+  user_anula                           Int       @dbLegacy.UnsignedInt
+  user_create_id                       Int       @dbLegacy.UnsignedInt
+  created_at                           DateTime? @dbLegacy.Timestamp(0)
+  updated_at                           DateTime? @dbLegacy.Timestamp(0)
+  clientes                             clientes  @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "anuladas_cliente_id_foreign")
+  creditos                             creditos? @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "anuladas_credito_id_foreign")
+  users_anuladas_user_anulaTousers     users     @relation("anuladas_user_anulaTousers", fields: [user_anula], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "anuladas_user_anula_foreign")
+  users_anuladas_user_create_idTousers users     @relation("anuladas_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "anuladas_user_create_id_foreign")
+
+  @@index([cliente_id], map: "anuladas_cliente_id_foreign")
+  @@index([credito_id], map: "anuladas_credito_id_foreign")
+  @@index([user_anula], map: "anuladas_user_anula_foreign")
+  @@index([user_create_id], map: "anuladas_user_create_id_foreign")
+}
+
+model auditorias {
+  id         Int                 @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  concepto   auditorias_concepto
+  clave_ini  Int?                @dbLegacy.MediumInt
+  clave_fin  Int?                @dbLegacy.MediumInt
+  created_at DateTime?           @dbLegacy.Timestamp(0)
+  updated_at DateTime?           @dbLegacy.Timestamp(0)
+}
+
+model audits {
+  id             Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  user_id        Int?      @dbLegacy.UnsignedInt
+  event          String    @dbLegacy.VarChar(255)
+  auditable_id   Int       @dbLegacy.UnsignedInt
+  auditable_type String    @dbLegacy.VarChar(255)
+  old_values     String?   @dbLegacy.Text
+  new_values     String?   @dbLegacy.Text
+  url            String?   @dbLegacy.Text
+  ip_address     String?   @dbLegacy.VarChar(45)
+  user_agent     String?   @dbLegacy.VarChar(255)
+  created_at     DateTime? @dbLegacy.Timestamp(0)
+  updated_at     DateTime? @dbLegacy.Timestamp(0)
+
+  @@index([auditable_id, auditable_type], map: "audits_auditable_id_auditable_type_index")
+}
+
+model bancos {
+  id     Int            @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre String         @dbLegacy.VarChar(255)
+  estado bancos_estado? @default(Activo)
+}
+
+model call_busquedas {
+  id         Int                      @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  user_id    Int                      @dbLegacy.UnsignedInt
+  busqueda   call_busquedas_busqueda?
+  rango_ini  DateTime?                @dbLegacy.Date
+  rango_fin  DateTime?                @dbLegacy.Date
+  created_at DateTime?                @dbLegacy.Timestamp(0)
+  updated_at DateTime?                @dbLegacy.Timestamp(0)
+  users      users                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "call_busquedas_user_id_foreign")
+
+  @@index([user_id], map: "call_busquedas_user_id_foreign")
+}
+
+model cancelados {
+  id         Int                @id @dbLegacy.UnsignedInt
+  reporte    cancelados_reporte
+  credito_id Int                @dbLegacy.UnsignedInt
+  created_at DateTime?          @dbLegacy.Timestamp(0)
+  updated_at DateTime?          @dbLegacy.Timestamp(0)
+}
+
+model cartera_negocio {
+  id         Int      @id @default(autoincrement())
+  cartera_id Int      @dbLegacy.UnsignedInt
+  negocio_id Int      @dbLegacy.UnsignedInt
+  carteras   carteras @relation(fields: [cartera_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cartera_negocio_ibfk_1")
+  negocios   negocios @relation(fields: [negocio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cartera_negocio_ibfk_2")
+
+  @@index([cartera_id], map: "cartera_id")
+  @@index([negocio_id], map: "negocio_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model carteras {
+  id                      Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre                  String            @unique(map: "carteras_nombre_unique") @dbLegacy.VarChar(255)
+  estado                  carteras_estado   @default(Activo)
+  min_cuotas              Int
+  max_cuotas              Int
+  tasa                    Float?            @dbLegacy.Float
+  porcentaje_pago_parcial Decimal?          @dbLegacy.Decimal(10, 0)
+  created_at              DateTime?         @dbLegacy.Timestamp(0)
+  updated_at              DateTime?         @dbLegacy.Timestamp(0)
+  amortizacion            String?           @dbLegacy.Text
+  cartera_negocio         cartera_negocio[]
+  egresos                 egresos[]
+  otros_pagos             otros_pagos[]
+  precreditos             precreditos[]
+}
+
+model castigadas {
+  id                                     Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  credito_id                             Int       @dbLegacy.UnsignedInt
+  fecha_limite                           DateTime  @dbLegacy.Date
+  saldo                                  Float
+  user_create_id                         Int       @dbLegacy.UnsignedInt
+  user_update_id                         Int       @dbLegacy.UnsignedInt
+  created_at                             DateTime? @dbLegacy.Timestamp(0)
+  updated_at                             DateTime? @dbLegacy.Timestamp(0)
+  creditos                               creditos  @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "castigadas_credito_id_foreign")
+  users_castigadas_user_create_idTousers users     @relation("castigadas_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "castigadas_user_create_id_foreign")
+  users_castigadas_user_update_idTousers users     @relation("castigadas_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "castigadas_user_update_id_foreign")
+
+  @@index([credito_id], map: "castigadas_credito_id_foreign")
+  @@index([user_create_id], map: "castigadas_user_create_id_foreign")
+  @@index([user_update_id], map: "castigadas_user_update_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model clientes {
+  id                                   Int                             @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre                               String?                         @dbLegacy.VarChar(255)
+  primer_nombre                        String?                         @dbLegacy.VarChar(60)
+  segundo_nombre                       String?                         @dbLegacy.VarChar(60)
+  primer_apellido                      String?                         @dbLegacy.VarChar(60)
+  segundo_apellido                     String?                         @dbLegacy.VarChar(60)
+  tipo_doc                             clientes_tipo_doc               @default(Cedula_Ciudadan_a)
+  num_doc                              String                          @unique(map: "clientes_num_doc_unique") @dbLegacy.VarChar(255)
+  fecha_nacimiento                     String?                         @dbLegacy.VarChar(255)
+  direccion                            String?                         @dbLegacy.VarChar(255)
+  barrio                               String?                         @dbLegacy.VarChar(255)
+  municipio_id                         Int?                            @dbLegacy.UnsignedInt
+  movil                                String                          @dbLegacy.VarChar(255)
+  fijo                                 String?                         @dbLegacy.VarChar(255)
+  email                                String?                         @dbLegacy.VarChar(255)
+  placa                                String?                         @dbLegacy.VarChar(255)
+  ocupacion                            String?                         @dbLegacy.VarChar(255)
+  empresa                              String?                         @dbLegacy.VarChar(255)
+  tipo_actividad                       clientes_tipo_actividad
+  codeudor_id                          Int?                            @dbLegacy.UnsignedInt
+  numero_de_creditos                   Int?
+  user_create_id                       Int                             @dbLegacy.UnsignedInt
+  user_update_id                       Int?                            @dbLegacy.UnsignedInt
+  calificacion                         clientes_calificacion?
+  created_at                           DateTime?                       @dbLegacy.Timestamp(0)
+  updated_at                           DateTime?                       @dbLegacy.Timestamp(0)
+  dir_empresa                          String?                         @dbLegacy.VarChar(255)
+  tel_empresa                          String?                         @dbLegacy.VarChar(255)
+  conyuge_id                           Int?                            @dbLegacy.UnsignedInt
+  genero                               clientes_genero
+  estado_civil                         clientes_estado_civil?
+  fecha_exp                            DateTime?                       @dbLegacy.Date
+  lugar_exp                            String?                         @dbLegacy.VarChar(255)
+  lugar_nacimiento                     String?                         @dbLegacy.VarChar(255)
+  nivel_estudios                       clientes_nivel_estudios?
+  antiguedad_movil                     Int?
+  anos_residencia                      Int?
+  envio_correspondencia                clientes_envio_correspondencia?
+  estrato                              clientes_estrato?
+  meses_residencia                     Int?
+  tipo_vivienda                        clientes_tipo_vivienda?
+  nombre_arrendador                    String?                         @dbLegacy.VarChar(255)
+  telefono_arrendador                  String?                         @dbLegacy.VarChar(255)
+  cargo                                String?                         @dbLegacy.VarChar(255)
+  descripcion_actividad                String?                         @dbLegacy.VarChar(255)
+  doc_empresa                          String?                         @dbLegacy.VarChar(255)
+  fecha_vinculacion                    DateTime?                       @dbLegacy.Date
+  tipo_contrato                        clientes_tipo_contrato?
+  reportado                            clientes_reportado              @default(no)
+  version                              clientes_version                @default(dbgenerated("1"))
+  anuladas                             anuladas[]
+  codeudores                           codeudores?                     @relation(fields: [codeudor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "clientes_codeudor_id_foreign")
+  conyuges                             conyuges?                       @relation(fields: [conyuge_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "clientes_conyuge_id_foreign")
+  municipios                           municipios?                     @relation(fields: [municipio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "clientes_municipio_id_foreign")
+  users_clientes_user_create_idTousers users                           @relation("clientes_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "clientes_user_create_id_foreign")
+  users_clientes_user_update_idTousers users?                          @relation("clientes_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "clientes_user_update_id_foreign")
+  documentos                           documentos[]
+  estudios                             estudios[]
+  precreditos                          precreditos[]
+  soat                                 soat[]
+
+  @@index([codeudor_id], map: "clientes_codeudor_id_foreign")
+  @@index([conyuge_id], map: "clientes_conyuge_id_foreign")
+  @@index([municipio_id], map: "clientes_municipio_id_foreign")
+  @@index([user_create_id], map: "clientes_user_create_id_foreign")
+  @@index([user_update_id], map: "clientes_user_update_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model codeudores {
+  id                                              Int                               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  codeudor                                        codeudores_codeudor
+  nombrec                                         String                            @dbLegacy.VarChar(255)
+  primer_nombrec                                  String?                           @dbLegacy.VarChar(60)
+  segundo_nombrec                                 String?                           @dbLegacy.VarChar(60)
+  primer_apellidoc                                String?                           @dbLegacy.VarChar(60)
+  segundo_apellidoc                               String?                           @dbLegacy.VarChar(60)
+  tipo_docc                                       codeudores_tipo_docc              @default(Cedula_Ciudadan_a)
+  num_docc                                        String                            @dbLegacy.VarChar(255)
+  fecha_nacimientoc                               String?                           @dbLegacy.VarChar(255)
+  direccionc                                      String?                           @dbLegacy.VarChar(255)
+  barrioc                                         String?                           @dbLegacy.VarChar(255)
+  municipioc_id                                   Int?                              @dbLegacy.UnsignedInt
+  movilc                                          String                            @dbLegacy.VarChar(255)
+  fijoc                                           String?                           @dbLegacy.VarChar(255)
+  ocupacionc                                      String?                           @dbLegacy.VarChar(255)
+  empresac                                        String?                           @dbLegacy.VarChar(255)
+  tipo_actividadc                                 codeudores_tipo_actividadc?
+  emailc                                          String?                           @dbLegacy.VarChar(255)
+  placac                                          String?                           @dbLegacy.VarChar(255)
+  created_at                                      DateTime?                         @dbLegacy.Timestamp(0)
+  updated_at                                      DateTime?                         @dbLegacy.Timestamp(0)
+  dir_empresac                                    String?                           @dbLegacy.VarChar(255)
+  tel_empresac                                    String?                           @dbLegacy.VarChar(255)
+  conyuge_id                                      Int?                              @dbLegacy.UnsignedInt
+  nombre                                          String?                           @dbLegacy.VarChar(255)
+  primer_nombre                                   String?                           @dbLegacy.VarChar(60)
+  segundo_nombre                                  String?                           @dbLegacy.VarChar(60)
+  primer_apellido                                 String?                           @dbLegacy.VarChar(60)
+  segundo_apellido                                String?                           @dbLegacy.VarChar(60)
+  genero                                          codeudores_genero
+  tipo_doc                                        codeudores_tipo_doc               @default(Cedula_Ciudadana)
+  num_doc                                         String?                           @dbLegacy.VarChar(255)
+  estado_civil                                    codeudores_estado_civil?
+  fecha_exp                                       DateTime?                         @dbLegacy.Date
+  lugar_exp                                       String?                           @dbLegacy.VarChar(255)
+  fecha_nacimiento                                String?                           @dbLegacy.VarChar(255)
+  lugar_nacimiento                                String?                           @dbLegacy.VarChar(255)
+  nivel_estudios                                  codeudores_nivel_estudios?
+  direccion                                       String?                           @dbLegacy.VarChar(255)
+  barrio                                          String?                           @dbLegacy.VarChar(255)
+  movil                                           String?                           @dbLegacy.VarChar(255)
+  antiguedad_movil                                Int?
+  fijo                                            String?                           @dbLegacy.VarChar(255)
+  email                                           String?                           @dbLegacy.VarChar(255)
+  anos_residencia                                 Int?
+  envio_correspondencia                           codeudores_envio_correspondencia?
+  estrato                                         codeudores_estrato?
+  meses_residencia                                Int?
+  tipo_vivienda                                   codeudores_tipo_vivienda?
+  nombre_arrendador                               String?                           @dbLegacy.VarChar(255)
+  telefono_arrendador                             String?                           @dbLegacy.VarChar(255)
+  tipo_actividad                                  codeudores_tipo_actividad?
+  ocupacion                                       String?                           @dbLegacy.VarChar(255)
+  empresa                                         String?                           @dbLegacy.VarChar(255)
+  dir_empresa                                     String?                           @dbLegacy.VarChar(255)
+  tel_empresa                                     String?                           @dbLegacy.VarChar(255)
+  cargo                                           String?                           @dbLegacy.VarChar(255)
+  descripcion_actividad                           String?                           @dbLegacy.VarChar(255)
+  doc_empresa                                     String?                           @dbLegacy.VarChar(255)
+  fecha_vinculacion                               DateTime?                         @dbLegacy.Date
+  tipo_contrato                                   codeudores_tipo_contrato?
+  reportado                                       codeudores_reportado?
+  municipio_id                                    Int?                              @dbLegacy.UnsignedInt
+  user_create_id                                  Int?                              @dbLegacy.UnsignedInt
+  user_update_id                                  Int?                              @dbLegacy.UnsignedInt
+  version                                         codeudores_version                @default(dbgenerated("1"))
+  clientes                                        clientes[]
+  conyuges                                        conyuges?                         @relation(fields: [conyuge_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "codeudores_conyugec_id_foreign")
+  municipios_codeudores_municipio_idTomunicipios  municipios?                       @relation("codeudores_municipio_idTomunicipios", fields: [municipio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "codeudores_municipio_id_foreign")
+  municipios_codeudores_municipioc_idTomunicipios municipios?                       @relation("codeudores_municipioc_idTomunicipios", fields: [municipioc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "codeudores_municipioc_id_foreign")
+  users_codeudores_user_create_idTousers          users?                            @relation("codeudores_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "codeudores_user_create_id_foreign")
+  users_codeudores_user_update_idTousers          users?                            @relation("codeudores_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "codeudores_user_update_id_foreign")
+  estudios                                        estudios[]
+  soat                                            soat[]
+
+  @@index([conyuge_id], map: "codeudores_conyuge_id_foreign")
+  @@index([municipio_id], map: "codeudores_municipio_id_foreign")
+  @@index([municipioc_id], map: "codeudores_municipioc_id_foreign")
+  @@index([user_create_id], map: "codeudores_user_create_id_foreign")
+  @@index([user_update_id], map: "codeudores_user_update_id_foreign")
+}
+
+model consecutivos {
+  id            Int    @id @default(autoincrement())
+  componente    String @dbLegacy.VarChar(100)
+  prefijo       String @dbLegacy.VarChar(10)
+  incrementable Int
+}
+
+model conyuges {
+  id          Int                @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombrey     String             @dbLegacy.VarChar(255)
+  p_nombrey   String             @dbLegacy.VarChar(255)
+  s_nombrey   String?            @dbLegacy.VarChar(255)
+  p_apellidoy String             @dbLegacy.VarChar(255)
+  s_apellidoy String?            @dbLegacy.VarChar(255)
+  tipo_docy   conyuges_tipo_docy @default(Cedula_Ciudadan_a)
+  num_docy    String             @dbLegacy.VarChar(255)
+  diry        String             @dbLegacy.VarChar(255)
+  movily      String             @dbLegacy.VarChar(255)
+  fijoy       String?            @dbLegacy.VarChar(255)
+  clientes    clientes[]
+  codeudores  codeudores[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model creditos {
+  id                                   Int                     @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  precredito_id                        Int                     @dbLegacy.UnsignedInt
+  cuotas_faltantes                     Int
+  saldo                                Float?
+  saldo_favor                          Float?
+  estado                               creditos_estado
+  rendimiento                          Float
+  valor_credito                        Float
+  castigada                            creditos_castigada?
+  refinanciacion                       creditos_refinanciacion @default(No)
+  end_procredito                       Int
+  end_datacredito                      Int
+  gestor_id                            Int?                    @dbLegacy.UnsignedInt
+  user_create_id                       Int                     @dbLegacy.UnsignedInt
+  user_update_id                       Int                     @dbLegacy.UnsignedInt
+  created_at                           DateTime?               @dbLegacy.Timestamp(0)
+  updated_at                           DateTime?               @dbLegacy.Timestamp(0)
+  credito_refinanciado_id              Int?                    @dbLegacy.UnsignedInt
+  last_llamada_id                      Int?                    @dbLegacy.UnsignedInt
+  recordatorio                         String?                 @dbLegacy.LongText
+  sanciones_debe                       Int?                    @default(0)
+  sanciones_ok                         Int?                    @default(0)
+  sanciones_exoneradas                 Int?                    @default(0)
+  mes                                  creditos_mes?
+  anio                                 Int?
+  calificacion                         creditos_calificacion?
+  permitir_mover_fecha                 Boolean                 @default(false)
+  tags                                 String?                 @dbLegacy.VarChar(256)
+  acuerdos                             acuerdos[]
+  anuladas                             anuladas[]
+  castigadas                           castigadas[]
+  creditos                             creditos?               @relation("creditosTocreditos", fields: [credito_refinanciado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "creditos_credito_refinanciado_id_foreign")
+  other_creditos                       creditos[]              @relation("creditosTocreditos")
+  precreditos                          precreditos             @relation(fields: [precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creditos_precredito_id_foreign")
+  users_creditos_user_create_idTousers users                   @relation("creditos_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creditos_user_create_id_foreign")
+  users_creditos_user_update_idTousers users                   @relation("creditos_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creditos_user_update_id_foreign")
+  documentos                           documentos[]
+  extras                               extras[]
+  facturas                             facturas[]
+  fecha_cobros                         fecha_cobros[]
+  sanciones                            sanciones[]
+
+  @@index([credito_refinanciado_id], map: "creditos_credito_refinanciado_id_foreign")
+  @@index([last_llamada_id], map: "creditos_last_llamada_id_foreign")
+  @@index([precredito_id], map: "creditos_precredito_id_foreign")
+  @@index([user_create_id], map: "creditos_user_create_id_foreign")
+  @@index([user_update_id], map: "creditos_user_update_id_foreign")
+}
+
+model criterios {
+  id          Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  criterio    String    @dbLegacy.VarChar(255)
+  descripcion String    @dbLegacy.LongText
+  created_at  DateTime? @dbLegacy.Timestamp(0)
+  updated_at  DateTime? @dbLegacy.Timestamp(0)
+}
+
+model documentos {
+  id             Int          @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre         String       @dbLegacy.VarChar(255)
+  ruta           String       @dbLegacy.VarChar(255)
+  cliente_id     Int?         @dbLegacy.UnsignedInt
+  precredito_id  Int?         @dbLegacy.UnsignedInt
+  credito_id     Int?         @dbLegacy.UnsignedInt
+  user_create_id Int          @dbLegacy.UnsignedInt
+  created_at     DateTime?    @dbLegacy.Timestamp(0)
+  updated_at     DateTime?    @dbLegacy.Timestamp(0)
+  clientes       clientes?    @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "documentos_cliente_id_foreign")
+  creditos       creditos?    @relation(fields: [credito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "documentos_credito_id_foreign")
+  precreditos    precreditos? @relation(fields: [precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "documentos_precredito_id_foreign")
+  users          users        @relation(fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "documentos_user_create_id_foreign")
+
+  @@index([cliente_id], map: "documentos_cliente_id_foreign")
+  @@index([credito_id], map: "documentos_credito_id_foreign")
+  @@index([precredito_id], map: "documentos_precredito_id_foreign")
+  @@index([user_create_id], map: "documentos_user_create_id_foreign")
+}
+
+model egresos {
+  id                                  Int              @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  punto_id                            Int?             @dbLegacy.UnsignedInt
+  fecha                               String           @dbLegacy.VarChar(255)
+  comprobante_egreso                  String           @dbLegacy.VarChar(255)
+  concepto                            egresos_concepto
+  user_nomina_id                      Int?             @dbLegacy.UnsignedInt
+  proveedor_id                        Int?             @dbLegacy.UnsignedInt
+  tipo                                egresos_tipo
+  banco_id                            Int?             @dbLegacy.UnsignedInt
+  num_consignacion                    String?          @dbLegacy.VarChar(255)
+  valor                               Float
+  observaciones                       String?          @dbLegacy.Text
+  cartera_id                          Int              @dbLegacy.UnsignedInt
+  user_create_id                      Int              @dbLegacy.UnsignedInt
+  user_update_id                      Int              @dbLegacy.UnsignedInt
+  created_at                          DateTime?        @dbLegacy.Timestamp(0)
+  updated_at                          DateTime?        @dbLegacy.Timestamp(0)
+  carteras                            carteras         @relation(fields: [cartera_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "egresos_cartera_id_foreign")
+  users_egresos_user_create_idTousers users            @relation("egresos_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "egresos_user_create_id_foreign")
+  users_egresos_user_update_idTousers users            @relation("egresos_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "egresos_user_update_id_foreign")
+
+  @@index([banco_id], map: "banco_id")
+  @@index([cartera_id], map: "egresos_cartera_id_foreign")
+  @@index([user_create_id], map: "egresos_user_create_id_foreign")
+  @@index([user_update_id], map: "egresos_user_update_id_foreign")
+  @@index([proveedor_id], map: "proveedor_id")
+  @@index([user_nomina_id], map: "user_nomina_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model empresas {
+  id                               Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  regimen                          empresas_regimen?
+  razon_social                     String?           @dbLegacy.VarChar(100)
+  pnombre                          String?           @dbLegacy.VarChar(30)
+  snombre                          String?           @dbLegacy.VarChar(30)
+  papellido                        String?           @dbLegacy.VarChar(30)
+  sapellido                        String?           @dbLegacy.VarChar(30)
+  tipo_doc                         empresas_tipo_doc
+  num_doc                          String            @dbLegacy.VarChar(11)
+  tel1                             Int
+  tel2                             Int?
+  dir                              String            @dbLegacy.VarChar(100)
+  mun_id                           Int?              @dbLegacy.UnsignedInt
+  email                            String?           @dbLegacy.VarChar(60)
+  web                              String?           @dbLegacy.VarChar(30)
+  estado                           empresas_estado?  @default(Activo)
+  created_by                       Int               @dbLegacy.UnsignedInt
+  updated_by                       Int?              @dbLegacy.UnsignedInt
+  created_at                       DateTime?         @dbLegacy.Timestamp(0)
+  updated_at                       DateTime?         @dbLegacy.Timestamp(0)
+  users_empresas_created_byTousers users             @relation("empresas_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "empresas_created_by_foreign")
+  municipios                       municipios?       @relation(fields: [mun_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "empresas_mun_id_foreign")
+  users_empresas_updated_byTousers users?            @relation("empresas_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "empresas_updated_by_foreign")
+
+  @@index([created_by], map: "empresas_created_by_foreign")
+  @@index([mun_id], map: "empresas_mun_id_foreign")
+  @@index([updated_by], map: "empresas_updated_by_foreign")
+}
+
+model est_datacreditos {
+  id       Int        @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  criterio String     @dbLegacy.VarChar(255)
+  puntaje  Int
+  estudios estudios[]
+}
+
+model est_laborales {
+  id       Int        @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  criterio String     @dbLegacy.VarChar(255)
+  puntaje  Int
+  estudios estudios[]
+}
+
+model est_referencias {
+  id       Int        @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  criterio String     @dbLegacy.VarChar(255)
+  puntaje  Int
+  estudios estudios[]
+}
+
+model est_viviendas {
+  id       Int        @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  criterio String     @dbLegacy.VarChar(255)
+  puntaje  Int
+  estudios estudios[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model estudios {
+  id                                   Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  cliente_id                           Int?              @dbLegacy.UnsignedInt
+  codeudor_id                          Int?              @dbLegacy.UnsignedInt
+  funcionario_id                       Int?              @dbLegacy.UnsignedInt
+  estDatacredito_id                    Int?              @dbLegacy.UnsignedInt
+  estLaboral_id                        Int?              @dbLegacy.UnsignedInt
+  estVivienda_id                       Int?              @dbLegacy.UnsignedInt
+  estReferencia_id                     Int?              @dbLegacy.UnsignedInt
+  cal_asesor                           Float?
+  cal_estudio                          Float?
+  observaciones                        String?           @dbLegacy.LongText
+  user_create_id                       Int               @dbLegacy.UnsignedInt
+  user_update_id                       Int               @dbLegacy.UnsignedInt
+  created_at                           DateTime?         @dbLegacy.Timestamp(0)
+  updated_at                           DateTime?         @dbLegacy.Timestamp(0)
+  ref_1                                String?           @dbLegacy.LongText
+  ref_2                                String?           @dbLegacy.LongText
+  ref_3                                String?           @dbLegacy.LongText
+  ref_4                                String?           @dbLegacy.LongText
+  clientes                             clientes?         @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_cliente_id_foreign")
+  codeudores                           codeudores?       @relation(fields: [codeudor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_codeudor_id_foreign")
+  est_datacreditos                     est_datacreditos? @relation(fields: [estDatacredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_estdatacredito_id_foreign")
+  est_laborales                        est_laborales?    @relation(fields: [estLaboral_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_estlaboral_id_foreign")
+  est_referencias                      est_referencias?  @relation(fields: [estReferencia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_estreferencia_id_foreign")
+  est_viviendas                        est_viviendas?    @relation(fields: [estVivienda_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_estvivienda_id_foreign")
+  users_estudios_funcionario_idTousers users?            @relation("estudios_funcionario_idTousers", fields: [funcionario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_funcionario_id_foreign")
+  users_estudios_user_create_idTousers users             @relation("estudios_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_user_create_id_foreign")
+  users_estudios_user_update_idTousers users             @relation("estudios_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "estudios_user_update_id_foreign")
+
+  @@index([cliente_id], map: "estudios_cliente_id_foreign")
+  @@index([codeudor_id], map: "estudios_codeudor_id_foreign")
+  @@index([estDatacredito_id], map: "estudios_estdatacredito_id_foreign")
+  @@index([estLaboral_id], map: "estudios_estlaboral_id_foreign")
+  @@index([estReferencia_id], map: "estudios_estreferencia_id_foreign")
+  @@index([estVivienda_id], map: "estudios_estvivienda_id_foreign")
+  @@index([funcionario_id], map: "estudios_funcionario_id_foreign")
+  @@index([user_create_id], map: "estudios_user_create_id_foreign")
+  @@index([user_update_id], map: "estudios_user_update_id_foreign")
+}
+
+model extras {
+  id                                 Int             @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  fecha                              String          @dbLegacy.VarChar(255)
+  concepto                           extras_concepto
+  estado                             extras_estado
+  valor                              Float
+  descripcion                        String?         @dbLegacy.LongText
+  credito_id                         Int             @dbLegacy.UnsignedInt
+  user_create_id                     Int             @dbLegacy.UnsignedInt
+  user_update_id                     Int             @dbLegacy.UnsignedInt
+  created_at                         DateTime?       @dbLegacy.Timestamp(0)
+  updated_at                         DateTime?       @dbLegacy.Timestamp(0)
+  creditos                           creditos        @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "extras_credito_id_foreign")
+  users_extras_user_create_idTousers users           @relation("extras_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "extras_user_create_id_foreign")
+  users_extras_user_update_idTousers users           @relation("extras_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "extras_user_update_id_foreign")
+
+  @@index([credito_id], map: "extras_credito_id_foreign")
+  @@index([user_create_id], map: "extras_user_create_id_foreign")
+  @@index([user_update_id], map: "extras_user_update_id_foreign")
+}
+
+model fact_precred_conceptos {
+  id            Int                            @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre        String                         @dbLegacy.VarChar(255)
+  estado        fact_precred_conceptos_estado? @default(Activo)
+  valor         Float?
+  created_at    DateTime?                      @dbLegacy.Timestamp(0)
+  updated_at    DateTime?                      @dbLegacy.Timestamp(0)
+  precred_pagos precred_pagos[]
+}
+
+model fact_precreditos {
+  id                                           Int                   @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  precredito_id                                Int                   @dbLegacy.UnsignedInt
+  num_fact                                     String                @unique(map: "fact_precreditos_num_fact_unique") @dbLegacy.VarChar(255)
+  fecha                                        DateTime              @dbLegacy.Date
+  total                                        Float
+  tipo                                         fact_precreditos_tipo
+  banco_id                                     Int?
+  referencia                                   String?               @unique(map: "referencia") @dbLegacy.VarChar(64)
+  user_create_id                               Int                   @dbLegacy.UnsignedInt
+  user_update_id                               Int?                  @dbLegacy.UnsignedInt
+  created_at                                   DateTime?             @dbLegacy.Timestamp(0)
+  updated_at                                   DateTime?             @dbLegacy.Timestamp(0)
+  precreditos                                  precreditos           @relation(fields: [precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fact_precreditos_precredito_id_foreign")
+  users_fact_precreditos_user_create_idTousers users                 @relation("fact_precreditos_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fact_precreditos_user_create_id_foreign")
+  users_fact_precreditos_user_update_idTousers users?                @relation("fact_precreditos_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fact_precreditos_user_update_id_foreign")
+  precred_pagos                                precred_pagos[]
+
+  @@index([precredito_id], map: "fact_precreditos_precredito_id_foreign")
+  @@index([user_create_id], map: "fact_precreditos_user_create_id_foreign")
+  @@index([user_update_id], map: "fact_precreditos_user_update_id_foreign")
+  @@index([num_fact], map: "num_fact")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model facturas {
+  id                                   Int             @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  credito_id                           Int?            @dbLegacy.UnsignedInt
+  num_fact                             String          @dbLegacy.VarChar(255)
+  fecha_str                            String?         @dbLegacy.VarChar(255)
+  total                                Float
+  tipo                                 facturas_tipo
+  banco                                facturas_banco?
+  fecha_proximo_pago                   DateTime?       @dbLegacy.Date
+  user_create_id                       Int             @dbLegacy.UnsignedInt
+  user_update_id                       Int             @dbLegacy.UnsignedInt
+  created_at                           DateTime?       @dbLegacy.Timestamp(0)
+  updated_at                           DateTime?       @dbLegacy.Timestamp(0)
+  ref                                  String?         @dbLegacy.VarChar(255)
+  num_consignacion                     String?         @unique(map: "num_consignacion") @dbLegacy.VarChar(100)
+  fecha                                DateTime?       @dbLegacy.Date
+  creditos                             creditos?       @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "facturas_credito_id_foreign")
+  users_facturas_user_create_idTousers users           @relation("facturas_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "facturas_user_create_id_foreign")
+  users_facturas_user_update_idTousers users           @relation("facturas_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "facturas_user_update_id_foreign")
+
+  @@index([credito_id], map: "facturas_credito_id_foreign")
+  @@index([user_create_id], map: "facturas_user_create_id_foreign")
+  @@index([user_update_id], map: "facturas_user_update_id_foreign")
+}
+
+model fecha_cobros {
+  id         Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  credito_id Int       @dbLegacy.UnsignedInt
+  fecha_pago DateTime  @dbLegacy.Date
+  created_at DateTime? @dbLegacy.Timestamp(0)
+  updated_at DateTime? @dbLegacy.Timestamp(0)
+  creditos   creditos  @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fecha_cobros_credito_id_foreign")
+
+  @@index([credito_id], map: "fecha_cobros_credito_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model firmas {
+  id       Int     @id @default(autoincrement())
+  nombre   String  @dbLegacy.VarChar(255)
+  cargo    String? @dbLegacy.VarChar(126)
+  telefono String? @dbLegacy.VarChar(64)
+  email    String? @dbLegacy.VarChar(126)
+  firma    String? @dbLegacy.LongText
+  html     String? @dbLegacy.LongText
+}
+
+model listas {
+  id             Int           @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre         String        @dbLegacy.VarChar(255)
+  estado         listas_estado @default(Activo)
+  user_create_id Int           @dbLegacy.UnsignedInt
+  user_update_id Int           @dbLegacy.UnsignedInt
+  created_at     DateTime?     @dbLegacy.Timestamp(0)
+  updated_at     DateTime?     @dbLegacy.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model llamadas {
+  id                                   Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  credito_id                           Int       @dbLegacy.UnsignedInt
+  criterio_id                          Int       @dbLegacy.UnsignedInt
+  agenda                               DateTime? @dbLegacy.Date
+  efectiva                             Int?      @dbLegacy.TinyInt
+  observaciones                        String?   @dbLegacy.LongText
+  user_create_id                       Int       @dbLegacy.UnsignedInt
+  user_update_id                       Int       @dbLegacy.UnsignedInt
+  created_at                           DateTime? @dbLegacy.Timestamp(0)
+  updated_at                           DateTime? @dbLegacy.Timestamp(0)
+  users_llamadas_user_create_idTousers users     @relation("llamadas_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "llamadas_user_create_id_foreign")
+  users_llamadas_user_update_idTousers users     @relation("llamadas_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "llamadas_user_update_id_foreign")
+
+  @@index([credito_id], map: "llamadas_credito_id_foreign")
+  @@index([criterio_id], map: "llamadas_criterio_id_foreign")
+  @@index([user_create_id], map: "llamadas_user_create_id_foreign")
+  @@index([user_update_id], map: "llamadas_user_update_id_foreign")
+}
+
+model loads {
+  id         Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  filename   String?   @dbLegacy.VarChar(255)
+  created_by Int       @dbLegacy.UnsignedInt
+  created_at DateTime? @dbLegacy.Timestamp(0)
+  updated_at DateTime? @dbLegacy.Timestamp(0)
+  users      users     @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "loads_created_by_foreign")
+  masivos    masivos[]
+
+  @@index([created_by], map: "loads_created_by_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model masivos {
+  id            Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  fecha         DateTime  @dbLegacy.Date
+  documento     String    @dbLegacy.VarChar(255)
+  referencia    String?   @dbLegacy.VarChar(255)
+  monto         Float
+  entidad       String    @dbLegacy.VarChar(255)
+  efectivo      Boolean   @default(false)
+  ref_type      String?   @dbLegacy.VarChar(255)
+  ref_id        String?   @dbLegacy.VarChar(255)
+  ref_recibo_id Int
+  load_id       Int       @dbLegacy.UnsignedInt
+  created_at    DateTime? @dbLegacy.Timestamp(0)
+  updated_at    DateTime? @dbLegacy.Timestamp(0)
+  loads         loads     @relation(fields: [load_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "masivos_load_id_foreign")
+
+  @@index([load_id], map: "masivos_load_id_foreign")
+}
+
+model mensajes {
+  id             Int             @unique(map: "id") @dbLegacy.UnsignedInt
+  nombre         String          @unique(map: "nombre") @dbLegacy.VarChar(255)
+  estado         mensajes_estado @default(dbgenerated("1"))
+  mensaje        String          @dbLegacy.VarChar(255)
+  user_create_id Int             @dbLegacy.UnsignedInt
+  user_update_id Int             @dbLegacy.UnsignedInt
+  created_at     DateTime?       @dbLegacy.Timestamp(0)
+  updated_at     DateTime?       @dbLegacy.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model migrations {
+  migration String @dbLegacy.VarChar(255)
+  batch     Int
+
+  @@ignore
+}
+
+model municipios {
+  id                                              Int          @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre                                          String       @dbLegacy.VarChar(255)
+  departamento                                    String       @dbLegacy.VarChar(255)
+  codigo_municipio                                String?      @dbLegacy.VarChar(11)
+  codigo_departamento                             String?      @dbLegacy.VarChar(11)
+  clientes                                        clientes[]
+  codeudores_codeudores_municipio_idTomunicipios  codeudores[] @relation("codeudores_municipio_idTomunicipios")
+  codeudores_codeudores_municipioc_idTomunicipios codeudores[] @relation("codeudores_municipioc_idTomunicipios")
+  empresas                                        empresas[]
+  puntos                                          puntos[]
+  terceros                                        terceros[]
+}
+
+model negocios {
+  id              Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre          String            @dbLegacy.VarChar(255)
+  descripcion     String?           @dbLegacy.LongText
+  created_at      DateTime?         @dbLegacy.Timestamp(0)
+  updated_at      DateTime?         @dbLegacy.Timestamp(0)
+  cartera_negocio cartera_negocio[]
+}
+
+model oauth_access_token_scopes {
+  id                  Int                 @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  access_token_id     String              @dbLegacy.VarChar(40)
+  scope_id            String              @dbLegacy.VarChar(40)
+  created_at          DateTime?           @dbLegacy.Timestamp(0)
+  updated_at          DateTime?           @dbLegacy.Timestamp(0)
+  oauth_access_tokens oauth_access_tokens @relation(fields: [access_token_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_access_token_scopes_access_token_id_foreign")
+  oauth_scopes        oauth_scopes        @relation(fields: [scope_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_access_token_scopes_scope_id_foreign")
+
+  @@index([access_token_id], map: "oauth_access_token_scopes_access_token_id_index")
+  @@index([scope_id], map: "oauth_access_token_scopes_scope_id_index")
+}
+
+model oauth_access_tokens {
+  id                        String                      @id @dbLegacy.VarChar(40)
+  session_id                Int                         @dbLegacy.UnsignedInt
+  expire_time               Int
+  created_at                DateTime?                   @dbLegacy.Timestamp(0)
+  updated_at                DateTime?                   @dbLegacy.Timestamp(0)
+  oauth_access_token_scopes oauth_access_token_scopes[]
+  oauth_sessions            oauth_sessions              @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_access_tokens_session_id_foreign")
+  oauth_refresh_tokens      oauth_refresh_tokens?
+
+  @@unique([id, session_id], map: "oauth_access_tokens_id_session_id_unique")
+  @@index([session_id], map: "oauth_access_tokens_session_id_index")
+}
+
+model oauth_auth_code_scopes {
+  id               Int              @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  auth_code_id     String           @dbLegacy.VarChar(40)
+  scope_id         String           @dbLegacy.VarChar(40)
+  created_at       DateTime?        @dbLegacy.Timestamp(0)
+  updated_at       DateTime?        @dbLegacy.Timestamp(0)
+  oauth_auth_codes oauth_auth_codes @relation(fields: [auth_code_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_auth_code_scopes_auth_code_id_foreign")
+  oauth_scopes     oauth_scopes     @relation(fields: [scope_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_auth_code_scopes_scope_id_foreign")
+
+  @@index([auth_code_id], map: "oauth_auth_code_scopes_auth_code_id_index")
+  @@index([scope_id], map: "oauth_auth_code_scopes_scope_id_index")
+}
+
+model oauth_auth_codes {
+  id                     String                   @id @dbLegacy.VarChar(40)
+  session_id             Int                      @dbLegacy.UnsignedInt
+  redirect_uri           String                   @dbLegacy.VarChar(255)
+  expire_time            Int
+  created_at             DateTime?                @dbLegacy.Timestamp(0)
+  updated_at             DateTime?                @dbLegacy.Timestamp(0)
+  oauth_auth_code_scopes oauth_auth_code_scopes[]
+  oauth_sessions         oauth_sessions           @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_auth_codes_session_id_foreign")
+
+  @@index([session_id], map: "oauth_auth_codes_session_id_index")
+}
+
+model oauth_client_endpoints {
+  id            Int           @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  client_id     String        @dbLegacy.VarChar(40)
+  redirect_uri  String        @dbLegacy.VarChar(255)
+  created_at    DateTime?     @dbLegacy.Timestamp(0)
+  updated_at    DateTime?     @dbLegacy.Timestamp(0)
+  oauth_clients oauth_clients @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "oauth_client_endpoints_client_id_foreign")
+
+  @@unique([client_id, redirect_uri], map: "oauth_client_endpoints_client_id_redirect_uri_unique")
+}
+
+model oauth_client_grants {
+  id            Int           @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  client_id     String        @dbLegacy.VarChar(40)
+  grant_id      String        @dbLegacy.VarChar(40)
+  created_at    DateTime?     @dbLegacy.Timestamp(0)
+  updated_at    DateTime?     @dbLegacy.Timestamp(0)
+  oauth_clients oauth_clients @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_client_grants_client_id_foreign")
+  oauth_grants  oauth_grants  @relation(fields: [grant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_client_grants_grant_id_foreign")
+
+  @@index([client_id], map: "oauth_client_grants_client_id_index")
+  @@index([grant_id], map: "oauth_client_grants_grant_id_index")
+}
+
+model oauth_client_scopes {
+  id            Int           @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  client_id     String        @dbLegacy.VarChar(40)
+  scope_id      String        @dbLegacy.VarChar(40)
+  created_at    DateTime?     @dbLegacy.Timestamp(0)
+  updated_at    DateTime?     @dbLegacy.Timestamp(0)
+  oauth_clients oauth_clients @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_client_scopes_client_id_foreign")
+  oauth_scopes  oauth_scopes  @relation(fields: [scope_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_client_scopes_scope_id_foreign")
+
+  @@index([client_id], map: "oauth_client_scopes_client_id_index")
+  @@index([scope_id], map: "oauth_client_scopes_scope_id_index")
+}
+
+model oauth_clients {
+  id                     String                   @id @dbLegacy.VarChar(40)
+  secret                 String                   @dbLegacy.VarChar(40)
+  name                   String                   @dbLegacy.VarChar(255)
+  created_at             DateTime?                @dbLegacy.Timestamp(0)
+  updated_at             DateTime?                @dbLegacy.Timestamp(0)
+  oauth_client_endpoints oauth_client_endpoints[]
+  oauth_client_grants    oauth_client_grants[]
+  oauth_client_scopes    oauth_client_scopes[]
+  oauth_sessions         oauth_sessions[]
+
+  @@unique([id, secret], map: "oauth_clients_id_secret_unique")
+}
+
+model oauth_grant_scopes {
+  id           Int          @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  grant_id     String       @dbLegacy.VarChar(40)
+  scope_id     String       @dbLegacy.VarChar(40)
+  created_at   DateTime?    @dbLegacy.Timestamp(0)
+  updated_at   DateTime?    @dbLegacy.Timestamp(0)
+  oauth_grants oauth_grants @relation(fields: [grant_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_grant_scopes_grant_id_foreign")
+  oauth_scopes oauth_scopes @relation(fields: [scope_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_grant_scopes_scope_id_foreign")
+
+  @@index([grant_id], map: "oauth_grant_scopes_grant_id_index")
+  @@index([scope_id], map: "oauth_grant_scopes_scope_id_index")
+}
+
+model oauth_grants {
+  id                  String                @id @dbLegacy.VarChar(40)
+  created_at          DateTime?             @dbLegacy.Timestamp(0)
+  updated_at          DateTime?             @dbLegacy.Timestamp(0)
+  oauth_client_grants oauth_client_grants[]
+  oauth_grant_scopes  oauth_grant_scopes[]
+}
+
+model oauth_refresh_tokens {
+  id                  String              @unique(map: "oauth_refresh_tokens_id_unique") @dbLegacy.VarChar(40)
+  access_token_id     String              @id @dbLegacy.VarChar(40)
+  expire_time         Int
+  created_at          DateTime?           @dbLegacy.Timestamp(0)
+  updated_at          DateTime?           @dbLegacy.Timestamp(0)
+  oauth_access_tokens oauth_access_tokens @relation(fields: [access_token_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_refresh_tokens_access_token_id_foreign")
+}
+
+model oauth_scopes {
+  id                        String                      @id @dbLegacy.VarChar(40)
+  description               String                      @dbLegacy.VarChar(255)
+  created_at                DateTime?                   @dbLegacy.Timestamp(0)
+  updated_at                DateTime?                   @dbLegacy.Timestamp(0)
+  oauth_access_token_scopes oauth_access_token_scopes[]
+  oauth_auth_code_scopes    oauth_auth_code_scopes[]
+  oauth_client_scopes       oauth_client_scopes[]
+  oauth_grant_scopes        oauth_grant_scopes[]
+  oauth_session_scopes      oauth_session_scopes[]
+}
+
+model oauth_session_scopes {
+  id             Int            @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  session_id     Int            @dbLegacy.UnsignedInt
+  scope_id       String         @dbLegacy.VarChar(40)
+  created_at     DateTime?      @dbLegacy.Timestamp(0)
+  updated_at     DateTime?      @dbLegacy.Timestamp(0)
+  oauth_scopes   oauth_scopes   @relation(fields: [scope_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_session_scopes_scope_id_foreign")
+  oauth_sessions oauth_sessions @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "oauth_session_scopes_session_id_foreign")
+
+  @@index([scope_id], map: "oauth_session_scopes_scope_id_index")
+  @@index([session_id], map: "oauth_session_scopes_session_id_index")
+}
+
+model oauth_sessions {
+  id                   Int                       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  client_id            String                    @dbLegacy.VarChar(40)
+  owner_type           oauth_sessions_owner_type @default(user)
+  owner_id             String                    @dbLegacy.VarChar(255)
+  client_redirect_uri  String?                   @dbLegacy.VarChar(255)
+  created_at           DateTime?                 @dbLegacy.Timestamp(0)
+  updated_at           DateTime?                 @dbLegacy.Timestamp(0)
+  oauth_access_tokens  oauth_access_tokens[]
+  oauth_auth_codes     oauth_auth_codes[]
+  oauth_session_scopes oauth_session_scopes[]
+  oauth_clients        oauth_clients             @relation(fields: [client_id], references: [id], onDelete: Cascade, map: "oauth_sessions_client_id_foreign")
+
+  @@index([client_id, owner_type, owner_id], map: "oauth_sessions_client_id_owner_type_owner_id_index")
+}
+
+model oficios {
+  id     Int    @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre String @unique(map: "oficios_nombre_unique") @dbLegacy.VarChar(255)
+}
+
+model otros_pagos {
+  id             Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  factura_id     Int       @dbLegacy.UnsignedInt
+  cartera_id     Int       @dbLegacy.UnsignedInt
+  fecha_factura  String    @dbLegacy.VarChar(255)
+  concepto       String    @dbLegacy.VarChar(255)
+  valor_unitario Float
+  cantidad       Float
+  subtotal       Float
+  created_at     DateTime? @dbLegacy.Timestamp(0)
+  updated_at     DateTime? @dbLegacy.Timestamp(0)
+  carteras       carteras  @relation(fields: [cartera_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "otros_pagos_cartera_id_foreign")
+
+  @@index([cartera_id], map: "otros_pagos_cartera_id_foreign")
+  @@index([factura_id], map: "otros_pagos_factura_id_foreign")
+}
+
+model pagos {
+  id            Int            @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  factura_id    Int            @dbLegacy.UnsignedInt
+  credito_id    Int            @dbLegacy.UnsignedInt
+  concepto      pagos_concepto
+  abono         Float
+  debe          Float
+  descripcion   String?        @dbLegacy.LongText
+  estado        pagos_estado
+  num_cuota     Json?
+  pago_desde    DateTime?      @dbLegacy.Date
+  pago_hasta    DateTime?      @dbLegacy.Date
+  abono_pago_id String?        @dbLegacy.VarChar(255)
+  created_at    DateTime?      @dbLegacy.Timestamp(0)
+  updated_at    DateTime?      @dbLegacy.Timestamp(0)
+
+  @@index([credito_id], map: "pagos_credito_id_foreign")
+  @@index([factura_id], map: "pagos_factura_id_foreign")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model password_resets {
+  email      String   @dbLegacy.VarChar(255)
+  token      String   @dbLegacy.VarChar(255)
+  created_at DateTime @default(now()) @dbLegacy.Timestamp(0)
+
+  @@index([email], map: "password_resets_email_index")
+  @@index([token], map: "password_resets_token_index")
+  @@ignore
+}
+
+model permission_role {
+  permission_id Int         @dbLegacy.UnsignedInt
+  role_id       Int         @dbLegacy.UnsignedInt
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade, map: "permission_role_permission_id_foreign")
+  roles         roles       @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "permission_role_role_id_foreign")
+
+  @@id([permission_id, role_id])
+  @@index([role_id], map: "permission_role_role_id_foreign")
+}
+
+model permissions {
+  id              Int                @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  name            String             @unique(map: "permissions_name_unique") @dbLegacy.VarChar(255)
+  display_name    String?            @dbLegacy.VarChar(255)
+  description     String?            @dbLegacy.VarChar(255)
+  created_at      DateTime?          @dbLegacy.Timestamp(0)
+  updated_at      DateTime?          @dbLegacy.Timestamp(0)
+  status          permissions_status @default(Activo)
+  created_by      Int                @dbLegacy.UnsignedInt
+  updated_by      Int?
+  category        String             @dbLegacy.VarChar(255)
+  permission_role permission_role[]
+}
+
+model precred_pagos {
+  id                                        Int                    @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  fact_precredito_id                        Int                    @dbLegacy.UnsignedInt
+  concepto_id                               Int                    @dbLegacy.UnsignedInt
+  precredito_id                             Int                    @dbLegacy.UnsignedInt
+  subtotal                                  Float
+  user_create_id                            Int                    @dbLegacy.UnsignedInt
+  user_update_id                            Int?                   @dbLegacy.UnsignedInt
+  created_at                                DateTime?              @dbLegacy.Timestamp(0)
+  updated_at                                DateTime?              @dbLegacy.Timestamp(0)
+  fact_precred_conceptos                    fact_precred_conceptos @relation(fields: [concepto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precred_pagos_concepto_id_foreign")
+  fact_precreditos                          fact_precreditos       @relation(fields: [fact_precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precred_pagos_fact_precredito_id_foreign")
+  precreditos                               precreditos            @relation(fields: [precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precred_pagos_precredito_id_foreign")
+  users_precred_pagos_user_create_idTousers users                  @relation("precred_pagos_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precred_pagos_user_create_id_foreign")
+  users_precred_pagos_user_update_idTousers users?                 @relation("precred_pagos_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precred_pagos_user_update_id_foreign")
+
+  @@index([concepto_id], map: "precred_pagos_concepto_id_foreign")
+  @@index([fact_precredito_id], map: "precred_pagos_fact_precredito_id_foreign")
+  @@index([precredito_id], map: "precred_pagos_precredito_id_foreign")
+  @@index([user_create_id], map: "precred_pagos_user_create_id_foreign")
+  @@index([user_update_id], map: "precred_pagos_user_update_id_foreign")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model precreditos {
+  id                                      Int                  @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  num_fact                                String               @unique(map: "precreditos_num_fact_unique") @dbLegacy.VarChar(255)
+  fecha                                   String               @dbLegacy.VarChar(255)
+  cartera_id                              Int                  @dbLegacy.UnsignedInt
+  funcionario_id                          Int                  @dbLegacy.UnsignedInt
+  cliente_id                              Int                  @dbLegacy.UnsignedInt
+  producto_id                             Int?                 @dbLegacy.UnsignedInt
+  vlr_fin                                 Float
+  cencos                                  String?              @dbLegacy.VarChar(6)
+  periodo                                 precreditos_periodo
+  meses                                   Int
+  cuotas                                  Int
+  vlr_cuota                               Float
+  p_fecha                                 String               @dbLegacy.VarChar(255)
+  s_fecha                                 String?              @dbLegacy.VarChar(255)
+  estudio                                 precreditos_estudio
+  cuota_inicial                           Float?
+  s_inicial                               Float?               @default(0)
+  aprobado                                precreditos_aprobado
+  observaciones                           String?              @dbLegacy.LongText
+  user_create_id                          Int                  @dbLegacy.UnsignedInt
+  user_update_id                          Int?                 @dbLegacy.UnsignedInt
+  created_at                              DateTime?            @dbLegacy.Timestamp(0)
+  updated_at                              DateTime?            @dbLegacy.Timestamp(0)
+  version                                 precreditos_version  @default(dbgenerated("1"))
+  creditos                                creditos[]
+  documentos                              documentos[]
+  fact_precreditos                        fact_precreditos[]
+  precred_pagos                           precred_pagos[]
+  carteras                                carteras             @relation(fields: [cartera_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_cartera_id_foreign")
+  clientes                                clientes             @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_cliente_id_foreign")
+  users_precreditos_funcionario_idTousers users                @relation("precreditos_funcionario_idTousers", fields: [funcionario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_funcionario_id_foreign")
+  productos                               productos?           @relation(fields: [producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_producto_id_foreign")
+  users_precreditos_user_create_idTousers users                @relation("precreditos_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_user_create_id_foreign")
+  users_precreditos_user_update_idTousers users?               @relation("precreditos_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "precreditos_user_update_id_foreign")
+  ref_productos                           ref_productos[]
+
+  @@index([cartera_id], map: "precreditos_cartera_id_foreign")
+  @@index([cliente_id], map: "precreditos_cliente_id_foreign")
+  @@index([funcionario_id], map: "precreditos_funcionario_id_foreign")
+  @@index([producto_id], map: "precreditos_producto_id_foreign")
+  @@index([user_create_id], map: "precreditos_user_create_id_foreign")
+  @@index([user_update_id], map: "precreditos_user_update_id_foreign")
+}
+
+model procesos {
+  id             Int      @id @default(autoincrement())
+  juzgado        String?  @dbLegacy.VarChar(250)
+  radicado       String?  @dbLegacy.VarChar(100)
+  fecha_radicado DateTime @dbLegacy.Date
+  credito_id     Int      @dbLegacy.UnsignedInt
+  cliente_id     Int      @dbLegacy.UnsignedInt
+  user_create_id Int      @dbLegacy.UnsignedInt
+  user_update_id Int?     @dbLegacy.UnsignedInt
+  created_at     DateTime @dbLegacy.Date
+  updated_at     DateTime @dbLegacy.Date
+
+  @@index([cliente_id], map: "cliente_id")
+  @@index([credito_id], map: "credito_id")
+  @@index([juzgado], map: "juzgado_id_2")
+  @@index([user_create_id], map: "user_create_id")
+  @@index([user_update_id], map: "user_update_id")
+}
+
+model producto_precredito {
+  id            Int   @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  producto_id   Int?  @dbLegacy.UnsignedInt
+  precredito_id Int?  @dbLegacy.UnsignedInt
+  cantidad      Float
+
+  @@index([precredito_id], map: "precredito_id")
+  @@index([producto_id], map: "productos_producto_id_foreign")
+}
+
+model productos {
+  id               Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre           String            @dbLegacy.VarChar(255)
+  estado           productos_estado? @default(Activo)
+  descripcion      String?           @dbLegacy.LongText
+  tipo_producto_id Int?              @dbLegacy.UnsignedInt
+  referencia       String?           @dbLegacy.VarChar(60)
+  created_by       Int?              @dbLegacy.UnsignedInt
+  updated_by       Int?              @dbLegacy.UnsignedInt
+  created_at       DateTime?         @dbLegacy.Timestamp(0)
+  updated_at       DateTime?         @dbLegacy.Timestamp(0)
+  min_vehiculos    Int?
+  precreditos      precreditos[]
+  ref_productos    ref_productos[]
+}
+
+model proveedores {
+  id             Int                   @id @default(autoincrement())
+  nombre         String                @dbLegacy.VarChar(255)
+  estado         proveedores_estado?   @default(Activo)
+  tipo_doc       proveedores_tipo_doc?
+  num_doc        String?               @unique(map: "num_doc") @dbLegacy.VarChar(100)
+  telefono       String?               @dbLegacy.VarChar(100)
+  direccion      String?               @dbLegacy.VarChar(255)
+  user_create_id Int?
+  user_update_id Int?                  @unique(map: "user_update_id")
+  created_at     DateTime              @default(now()) @dbLegacy.Timestamp(0)
+  updated_at     DateTime?             @default(now()) @dbLegacy.Timestamp(0)
+
+  @@index([user_create_id], map: "user_create_id")
+}
+
+model puntos {
+  id           Int           @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  zona_id      Int?
+  nombre       String        @dbLegacy.VarChar(255)
+  prefijo      String?       @dbLegacy.VarChar(3)
+  increment    Int?
+  estado       puntos_estado @default(Activo)
+  direccion    String?       @dbLegacy.VarChar(255)
+  telefono     String?       @dbLegacy.VarChar(255)
+  descripcion  String?       @dbLegacy.Text
+  municipio_id Int?          @dbLegacy.UnsignedInt
+  created_at   DateTime?     @dbLegacy.Timestamp(0)
+  updated_at   DateTime?     @dbLegacy.Timestamp(0)
+  municipios   municipios?   @relation(fields: [municipio_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "puntos_municipio_id_foreign")
+  users        users[]
+
+  @@index([municipio_id], map: "puntos_municipio_id_foreign")
+}
+
+model ref_productos {
+  id                                    Int                       @id @default(autoincrement())
+  nombre                                String                    @dbLegacy.VarChar(100)
+  estado                                ref_productos_estado?     @default(En_proceso)
+  fecha_exp                             DateTime?                 @dbLegacy.Date
+  costo                                 Float?
+  iva                                   Float?
+  num_fact                              String?                   @dbLegacy.VarChar(60)
+  otros                                 Float?
+  expedido_a                            ref_productos_expedido_a?
+  observaciones                         String?                   @dbLegacy.LongText
+  vehiculo_id                           Int                       @dbLegacy.UnsignedInt
+  producto_id                           Int                       @dbLegacy.UnsignedInt
+  proveedor_id                          Int                       @dbLegacy.UnsignedInt
+  precredito_id                         Int                       @dbLegacy.UnsignedInt
+  created_by                            Int                       @dbLegacy.UnsignedInt
+  updated_by                            Int?                      @dbLegacy.UnsignedInt
+  created_at                            DateTime?                 @dbLegacy.Timestamp(0)
+  updated_at                            DateTime?                 @dbLegacy.Timestamp(0)
+  users_ref_productos_created_byTousers users                     @relation("ref_productos_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_created_by_foreign")
+  precreditos                           precreditos               @relation(fields: [precredito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_precredito_id_foreign")
+  productos                             productos                 @relation(fields: [producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_producto_id_foreign")
+  terceros                              terceros                  @relation(fields: [proveedor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_proveedor_id_foreign")
+  users_ref_productos_updated_byTousers users?                    @relation("ref_productos_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_updated_by_foreign")
+  vehiculos                             vehiculos                 @relation(fields: [vehiculo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ref_productos_vehiculo_id_foreign")
+
+  @@index([created_by], map: "ref_productos_created_by_foreign")
+  @@index([precredito_id], map: "ref_productos_precredito_id_foreign")
+  @@index([producto_id], map: "ref_productos_producto_id_foreign")
+  @@index([proveedor_id], map: "ref_productos_proveedor_id_foreign")
+  @@index([updated_by], map: "ref_productos_updated_by_foreign")
+  @@index([vehiculo_id], map: "ref_productos_vehiculo_id_foreign")
+}
+
+model referencias {
+  id         Int                    @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre     String                 @dbLegacy.VarChar(255)
+  parentesco referencias_parentesco
+  direccion  String                 @dbLegacy.VarChar(255)
+  celular    String                 @dbLegacy.VarChar(255)
+  created_at DateTime?              @dbLegacy.Timestamp(0)
+  updated_at DateTime?              @dbLegacy.Timestamp(0)
+}
+
+model role_user {
+  user_id Int   @dbLegacy.UnsignedInt
+  role_id Int   @dbLegacy.UnsignedInt
+  roles   roles @relation(fields: [role_id], references: [id], onDelete: Cascade, map: "role_user_role_id_foreign")
+  users   users @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "role_user_user_id_foreign")
+
+  @@id([user_id, role_id])
+  @@index([role_id], map: "role_user_role_id_foreign")
+}
+
+model roles {
+  id              Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  name            String            @unique(map: "roles_name_unique") @dbLegacy.VarChar(255)
+  display_name    String?           @dbLegacy.VarChar(255)
+  description     String?           @dbLegacy.VarChar(255)
+  created_at      DateTime?         @dbLegacy.Timestamp(0)
+  updated_at      DateTime?         @dbLegacy.Timestamp(0)
+  permission_role permission_role[]
+  role_user       role_user[]
+}
+
+model sanciones {
+  id         Int              @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  credito_id Int              @dbLegacy.UnsignedInt
+  valor      Float
+  estado     sanciones_estado
+  pago_id    Int?
+  created_at DateTime?        @dbLegacy.Timestamp(0)
+  updated_at DateTime?        @dbLegacy.Timestamp(0)
+  creditos   creditos         @relation(fields: [credito_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sanciones_credito_id_foreign")
+
+  @@index([credito_id], map: "sanciones_credito_id_foreign")
+}
+
+model soat {
+  id                               Int         @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  cliente_id                       Int?        @dbLegacy.UnsignedInt
+  codeudor_id                      Int?        @dbLegacy.UnsignedInt
+  placa                            String?     @dbLegacy.VarChar(255)
+  tipo                             soat_tipo
+  vencimiento                      DateTime    @dbLegacy.Date
+  user_create_id                   Int         @dbLegacy.UnsignedInt
+  user_update_id                   Int         @dbLegacy.UnsignedInt
+  created_at                       DateTime?   @dbLegacy.Timestamp(0)
+  updated_at                       DateTime?   @dbLegacy.Timestamp(0)
+  clientes                         clientes?   @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soat_cliente_id_foreign")
+  codeudores                       codeudores? @relation(fields: [codeudor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soat_codeudor_id_foreign")
+  users_soat_user_create_idTousers users       @relation("soat_user_create_idTousers", fields: [user_create_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soat_user_create_id_foreign")
+  users_soat_user_update_idTousers users       @relation("soat_user_update_idTousers", fields: [user_update_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "soat_user_update_id_foreign")
+
+  @@index([cliente_id], map: "soat_cliente_id_foreign")
+  @@index([codeudor_id], map: "soat_codeudor_id_foreign")
+  @@index([user_create_id], map: "soat_user_create_id_foreign")
+  @@index([user_update_id], map: "soat_user_update_id_foreign")
+}
+
+model sublistas {
+  id             Int              @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre         String           @dbLegacy.VarChar(255)
+  cencos         String           @dbLegacy.VarChar(255)
+  lista_id       Int?             @dbLegacy.UnsignedInt
+  estado         sublistas_estado @default(Activo)
+  user_create_id Int              @dbLegacy.UnsignedInt
+  user_update_id Int              @dbLegacy.UnsignedInt
+  created_at     DateTime?        @dbLegacy.Timestamp(0)
+  updated_at     DateTime?        @dbLegacy.Timestamp(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model terceros {
+  id                               Int               @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  tipo                             terceros_tipo
+  regimen                          terceros_regimen?
+  razon_social                     String?           @dbLegacy.VarChar(255)
+  nombre_comercial                 String?           @dbLegacy.VarChar(255)
+  pnombre                          String?           @dbLegacy.VarChar(30)
+  snombre                          String?           @dbLegacy.VarChar(30)
+  papellido                        String?           @dbLegacy.VarChar(30)
+  sapellido                        String?           @dbLegacy.VarChar(30)
+  tipo_doc                         terceros_tipo_doc
+  num_doc                          String            @dbLegacy.VarChar(30)
+  tel1                             String            @dbLegacy.VarChar(30)
+  tel2                             String?           @dbLegacy.VarChar(30)
+  dir                              String            @dbLegacy.VarChar(100)
+  mun_id                           Int?              @dbLegacy.UnsignedInt
+  email                            String?           @dbLegacy.VarChar(60)
+  created_by                       Int               @dbLegacy.UnsignedInt
+  updated_by                       Int?              @dbLegacy.UnsignedInt
+  created_at                       DateTime?         @dbLegacy.Timestamp(0)
+  updated_at                       DateTime?         @dbLegacy.Timestamp(0)
+  ref_productos                    ref_productos[]
+  users_terceros_created_byTousers users             @relation("terceros_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "terceros_created_by_foreign")
+  municipios                       municipios?       @relation(fields: [mun_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "terceros_mun_id_foreign")
+  users_terceros_updated_byTousers users?            @relation("terceros_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "terceros_updated_by_foreign")
+
+  @@index([mun_id], map: "fk_municipio")
+  @@index([created_by], map: "terceros_created_by_foreign")
+  @@index([updated_by], map: "terceros_updated_by_foreign")
+}
+
+model tipo_productos {
+  id                                     Int                   @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  referencia                             String                @unique(map: "codigo_UNIQUE") @dbLegacy.VarChar(64)
+  nombre                                 String?               @dbLegacy.VarChar(128)
+  estado                                 tipo_productos_estado @default(Activo)
+  created_by                             Int                   @dbLegacy.UnsignedInt
+  updated_by                             Int?                  @dbLegacy.UnsignedInt
+  created_at                             DateTime?             @dbLegacy.Timestamp(0)
+  updated_at                             DateTime?             @dbLegacy.Timestamp(0)
+  users_tipo_productos_created_byTousers users                 @relation("tipo_productos_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "categorias_user_create_id_foreign")
+  users_tipo_productos_updated_byTousers users?                @relation("tipo_productos_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "categorias_user_update_id_foreign")
+
+  @@index([created_by], map: "categorias_user_create_id_foreign_idx")
+  @@index([updated_by], map: "categorias_user_update_id_foreign_idx")
+}
+
+model tipo_vehiculos {
+  id        Int                    @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  nombre    String                 @dbLegacy.VarChar(255)
+  estado    tipo_vehiculos_estado? @default(Activo)
+  vehiculos vehiculos[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id                                                      Int                @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  name                                                    String             @dbLegacy.VarChar(255)
+  estado                                                  users_estado       @default(Activo)
+  rol                                                     users_rol
+  rol_id                                                  Int?               @dbLegacy.UnsignedInt
+  email                                                   String             @unique(map: "users_email_unique") @dbLegacy.VarChar(255)
+  password                                                String             @dbLegacy.VarChar(255)
+  telefono                                                String?            @dbLegacy.VarChar(20)
+  punto_id                                                Int                @dbLegacy.UnsignedInt
+  aliado_id                                               Int?               @dbLegacy.UnsignedInt
+  remember_token                                          String?            @dbLegacy.VarChar(100)
+  created_at                                              DateTime?          @dbLegacy.Timestamp(0)
+  updated_at                                              DateTime?          @dbLegacy.Timestamp(0)
+  num_cuenta                                              String?            @dbLegacy.VarChar(122)
+  banco_id                                                Int?
+  gora                                                    Boolean?
+  acuerdos_acuerdos_created_byTousers                     acuerdos[]         @relation("acuerdos_created_byTousers")
+  acuerdos_acuerdos_updated_byTousers                     acuerdos[]         @relation("acuerdos_updated_byTousers")
+  anuladas_anuladas_user_anulaTousers                     anuladas[]         @relation("anuladas_user_anulaTousers")
+  anuladas_anuladas_user_create_idTousers                 anuladas[]         @relation("anuladas_user_create_idTousers")
+  call_busquedas                                          call_busquedas[]
+  castigadas_castigadas_user_create_idTousers             castigadas[]       @relation("castigadas_user_create_idTousers")
+  castigadas_castigadas_user_update_idTousers             castigadas[]       @relation("castigadas_user_update_idTousers")
+  clientes_clientes_user_create_idTousers                 clientes[]         @relation("clientes_user_create_idTousers")
+  clientes_clientes_user_update_idTousers                 clientes[]         @relation("clientes_user_update_idTousers")
+  codeudores_codeudores_user_create_idTousers             codeudores[]       @relation("codeudores_user_create_idTousers")
+  codeudores_codeudores_user_update_idTousers             codeudores[]       @relation("codeudores_user_update_idTousers")
+  creditos_creditos_user_create_idTousers                 creditos[]         @relation("creditos_user_create_idTousers")
+  creditos_creditos_user_update_idTousers                 creditos[]         @relation("creditos_user_update_idTousers")
+  documentos                                              documentos[]
+  egresos_egresos_user_create_idTousers                   egresos[]          @relation("egresos_user_create_idTousers")
+  egresos_egresos_user_update_idTousers                   egresos[]          @relation("egresos_user_update_idTousers")
+  empresas_empresas_created_byTousers                     empresas[]         @relation("empresas_created_byTousers")
+  empresas_empresas_updated_byTousers                     empresas[]         @relation("empresas_updated_byTousers")
+  estudios_estudios_funcionario_idTousers                 estudios[]         @relation("estudios_funcionario_idTousers")
+  estudios_estudios_user_create_idTousers                 estudios[]         @relation("estudios_user_create_idTousers")
+  estudios_estudios_user_update_idTousers                 estudios[]         @relation("estudios_user_update_idTousers")
+  extras_extras_user_create_idTousers                     extras[]           @relation("extras_user_create_idTousers")
+  extras_extras_user_update_idTousers                     extras[]           @relation("extras_user_update_idTousers")
+  fact_precreditos_fact_precreditos_user_create_idTousers fact_precreditos[] @relation("fact_precreditos_user_create_idTousers")
+  fact_precreditos_fact_precreditos_user_update_idTousers fact_precreditos[] @relation("fact_precreditos_user_update_idTousers")
+  facturas_facturas_user_create_idTousers                 facturas[]         @relation("facturas_user_create_idTousers")
+  facturas_facturas_user_update_idTousers                 facturas[]         @relation("facturas_user_update_idTousers")
+  llamadas_llamadas_user_create_idTousers                 llamadas[]         @relation("llamadas_user_create_idTousers")
+  llamadas_llamadas_user_update_idTousers                 llamadas[]         @relation("llamadas_user_update_idTousers")
+  loads                                                   loads[]
+  precred_pagos_precred_pagos_user_create_idTousers       precred_pagos[]    @relation("precred_pagos_user_create_idTousers")
+  precred_pagos_precred_pagos_user_update_idTousers       precred_pagos[]    @relation("precred_pagos_user_update_idTousers")
+  precreditos_precreditos_funcionario_idTousers           precreditos[]      @relation("precreditos_funcionario_idTousers")
+  precreditos_precreditos_user_create_idTousers           precreditos[]      @relation("precreditos_user_create_idTousers")
+  precreditos_precreditos_user_update_idTousers           precreditos[]      @relation("precreditos_user_update_idTousers")
+  ref_productos_ref_productos_created_byTousers           ref_productos[]    @relation("ref_productos_created_byTousers")
+  ref_productos_ref_productos_updated_byTousers           ref_productos[]    @relation("ref_productos_updated_byTousers")
+  role_user                                               role_user[]
+  soat_soat_user_create_idTousers                         soat[]             @relation("soat_user_create_idTousers")
+  soat_soat_user_update_idTousers                         soat[]             @relation("soat_user_update_idTousers")
+  terceros_terceros_created_byTousers                     terceros[]         @relation("terceros_created_byTousers")
+  terceros_terceros_updated_byTousers                     terceros[]         @relation("terceros_updated_byTousers")
+  tipo_productos_tipo_productos_created_byTousers         tipo_productos[]   @relation("tipo_productos_created_byTousers")
+  tipo_productos_tipo_productos_updated_byTousers         tipo_productos[]   @relation("tipo_productos_updated_byTousers")
+  puntos                                                  puntos             @relation(fields: [punto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_punto_id_foreign")
+
+  @@index([banco_id], map: "banco_id")
+  @@index([punto_id], map: "users_punto_id_foreign")
+}
+
+model variables {
+  id                    Int       @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  meses_min             Int
+  meses_max             Int
+  vlr_dia_sancion       Int
+  vlr_estudio_tipico    Int
+  vlr_estudio_domicilio Int
+  razon_social          String?   @dbLegacy.VarChar(255)
+  nit                   String?   @dbLegacy.VarChar(255)
+  telefono_1            String?   @dbLegacy.VarChar(255)
+  telefono_2            String?   @dbLegacy.VarChar(255)
+  created_at            DateTime? @dbLegacy.Timestamp(0)
+  updated_at            DateTime? @dbLegacy.Timestamp(0)
+}
+
+model vehiculos {
+  id               Int             @id @default(autoincrement()) @dbLegacy.UnsignedInt
+  placa            String?         @dbLegacy.VarChar(255)
+  vencimiento_soat DateTime?       @dbLegacy.Date
+  vencimiento_rtm  DateTime?       @dbLegacy.Date
+  tipo_vehiculo_id Int             @dbLegacy.UnsignedInt
+  ref_productos    ref_productos[]
+  tipo_vehiculos   tipo_vehiculos  @relation(fields: [tipo_vehiculo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vehiculos_tipo_vehiculo_id_foreign")
+
+  @@index([tipo_vehiculo_id], map: "vehiculos_tipo_vehiculo_id_foreign")
+}
+
+model zonas {
+  id             Int       @id @dbLegacy.UnsignedInt
+  nombre         String    @dbLegacy.VarChar(100)
+  descripcion    String?   @dbLegacy.LongText
+  user_create_id Int       @dbLegacy.UnsignedInt
+  user_update_id Int?      @dbLegacy.UnsignedInt
+  created_at     DateTime  @default(now()) @dbLegacy.Timestamp(0)
+  updated_at     DateTime? @dbLegacy.Timestamp(0)
+
+  @@index([user_create_id], map: "user_create_id")
+  @@index([user_update_id], map: "user_update_id")
+}
+
+enum auditorias_concepto {
+  Sanciones
+}
+
+enum cancelados_reporte {
+  datacredito
+  procredito
+}
+
+enum codeudores_codeudor {
+  si
+  no
+}
+
+enum empresas_regimen {
+  Estatal
+  Gran_contribuyente    @map("Gran contribuyente")
+  Regimen_comun         @map("Regimen comun")
+  Regimen_especial      @map("Regimen especial")
+  No_responsable_de_IVA @map("No responsable de IVA")
+}
+
+enum terceros_tipo {
+  Cliente
+  Empleado
+  General
+  Proveedor
+  Vendedor
+}
+
+enum aliados_estado {
+  Activo
+  Inactivo
+}
+
+enum bancos_estado {
+  Activo
+  Inactivo
+}
+
+enum call_busquedas_busqueda {
+  Hoy
+  Morosos
+  Todos
+  Antes
+  Agenda
+}
+
+enum carteras_estado {
+  Activo
+  Inactivo
+}
+
+enum extras_concepto {
+  Prejuridico
+  Juridico
+}
+
+enum fact_precred_conceptos_estado {
+  Activo
+  Inactivo
+}
+
+enum listas_estado {
+  Activo
+  Inactivo
+}
+
+enum mensajes_estado {
+  ESTADO_1 @map("1")
+}
+
+enum oauth_sessions_owner_type {
+  client
+  user
+}
+
+enum productos_estado {
+  Activo
+  Inactivo
+}
+
+enum proveedores_estado {
+  Activo
+  Inactivo
+}
+
+enum ref_productos_estado {
+  En_proceso @map("En proceso")
+  Liquidado
+}
+
+enum referencias_parentesco {
+  Padre
+  Madre
+  Hermano_a @map("Hermano/a")
+  Tio_a     @map("Tio/a")
+  Nieto_a   @map("Nieto/a")
+  Suegro_a  @map("Suegro/a")
+  Cuado_a   @map("Cuado/a")
+  Primo_a   @map("Primo/a")
+  Sobrino_a @map("Sobrino/a")
+  Abuelo_a  @map("Abuelo/a")
+  Hijo_a    @map("Hijo/a")
+  Yerno
+  Nuera
+}
+
+enum terceros_regimen {
+  Estatal
+  Gran_contribuyente    @map("Gran contribuyente")
+  Regimen_comun         @map("Regimen comun")
+  Regimen_especial      @map("Regimen especial")
+  Regimen_simplificado  @map("Regimen simplificado")
+  No_responsable_de_IVA @map("No responsable de IVA")
+}
+
+enum tipo_vehiculos_estado {
+  Activo
+  Inactivo
+}
+
+enum users_estado {
+  Activo
+  Inactivo
+}
+
+enum acuerdos_estado {
+  Abierto
+  Cerrado
+}
+
+enum extras_estado {
+  Ok
+  Debe
+  Finalizado
+}
+
+enum pagos_concepto {
+  Cuota
+  Cuota_Parcial @map("Cuota Parcial")
+  Mora
+  Prejuridico
+  Juridico
+  Saldo_a_Favor @map("Saldo a Favor")
+  Aval
+}
+
+enum proveedores_tipo_doc {
+  Cedula_Ciudadan_a                       @map("Cedula Ciudadanía")
+  Nit
+  Cedula_de_Extranjer_a                   @map("Cedula de Extranjería")
+  Pasaporte
+  Pase_Diplom_tico                        @map("Pase Diplomático")
+  Carnet_Diplom_tico                      @map("Carnet Diplomático")
+  Tarjeta_de_Identidad                    @map("Tarjeta de Identidad")
+  Rut
+  N_mero__nico_de_Identificaci_n_Personal @map("Número único de Identificación Personal")
+  Nit_de_Extranjer_a                      @map("Nit de Extranjería")
+}
+
+enum sanciones_estado {
+  Ok
+  Debe
+  Exonerada
+}
+
+enum tipo_productos_estado {
+  Activo
+  Inactivo
+}
+
+enum users_rol {
+  Administrador
+  Asesor
+  Asesor_VIP    @map("Asesor VIP")
+  Cartera
+  Recaudador
+  Call
+}
+
+enum egresos_concepto {
+  Anulado
+  Asistimotos
+  Bancos
+  Cartera_de_terceros @map("Cartera de terceros")
+  Comisi_n            @map("Comisión")
+  Compras
+  Compra_de_inmueble  @map("Compra de inmueble")
+  Consignacion
+  Consultar
+  Financiero
+  Gastos
+  Impuestos
+  Jur_dico            @map("Jurídico")
+  Libre_inversi_n     @map("Libre inversión")
+  N_mina              @map("Nómina")
+  Operativo
+  Pago_a_proveedores  @map("Pago a proveedores")
+  Prestamos
+  Publicidad
+  Tarjetas_de_cr_dito @map("Tarjetas de crédito")
+  Devoluciones
+  Unificaciones
+}
+
+enum soat_tipo {
+  cliente
+  codeudor
+}
+
+enum sublistas_estado {
+  Activo
+  Inactivo
+}
+
+enum creditos_estado {
+  Al_dia                       @map("Al dia")
+  Mora
+  Prejuridico
+  Juridico
+  Cancelado
+  Cancelado_por_refinanciacion @map("Cancelado por refinanciacion")
+}
+
+enum fact_precreditos_tipo {
+  Efectivo
+  Consignaci_n @map("Consignación")
+}
+
+enum facturas_tipo {
+  Efectivo
+  Consignacion
+}
+
+enum puntos_estado {
+  Activo
+  Inactivo
+}
+
+enum anotaciones_notificado {
+  Si
+  No
+  Espera
+}
+
+enum clientes_tipo_doc {
+  Cedula_Ciudadan_a                       @map("Cedula Ciudadanía")
+  Nit
+  Cedula_de_Extranjer_a                   @map("Cedula de Extranjería")
+  Pasaporte
+  Pase_Diplom_tico                        @map("Pase Diplomático")
+  Carnet_Diplom_tico                      @map("Carnet Diplomático")
+  Tarjeta_de_Identidad                    @map("Tarjeta de Identidad")
+  Rut
+  N_mero__nico_de_Identificaci_n_Personal @map("Número único de Identificación Personal")
+  Nit_de_Extranjer_a                      @map("Nit de Extranjería")
+}
+
+enum conyuges_tipo_docy {
+  Cedula_Ciudadan_a                       @map("Cedula Ciudadanía")
+  Nit
+  Cedula_de_Extranjer_a                   @map("Cedula de Extranjería")
+  Pasaporte
+  Pase_Diplom_tico                        @map("Pase Diplomático")
+  Carnet_Diplom_tico                      @map("Carnet Diplomático")
+  Tarjeta_de_Identidad                    @map("Tarjeta de Identidad")
+  Rut
+  N_mero__nico_de_Identificaci_n_Personal @map("Número único de Identificación Personal")
+  Nit_de_Extranjer_a                      @map("Nit de Extranjería")
+}
+
+enum facturas_banco {
+  Apostar
+  Baloto
+  Banco_Agrario      @map("Banco Agrario")
+  Banco_AV_Villas    @map("Banco AV Villas")
+  Banco_Caja_Social  @map("Banco Caja Social")
+  Banco_de_Occidente @map("Banco de Occidente")
+  Banco_Popular      @map("Banco Popular")
+  Banc_ldex          @map("Bancóldex")
+  Bancolombia
+  BBVA
+  Banco_de_Bogot_    @map("Banco de Bogotá")
+  Citi
+  Colpatria
+  Davivienda
+  Gana_Gana          @map("Gana Gana")
+  GNB_Sudameris      @map("GNB Sudameris")
+  PSE_AV_VILLAS      @map("PSE AV VILLAS")
+  Su_Suerte          @map("Su Suerte")
+  Unificacion
+}
+
+enum permissions_status {
+  Activo
+  Inactivo
+}
+
+enum codeudores_tipo_docc {
+  Cedula_Ciudadan_a                       @map("Cedula Ciudadanía")
+  Nit
+  Cedula_de_Extranjer_a                   @map("Cedula de Extranjería")
+  Pasaporte
+  Pase_Diplom_tico                        @map("Pase Diplomático")
+  Carnet_Diplom_tico                      @map("Carnet Diplomático")
+  Tarjeta_de_identidad                    @map("Tarjeta de identidad")
+  Rut
+  N_mero_unico_de_identificaci_n_personal @map("Número unico de identificación personal")
+  Nit_de_extranjer_a                      @map("Nit de extranjería")
+}
+
+enum egresos_tipo {
+  Efectivo
+  Consignacion
+}
+
+enum empresas_tipo_doc {
+  Cedula_de_ciudadania  @map("Cedula de ciudadania")
+  Nit_empresarial       @map("Nit empresarial")
+  Nit_de_extranjeria    @map("Nit de extranjeria")
+  Cedula_de_extranjeria @map("Cedula de extranjeria")
+}
+
+enum pagos_estado {
+  Debe
+  Ok
+  Finalizado
+}
+
+enum creditos_castigada {
+  Si
+  No
+}
+
+enum ref_productos_expedido_a {
+  Cliente
+  Gora
+}
+
+enum creditos_refinanciacion {
+  Si
+  No
+}
+
+enum precreditos_periodo {
+  Quincenal
+  Mensual
+}
+
+enum terceros_tipo_doc {
+  C_dula_Ciudadan_a     @map("Cédula Ciudadanía")
+  Nit_empresarial       @map("Nit empresarial")
+  Nit_de_extranjeria    @map("Nit de extranjeria")
+  Cedula_de_extranjeria @map("Cedula de extranjeria")
+}
+
+enum empresas_estado {
+  Activo
+  Inactivo
+}
+
+enum precreditos_estudio {
+  Tipico
+  Domicilio
+  Sin_estudio @map("Sin estudio")
+}
+
+enum codeudores_tipo_actividadc {
+  Dependiente
+  Independiente
+}
+
+enum clientes_tipo_actividad {
+  Dependiente
+  Independiente
+}
+
+enum precreditos_aprobado {
+  Si
+  No
+  En_estudio @map("En estudio")
+  Desistio
+}
+
+enum clientes_calificacion {
+  BB
+  B
+  M
+  MM
+  CASTIGADA
+}
+
+enum creditos_mes {
+  Enero
+  Febrero
+  Marzo
+  Abril
+  Mayo
+  Junio
+  Julio
+  Agosto
+  Septiembre
+  Octubre
+  Noviembre
+  Diciembre
+}
+
+enum precreditos_version {
+  VERSION_1 @map("1")
+  VERSION_2 @map("2")
+  VERSION_3 @map("3")
+  VERSION_4 @map("4")
+}
+
+enum creditos_calificacion {
+  BB
+  B
+  M
+  MM
+  CASTIGADA
+}
+
+enum clientes_genero {
+  Femenino
+  Masculino
+}
+
+enum clientes_estado_civil {
+  Soltero_a   @map("Soltero/a")
+  Casado_a    @map("Casado/a")
+  Separado_a  @map("Separado/a")
+  Viudo_a     @map("Viudo/a")
+  Union_libre @map("Union libre")
+  Otro
+}
+
+enum codeudores_genero {
+  Femenino
+  Masculino
+}
+
+enum codeudores_tipo_doc {
+  Cedula_Ciudadana                     @map("Cedula Ciudadana")
+  Nit
+  Cedula_de_Extranjera                 @map("Cedula de Extranjera")
+  Pasaporte
+  Pase_Diplomtico                      @map("Pase Diplomtico")
+  Carnet_Diplomtico                    @map("Carnet Diplomtico")
+  Tarjeta_de_Identidad                 @map("Tarjeta de Identidad")
+  Rut
+  Nmero_nico_de_Identificacin_Personal @map("Nmero nico de Identificacin Personal")
+  Nit_de_Extranjera                    @map("Nit de Extranjera")
+}
+
+enum codeudores_estado_civil {
+  Soltero_a   @map("Soltero/a")
+  Casado_a    @map("Casado/a")
+  Separado_a  @map("Separado/a")
+  Viudo_a     @map("Viudo/a")
+  Union_libre @map("Union libre")
+  Otro
+}
+
+enum clientes_nivel_estudios {
+  Primaria
+  Bachiller
+  Tecnico
+  Universitario
+  Postgrado
+  Ninguno
+}
+
+enum clientes_envio_correspondencia {
+  Casa
+  Empresa
+  Correo_electronico @map("Correo electronico")
+}
+
+enum clientes_estrato {
+  ESTRATO_1 @map("1")
+  ESTRATO_2 @map("2")
+  ESTRATO_3 @map("3")
+  ESTRATO_4 @map("4")
+  ESTRATO_5 @map("5")
+  ESTRATO_6 @map("6")
+}
+
+enum codeudores_nivel_estudios {
+  Primaria
+  Bachiller
+  Tecnico
+  Universitario
+  Postgrado
+  Ninguno
+}
+
+enum clientes_tipo_vivienda {
+  Propia
+  Familiar
+  Alquilada
+}
+
+enum codeudores_envio_correspondencia {
+  Casa
+  Empresa
+  Correo_electronico @map("Correo electronico")
+}
+
+enum clientes_tipo_contrato {
+  Indefinido
+  Prestacion_de_servicios @map("Prestacion de servicios")
+  Termino_fijo            @map("Termino fijo")
+}
+
+enum codeudores_estrato {
+  ESTRATO_1 @map("1")
+  ESTRATO_2 @map("2")
+  ESTRATO_3 @map("3")
+  ESTRATO_4 @map("4")
+  ESTRATO_5 @map("5")
+  ESTRATO_6 @map("6")
+}
+
+enum clientes_reportado {
+  si
+  no
+}
+
+enum clientes_version {
+  VERSION_1 @map("1")
+  VERSION_2 @map("2")
+  VERSION_3 @map("3")
+}
+
+enum codeudores_tipo_vivienda {
+  Propia
+  Familiar
+  Alquilada
+}
+
+enum codeudores_tipo_actividad {
+  Dependiente
+  Independiente
+}
+
+enum codeudores_tipo_contrato {
+  Indefinido
+  Prestacion_de_servicios @map("Prestacion de servicios")
+  Termino_fijo            @map("Termino fijo")
+}
+
+enum codeudores_reportado {
+  si
+  no
+}
+
+enum codeudores_version {
+  VERSION_1 @map("1")
+  VERSION_2 @map("2")
+  VERSION_3 @map("3")
+}

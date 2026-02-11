@@ -14,33 +14,13 @@ export class MigrationController {
   ) {}
 
   /**
-   * POST /api/migration/migrate
-   * Inicia el proceso de migración de datos
-   */
-  migrateData = async (req: Request, res: Response) => {
-    try {
-      const result = await this.migrationService.migrateSomething();
-      res.status(200).json(result);
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Error durante la migración',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  }
-
-  /**
    * GET /api/migration/statistics
-   * Obtiene estadísticas de ambas bases de datos
+   * Obtiene estadísticas de migración de ambas bases de datos
    */
-  getStatistics = async (req: Request, res: Response) => {
+  getMigrationStatistics = async (req: Request, res: Response) => {
     try {
-      const stats = await this.migrationService.getStatistics();
-      res.status(200).json({
-        success: true,
-        data: stats
-      });
+      const stats = await this.migrationService.getMigrationStatistics();
+      res.status(200).json(stats);
     } catch (error) {
       res.status(500).json({
         success: false,
@@ -51,21 +31,38 @@ export class MigrationController {
   }
 
   /**
-   * GET /api/migration/compare/:id
-   * Compara un registro específico entre ambas bases de datos
+   * GET /api/migration/validate
+   * Valida la consistencia de datos entre ambas bases de datos
    */
-  compareRecord = async (req: Request, res: Response) => {
+  validateConsistency = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const comparison = await this.migrationService.compareRecord(id);
-      res.status(200).json({
-        success: true,
-        data: comparison
-      });
+      const validation = await this.migrationService.validateDataConsistency();
+      res.status(200).json(validation);
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: 'Error comparando registros',
+        message: 'Error validando consistencia',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
+
+  /**
+   * GET /api/migration/preview
+   * Pre-visualiza los datos que se van a migrar
+   */
+  previewMigration = async (req: Request, res: Response) => {
+    try {
+      const { skip, take } = req.query;
+      const preview = await this.migrationService.previewMigration(
+        skip ? parseInt(skip as string) : 0,
+        take ? parseInt(take as string) : 10
+      );
+      res.status(200).json(preview);
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error en pre-visualización',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
