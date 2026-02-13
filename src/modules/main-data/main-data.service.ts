@@ -1,6 +1,7 @@
 import { prismaMainService } from '../../database/main/prisma-main.service';
 import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service';
 import ClienteMapperService from './cliente-mapper';
+import { ReferenceParser } from './reference-parser';
 
 /**************************************************************************************************
  * Servicio para datos Main
@@ -229,13 +230,86 @@ class MainDataService {
    * 13. Retorna usuario completado con relaciones anidadas
    */
   async migrateClienteFromLegacy(documento: string): Promise<any> {
-    // 1. Consultar cliente en LEGACY
-    const clienteLegacy = await prismaLegacyService.clientes.findUnique({
-      where: { num_doc: documento },
-      include: {
-        conyuges: true,
-      },
-    });
+    // 1. Consultar cliente en LEGACY usando SQL directo para manejar enums vacíos
+    const clientesData = await prismaLegacyService.$queryRaw<any[]>`
+      SELECT 
+        CAST(id AS UNSIGNED) as id,
+        nombre,
+        primer_nombre,
+        segundo_nombre,
+        primer_apellido,
+        segundo_apellido,
+        tipo_doc,
+        num_doc,
+        fecha_nacimiento,
+        direccion,
+        barrio,
+        CAST(municipio_id AS UNSIGNED) as municipio_id,
+        movil,
+        fijo,
+        email,
+        placa,
+        ocupacion,
+        empresa,
+        NULLIF(tipo_actividad, '') as tipo_actividad,
+        CAST(codeudor_id AS UNSIGNED) as codeudor_id,
+        numero_de_creditos,
+        CAST(user_create_id AS UNSIGNED) as user_create_id,
+        CAST(user_update_id AS UNSIGNED) as user_update_id,
+        calificacion,
+        created_at,
+        updated_at,
+        dir_empresa,
+        tel_empresa,
+        CAST(conyuge_id AS UNSIGNED) as conyuge_id,
+        genero,
+        NULLIF(estado_civil, '') as estado_civil,
+        fecha_exp,
+        lugar_exp,
+        lugar_nacimiento,
+        NULLIF(nivel_estudios, '') as nivel_estudios,
+        antiguedad_movil,
+        anos_residencia,
+        NULLIF(envio_correspondencia, '') as envio_correspondencia,
+        NULLIF(estrato, '') as estrato,
+        meses_residencia,
+        NULLIF(tipo_vivienda, '') as tipo_vivienda,
+        nombre_arrendador,
+        telefono_arrendador,
+        cargo,
+        descripcion_actividad,
+        doc_empresa,
+        fecha_vinculacion,
+        NULLIF(tipo_contrato, '') as tipo_contrato,
+        reportado
+      FROM clientes
+      WHERE num_doc = ${documento}
+      LIMIT 1
+    `;
+
+    if (!clientesData || clientesData.length === 0) {
+      throw new Error(`Cliente no encontrado en base de datos LEGACY: ${documento}`);
+    }
+
+    // Obtener cónyuge relacionado (si existe)
+    let conyugeData: any = null;
+    if (clientesData[0].conyuge_id) {
+      conyugeData = await prismaLegacyService.conyuges.findUnique({
+        where: { id: clientesData[0].conyuge_id },
+      });
+    }
+
+    // Convertir BigInt a number para todas las operaciones con Prisma
+    const clienteLegacy = {
+      ...clientesData[0],
+      id: Number(clientesData[0].id),
+      municipio_id: clientesData[0].municipio_id ? Number(clientesData[0].municipio_id) : null,
+      conyuge_id: clientesData[0].conyuge_id ? Number(clientesData[0].conyuge_id) : null,
+      codeudor_id: clientesData[0].codeudor_id ? Number(clientesData[0].codeudor_id) : null,
+      user_create_id: Number(clientesData[0].user_create_id),
+      user_update_id: clientesData[0].user_update_id ? Number(clientesData[0].user_update_id) : null,
+      conyuges: conyugeData ? [conyugeData] : [],
+    };
 
     // 2. Validar que existe en LEGACY
     if (!clienteLegacy) {
@@ -263,10 +337,10 @@ class MainDataService {
     // 4.3 Obtener nombre, departamento y codigo_departamento del municipio si existe
     let municipioData: any = null;
     if (clienteLegacy.municipio_id) {
-      municipioData = await prismaLegacyService.$queryRaw`
+      municipioData = await prismaLegacyService.$queryRaw<any[]>`
         SELECT nombre, departamento, codigo_departamento
         FROM municipios 
-        WHERE id = ${clienteLegacy.municipio_id}
+        WHERE CAST(id AS UNSIGNED) = ${clienteLegacy.municipio_id}
         LIMIT 1
       `;
     }
@@ -277,12 +351,32 @@ class MainDataService {
     const [infoLaboralError, infoLaboralDto] = mapperService.mapToInfoLaboral(clienteLegacy);
     if (infoLaboralError) throw new Error(`Error en mapeo InfoLaboral: ${infoLaboralError}`);
 
-    const [infoReferenciasError, infoReferenciasDto] = mapperService.mapToInfoReferencias(clienteLegacy);
+    // 4.4 Obtener lista de parentescos válidos de main DB para fuzzy matching
+    const listaParentescos = await prismaMainService.lista_parentesco.findMany({
+      select: { tipo: true },
+    });
+    const parentescosArray = listaParentescos.map(p => p.tipo);
+    const parser = new ReferenceParser(parentescosArray);
+
+    // 4.5 Obtener estudios del cliente con referencias comentarios (ref_1 a ref_4)
+    let estudiosData: any[] = [];
+    if (clienteLegacy.id) {
+      estudiosData = await prismaLegacyService.estudios.findMany({
+        where: { cliente_id: clienteLegacy.id },
+        select: { ref_1: true, ref_2: true, ref_3: true, ref_4: true },
+      });
+    }
+
+    const [infoReferenciasError, infoReferenciasDto] = mapperService.mapToInfoReferencias(
+      clienteLegacy,
+      estudiosData,
+      parser
+    );
     if (infoReferenciasError) throw new Error(`Error en mapeo InfoReferencias: ${infoReferenciasError}`);
 
     let conyugeDto: any = null;
-    if (clienteLegacy.conyuges) {
-      const [conyugeError, conyugeMapped] = mapperService.mapToConyuge(clienteLegacy.conyuges, documento);
+    if (clienteLegacy.conyuges && clienteLegacy.conyuges.length > 0) {
+      const [conyugeError, conyugeMapped] = mapperService.mapToConyuge(clienteLegacy.conyuges[0], documento);
       if (conyugeError) throw new Error(`Error en mapeo Cónyuge: ${conyugeError}`);
       conyugeDto = conyugeMapped;
     }

@@ -11,6 +11,7 @@ import {
   InfoReferenciasCreateDto,
   ConyugeCreateDto,
 } from '../../domain/dtos/migrate-cliente.dto';
+import { ReferenceParser, ReferenceValidated } from './reference-parser';
 
 class ClienteMapperService {
   private static instance: ClienteMapperService;
@@ -154,6 +155,16 @@ class ClienteMapperService {
    * Mapea un cliente legacy a InfoLaboralCreateDto
    */
   mapToInfoLaboral(clienteLegacy: any): [string?, InfoLaboralCreateDto?] {
+    // Mapear tipo_actividad con validación
+    const tipoActividadMap: { [key: string]: string } = {
+      'Dependiente': 'Dependiente',
+      'Independiente': 'Independiente',
+    };
+    
+    const tipo_actividad = clienteLegacy.tipo_actividad 
+      ? tipoActividadMap[clienteLegacy.tipo_actividad] || clienteLegacy.tipo_actividad 
+      : 'Independiente'; // Default o value
+
     const props = {
       documento: clienteLegacy.num_doc || '',
       ocupacion_oficio: clienteLegacy.ocupacion || '',
@@ -162,7 +173,7 @@ class ClienteMapperService {
       nit: clienteLegacy.doc_empresa || '',
       tipo_contrato: clienteLegacy.tipo_contrato || 'N/A',
       cargo: clienteLegacy.cargo || 'N/A',
-      actividadEconomica: clienteLegacy.descripcion_actividad || clienteLegacy.tipo_actividad || '',
+      actividadEconomica: clienteLegacy.descripcion_actividad || tipo_actividad || '',
       id_rango: 1, // Default rango, puede variar según lógica de negocio
       fecha_vinculacion: clienteLegacy.fecha_vinculacion ? this.formatDate(clienteLegacy.fecha_vinculacion) : null,
       telefono: clienteLegacy.tel_empresa || '0',
@@ -173,11 +184,17 @@ class ClienteMapperService {
   }
 
   /**
-   * Mapea un cliente legacy a InfoReferenciasCreateDto
-   * Las referencias en legacy no están vinculadas directamente, así que retornamos con vacíos
+   * Mapea referencias desde comentarios en estudios legacy a InfoReferenciasCreateDto
+   * Procesa ref_1 a ref_4 usando ReferenceParser con fuzzy matching
+   * - ref_1, ref_2 → campos Familiar
+   * - ref_3, ref_4 → campos Personal
    */
-  mapToInfoReferencias(clienteLegacy: any): [string?, InfoReferenciasCreateDto?] {
-    const props = {
+  mapToInfoReferencias(
+    clienteLegacy: any,
+    estudios: any[],
+    parser: ReferenceParser
+  ): [string?, InfoReferenciasCreateDto?] {
+    const props: any = {
       documento: clienteLegacy.num_doc || '',
       nombreFamiliar: '',
       parentescoFamiliar: '',
@@ -196,6 +213,77 @@ class ClienteMapperService {
       celularPersonal2: '',
       direccion_personal_2: '',
     };
+
+    // Si no hay estudios, retornar con valores vacíos
+    if (!estudios || estudios.length === 0) {
+      return InfoReferenciasCreateDto.create(props);
+    }
+
+    const referencias: ReferenceValidated[] = [];
+
+    // Procesar ref_1 a ref_4 desde todos los estudios
+    for (const estudio of estudios) {
+      for (let i = 1; i <= 4; i++) {
+        const refField = `ref_${i}`;
+        const comentario = estudio[refField];
+
+        if (comentario && comentario.trim()) {
+          const parsed = parser.parseComentario(comentario, clienteLegacy.id);
+          if (parsed) {
+            referencias.push(parsed);
+          }
+        }
+      }
+    }
+
+    // Mapear referencias parseadas a campos del DTO
+    // ref_1 y ref_2 → Familiar
+    // ref_3 y ref_4 → Personal
+    if (referencias.length > 0 && referencias[0]) {
+      props.nombreFamiliar = referencias[0].nombre || '';
+      props.parentescoFamiliar = referencias[0].parentesco || null;
+      // Solo asignar celular si es válido (10 dígitos o null)
+      props.telefonoFamiliar = (referencias[0].celular && referencias[0].celular !== '0' && referencias[0].celular.length === 10) 
+        ? referencias[0].celular 
+        : '';
+      // Solo asignar dirección si no es "N/A" y tiene contenido real
+      props.direccion_familiar = (referencias[0].direccion && referencias[0].direccion !== 'N/A' && referencias[0].direccion.length > 2)
+        ? referencias[0].direccion.substring(0, 150)
+        : '';
+    }
+
+    if (referencias.length > 1 && referencias[1]) {
+      props.nombreFamiliar2 = referencias[1].nombre || '';
+      props.parentescoFamiliar2 = referencias[1].parentesco || null;
+      props.celularFamiliar2 = (referencias[1].celular && referencias[1].celular !== '0' && referencias[1].celular.length === 10) 
+        ? referencias[1].celular 
+        : '';
+      props.direccion_familiar_2 = (referencias[1].direccion && referencias[1].direccion !== 'N/A' && referencias[1].direccion.length > 2)
+        ? referencias[1].direccion.substring(0, 150)
+        : '';
+    }
+
+    if (referencias.length > 2 && referencias[2]) {
+      props.nombrePersonal = referencias[2].nombre || '';
+      props.parentescoPersonal = referencias[2].parentesco || null;
+      props.telefonoPersonal = (referencias[2].celular && referencias[2].celular !== '0' && referencias[2].celular.length === 10) 
+        ? referencias[2].celular 
+        : '';
+      props.direcion_personal = (referencias[2].direccion && referencias[2].direccion !== 'N/A' && referencias[2].direccion.length > 2)
+        ? referencias[2].direccion.substring(0, 150)
+        : '';
+    }
+
+    if (referencias.length > 3 && referencias[3]) {
+      props.nombrePersonal2 = referencias[3].nombre || '';
+      props.parentescoPersonal2 = referencias[3].parentesco || null;
+      props.celularPersonal2 = (referencias[3].celular && referencias[3].celular !== '0' && referencias[3].celular.length === 10) 
+        ? referencias[3].celular 
+        : '';
+      props.direccion_personal_2 = (referencias[3].direccion && referencias[3].direccion !== 'N/A' && referencias[3].direccion.length > 2)
+        ? referencias[3].direccion.substring(0, 150)
+        : '';
+    }
 
     return InfoReferenciasCreateDto.create(props);
   }
