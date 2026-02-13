@@ -43,6 +43,9 @@ export class MainDataRoutes {
     // ==================== ESTADÍSTICAS ====================
     router.get('/stats', controller.getEstadisticas);
 
+    // ==================== MIGRACIÓN ====================
+    router.post('/migrate/:documento', controller.migrateClienteFromLegacy);
+
     return router;
   }
 }

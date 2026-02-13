@@ -234,4 +234,46 @@ export class MainDataController {
       });
     }
   }
+
+  // ==================== MIGRACIÓN ====================
+
+  migrateClienteFromLegacy = async (req: Request, res: Response) => {
+    try {
+      const { documento } = req.params;
+
+      // Validaciones básicas
+      if (!documento || documento.trim() === '') {
+        res.status(400).json({
+          success: false,
+          error: 'Documento es requerido y no puede estar vacío'
+        });
+        return;
+      }
+
+      // Llamar al servicio de migración
+      const result = await this.mainDataService.migrateClienteFromLegacy(documento);
+
+      // Retornar resultado exitoso
+      res.status(201).json({
+        success: true,
+        message: `Cliente ${documento} migrado exitosamente de Legacy a Main`,
+        data: result
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      // Determinar el código de estado HTTP basado en el error
+      let statusCode = 500;
+      if (errorMessage.includes('no encontrado')) {
+        statusCode = 404;
+      } else if (errorMessage.includes('ya existe')) {
+        statusCode = 409;
+      }
+
+      res.status(statusCode).json({
+        success: false,
+        error: errorMessage
+      });
+    }
+  }
 }
