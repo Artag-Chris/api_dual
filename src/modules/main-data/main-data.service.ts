@@ -1,6 +1,7 @@
 import { prismaMainService } from '../../database/main/prisma-main.service';
 import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service';
 import ClienteMapperService from './cliente-mapper';
+import { CreditoMapper } from './credito-mapper';
 import { ReferenceParser } from './reference-parser';
 
 /**************************************************************************************************
@@ -376,6 +377,14 @@ class MainDataService {
     );
     if (infoReferenciasError) throw new Error(`Error en mapeo InfoReferencias: ${infoReferenciasError}`);
 
+    // 4.6 Obtener precreditos del cliente legacy para migrar a detalle_credito
+    let precreditosData: any[] = [];
+    if (clienteLegacy.id) {
+      precreditosData = await prismaLegacyService.precreditos.findMany({
+        where: { cliente_id: clienteLegacy.id },
+      });
+    }
+
     let conyugeDto: any = null;
     if (clienteLegacy.conyuges && clienteLegacy.conyuges.length > 0) {
       const [conyugeError, conyugeMapped] = mapperService.mapToConyuge(clienteLegacy.conyuges[0], documento);
@@ -554,6 +563,87 @@ class MainDataService {
           },
         });
 
+        // 10.1 Crear detalle_credito (créditos migrados desde precreditos legacy)
+        const detalleCreditos: any[] = [];
+        if (precreditosData && precreditosData.length > 0) {
+          for (const precredito of precreditosData) {
+            const [error, creditoDto] = await CreditoMapper.mapToCreditoDto(precredito, clienteLegacy);
+
+            if (!error && creditoDto) {
+              // Buscar el tipo de crédito en la lista
+              const tipoCredito = await tx.lista_tipo_credito.findFirst({
+                where: { tipo: creditoDto.tipoCredito },
+              });
+
+              // Crear el registro de crédito
+              const detalleCredito = await tx.detalle_credito.create({
+                data: {
+                  user_cliente: {
+                    connect: {
+                      documento: creditoDto.documento,
+                    },
+                  },
+                  lista_tipo_credito: {
+                    connect: {
+                      tipo: tipoCredito?.tipo || 'CREDITO EXPRESS',
+                    },
+                  },
+                  lista_estado_credito: {
+                    connect: {
+                      tipo: creditoDto.estado,
+                    },
+                  },
+                  lista_origen_credito: {
+                    connect: {
+                      tipo: creditoDto.origen,
+                    },
+                  },
+                  valor_prestamo: creditoDto.valor_prestamo,
+                  inicial: creditoDto.inicial,
+                  plazo: creditoDto.plazo,
+                  numero_cuotas: creditoDto.numero_cuotas,
+                  valor_cuota: creditoDto.valor_cuota,
+                  periocidad: creditoDto.periocidad,
+                  tasa: creditoDto.tasa,
+                  dia_pago: creditoDto.diaPago,
+                  fecha_Pago: creditoDto.fechaPago,
+                  seguro: creditoDto.seguro,
+                  iva_aval: creditoDto.iva_aval as any,
+                  pablok: creditoDto.pablok,
+                  seguro_add: creditoDto.seguro_add as any,
+                },
+              });
+
+              detalleCreditos.push(detalleCredito);
+            } else {
+              console.warn(`[MAIN-DATA-SERVICE] Error mapeando precredito ${precredito.id}: ${error}`);
+            }
+          }
+        }
+
+        // 10.2 Crear estudio_de_credito
+        const estudioDeCredito = await tx.estudio_de_credito.create({
+          data: {
+            documento: documento,
+            estado: 'EN ESTUDIO',
+            observacion: 'migrado desde FACILITO',
+          },
+        });
+
+        // 10.3 Crear estudios_realizados  
+        const estudiosRealizados = await tx.estudios_realizados.create({
+          data: {
+            documento: documento,
+            cupo: '0',
+            cupoDisponible: '0',
+            tasa: 0,
+            plazo: 12,
+            creditos_activos: precreditosData.length,
+            creditos_maximos: 2,
+            observacion: 'migrado desde FACILITO',
+          },
+        });
+
         // 11. Crear cónyuge si existe
         let conyuge = null;
         if (conyugeDto) {
@@ -576,6 +666,9 @@ class MainDataService {
           infoContacto,
           infoLaboral,
           infoReferencias,
+          estudioDeCredito,
+          estudiosRealizados,
+          detalleCreditos,
           conyuge,
         };
       });
@@ -588,6 +681,9 @@ class MainDataService {
           info_contacto: result.infoContacto,
           info_laboral: result.infoLaboral,
           info_referencias: result.infoReferencias,
+          estudio_de_credito: result.estudioDeCredito,
+          estudios_realizados: result.estudiosRealizados,
+          detalle_credito: result.detalleCreditos,
           ...(result.conyuge && { conyuge: result.conyuge }),
         },
       };

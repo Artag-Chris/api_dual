@@ -195,7 +195,6 @@ model conyuge {
   telefono          String           @dbMain.VarChar(20)
   fecha_registro    DateTime         @default(now()) @dbMain.DateTime(0)
   lista_documentos  lista_documentos @relation(fields: [tipo_documento], references: [tipo], map: "id_lista_documento")
-  info_personal     info_personal    @relation(fields: [documento], references: [documento], onUpdate: Restrict, map: "id_personal_documento")
 
   @@index([documento], map: "documento_2")
   @@index([tipo_documento], map: "id_lista_documento")
@@ -272,6 +271,9 @@ model detalle_credito {
   seguro_add                                                                             Decimal                     @dbMain.Decimal(10, 2)
   fecha_actualizacion                                                                    DateTime?                   @default(now()) @dbMain.Timestamp(0)
   actualizado_por                                                                        Int?
+  castigo                                                                                detalle_credito_castigo     @default(NO)
+  id_estrategia                                                                          Int?
+  id_cartera                                                                             Int?
   amortizacion                                                                           amortizacion[]
   creditos_reenganche_creditos_reenganche_id_credito_originalTodetalle_credito           creditos_reenganche[]       @relation("creditos_reenganche_id_credito_originalTodetalle_credito")
   creditos_reenganche_creditos_reenganche_id_credito_reengancheTodetalle_credito         creditos_reenganche[]       @relation("creditos_reenganche_id_credito_reengancheTodetalle_credito")
@@ -279,6 +281,8 @@ model detalle_credito {
   creditos_refinanciados_creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito creditos_refinanciados[]    @relation("creditos_refinanciados_prestamo_id_refinaciadoTodetalle_credito")
   despacho                                                                               despacho[]
   user_cliente                                                                           user_cliente                @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "detalle_credito_ibfk_1")
+  cartera                                                                                cartera?                    @relation(fields: [id_cartera], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_cartera")
+  estrategia_credito                                                                     estrategia_credito?         @relation(fields: [id_estrategia], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_estrategia_credito")
   lista_estado_credito                                                                   lista_estado_credito        @relation(fields: [estado], references: [tipo], map: "id_lista_estatado_credito")
   lista_origen_credito                                                                   lista_origen_credito        @relation(fields: [origen], references: [tipo], map: "id_lista_origen_credito")
   lista_tipo_credito                                                                     lista_tipo_credito          @relation(fields: [tipoCredito], references: [tipo], map: "id_lista_tipo_credito")
@@ -300,6 +304,8 @@ model detalle_credito {
   @@index([documento], map: "idx_detalle_credito_documento")
   @@index([estado], map: "idx_detalle_credito_estado")
   @@index([creador], map: "proveedor")
+  @@index([id_cartera], map: "fk_cartera")
+  @@index([id_estrategia], map: "fk_estrategia_credito")
 }
 
 model detalle_transferencia {
@@ -630,8 +636,8 @@ model info_personal {
   lugar_expedicion String           @dbMain.VarChar(100)
   estudios         String           @dbMain.VarChar(20)
   estrato          String           @dbMain.VarChar(20)
+  conyuge          String           @dbMain.VarChar(20)
   fecha_registro   DateTime         @default(now()) @dbMain.Timestamp(0)
-  conyuge          conyuge?
   user_cliente     user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "documento_user_personas")
   lista_documentos lista_documentos @relation(fields: [tipoDocumento], references: [tipo], map: "id_lista_docuemntos")
   lista_estrato    lista_estrato    @relation(fields: [estrato], references: [tipo], map: "id_lista_estrato")
@@ -1350,6 +1356,21 @@ model zonas {
   user_admin  user_admin[]
 }
 
+model cartera {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(255)
+  franja_dias     Int
+  fecha_creacion  DateTime?         @default(now()) @dbMain.Timestamp(0)
+  detalle_credito detalle_credito[]
+}
+
+model estrategia_credito {
+  id              Int               @id @default(autoincrement())
+  nombre          String            @dbMain.VarChar(255)
+  fecha_creacion  DateTime?         @default(now()) @dbMain.Timestamp(0)
+  detalle_credito detalle_credito[]
+}
+
 enum historial_reservas_estado_anterior {
   DISPONIBLE
   RESERVADO
@@ -1430,4 +1451,9 @@ enum historial_pagos_detallado_tipo_pago {
   CUOTA
   PAGO_TOTAL
   PAGO_INICIAL
+}
+
+enum detalle_credito_castigo {
+  SI
+  NO
 }

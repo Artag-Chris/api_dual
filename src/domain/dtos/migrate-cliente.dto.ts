@@ -293,3 +293,79 @@ export class ConyugeCreateDto {
     ];
   }
 }
+
+// ==================== DETALLE CREDITO DTO ====================
+export class DetalleCreditoCreateDto {
+  private constructor(
+    public readonly documento: string,
+    public readonly tipoCredito: string,
+    public readonly valor_prestamo: string,
+    public readonly inicial: number,
+    public readonly plazo: string,
+    public readonly numero_cuotas: string,
+    public readonly valor_cuota: string,
+    public readonly periocidad: string,
+    public readonly tasa: string,
+    public readonly diaPago: string,
+    public readonly fechaPago: string,
+    public readonly estado: string = 'EN ESTUDIO',
+    public readonly origen: string = 'NUEVO',
+    public readonly seguro: number = 0,
+    public readonly iva_aval: string = '0',
+    public readonly pablok: number = 0,
+    public readonly seguro_add: string = '0'
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, DetalleCreditoCreateDto?] {
+    const {
+      documento,
+      tipoCredito,
+      valor_prestamo,
+      inicial,
+      plazo,
+      numero_cuotas,
+      valor_cuota,
+      periocidad,
+      tasa,
+      diaPago,
+      fechaPago,
+      estado,
+      origen,
+      seguro,
+      iva_aval,
+      pablok,
+      seguro_add,
+    } = props;
+
+    if (!documento) return ['Documento is required', undefined];
+    if (valor_prestamo === undefined) return ['Valor prestamo is required', undefined];
+    if (numero_cuotas === undefined) return ['Numero cuotas is required', undefined];
+    if (!valor_cuota) return ['Valor cuota is required', undefined];
+    if (!tasa) return ['Tasa is required', undefined];
+    if (!diaPago) return ['Dia pago is required', undefined];
+    if (!fechaPago) return ['Fecha pago is required', undefined];
+
+    return [
+      undefined,
+      new DetalleCreditoCreateDto(
+        documento,
+        tipoCredito || 'CREDITO EXPRESS',
+        String(valor_prestamo),
+        inicial || 0,
+        plazo || 'N/A',
+        String(numero_cuotas),
+        String(valor_cuota),
+        periocidad || 'MENSUAL',
+        String(tasa),
+        String(diaPago),
+        String(fechaPago),
+        estado || 'EN ESTUDIO',
+        origen || 'NUEVO',
+        seguro || 0,
+        String(iva_aval || 0),
+        pablok || 0,
+        String(seguro_add || 0)
+      ),
+    ];
+  }
+}
