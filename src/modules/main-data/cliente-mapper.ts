@@ -155,29 +155,32 @@ class ClienteMapperService {
    * Mapea un cliente legacy a InfoLaboralCreateDto
    */
   mapToInfoLaboral(clienteLegacy: any): [string?, InfoLaboralCreateDto?] {
-    // Mapear tipo_actividad con validación
+    // Mapear tipo_actividad: usar DEPENDIENTE o INDEPENDIENTE, default INDEPENDIENTE
     const tipoActividadMap: { [key: string]: string } = {
-      'Dependiente': 'Dependiente',
-      'Independiente': 'Independiente',
+      'Dependiente': 'DEPENDIENTE',
+      'Independiente': 'INDEPENDIENTE',
     };
     
-    const tipo_actividad = clienteLegacy.tipo_actividad 
-      ? tipoActividadMap[clienteLegacy.tipo_actividad] || clienteLegacy.tipo_actividad 
-      : 'Independiente'; // Default o value
+    // Usar tipo_actividad como actividadEconomica (DEPENDIENTE/INDEPENDIENTE)
+    // Si no existe o es null, usar INDEPENDIENTE como default
+    let actividadEconomica = 'INDEPENDIENTE';
+    if (clienteLegacy.tipo_actividad) {
+      actividadEconomica = tipoActividadMap[clienteLegacy.tipo_actividad] || 'INDEPENDIENTE';
+    }
 
     const props = {
       documento: clienteLegacy.num_doc || '',
-      ocupacion_oficio: clienteLegacy.ocupacion || '',
-      empresa: clienteLegacy.empresa || 'N/A',
-      direccion_empresa: clienteLegacy.dir_empresa || '',
-      nit: clienteLegacy.doc_empresa || '',
-      tipo_contrato: clienteLegacy.tipo_contrato || 'N/A',
-      cargo: clienteLegacy.cargo || 'N/A',
-      actividadEconomica: clienteLegacy.descripcion_actividad || tipo_actividad || '',
+      ocupacion_oficio: (clienteLegacy.ocupacion || '').substring(0, 50),
+      empresa: (clienteLegacy.empresa || 'N/A').substring(0, 100),
+      direccion_empresa: (clienteLegacy.dir_empresa || '').substring(0, 100),
+      nit: (clienteLegacy.doc_empresa || '').substring(0, 50),
+      tipo_contrato: (clienteLegacy.tipo_contrato || 'N/A').substring(0, 50),
+      cargo: (clienteLegacy.cargo || 'N/A').substring(0, 50),
+      actividadEconomica: actividadEconomica.substring(0, 50),
       id_rango: 1, // Default rango, puede variar según lógica de negocio
       fecha_vinculacion: clienteLegacy.fecha_vinculacion ? this.formatDate(clienteLegacy.fecha_vinculacion) : null,
-      telefono: clienteLegacy.tel_empresa || '0',
-      descripcion: clienteLegacy.descripcion_actividad || null,
+      telefono: (clienteLegacy.tel_empresa || '0').substring(0, 30),
+      descripcion: (clienteLegacy.descripcion_actividad || '').substring(0, 65535), // Text field, permite más caracteres
     };
 
     return InfoLaboralCreateDto.create(props);

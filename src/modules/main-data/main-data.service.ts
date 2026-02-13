@@ -291,15 +291,7 @@ class MainDataService {
       throw new Error(`Cliente no encontrado en base de datos LEGACY: ${documento}`);
     }
 
-    // Obtener cónyuge relacionado (si existe)
-    let conyugeData: any = null;
-    if (clientesData[0].conyuge_id) {
-      conyugeData = await prismaLegacyService.conyuges.findUnique({
-        where: { id: clientesData[0].conyuge_id },
-      });
-    }
-
-    // Convertir BigInt a number para todas las operaciones con Prisma
+    // Convertir BigInt a number PRIMERO para todas las operaciones con Prisma
     const clienteLegacy = {
       ...clientesData[0],
       id: Number(clientesData[0].id),
@@ -308,8 +300,18 @@ class MainDataService {
       codeudor_id: clientesData[0].codeudor_id ? Number(clientesData[0].codeudor_id) : null,
       user_create_id: Number(clientesData[0].user_create_id),
       user_update_id: clientesData[0].user_update_id ? Number(clientesData[0].user_update_id) : null,
-      conyuges: conyugeData ? [conyugeData] : [],
+      conyuges: [],
     };
+
+    // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+    if (clienteLegacy.conyuge_id) {
+      const conyugeData = await prismaLegacyService.conyuges.findUnique({
+        where: { id: clienteLegacy.conyuge_id },
+      });
+      if (conyugeData) {
+        clienteLegacy.conyuges = [conyugeData];
+      }
+    }
 
     // 2. Validar que existe en LEGACY
     if (!clienteLegacy) {
