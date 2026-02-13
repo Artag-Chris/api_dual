@@ -245,11 +245,9 @@ class ClienteMapperService {
     if (referencias.length > 0 && referencias[0]) {
       props.nombreFamiliar = referencias[0].nombre || '';
       props.parentescoFamiliar = referencias[0].parentesco || null;
-      // Solo asignar celular si es válido (10 dígitos o null)
       props.telefonoFamiliar = (referencias[0].celular && referencias[0].celular !== '0' && referencias[0].celular.length === 10) 
         ? referencias[0].celular 
         : '';
-      // Solo asignar dirección si no es "N/A" y tiene contenido real
       props.direccion_familiar = (referencias[0].direccion && referencias[0].direccion !== 'N/A' && referencias[0].direccion.length > 2)
         ? referencias[0].direccion.substring(0, 150)
         : '';

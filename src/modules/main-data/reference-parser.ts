@@ -72,22 +72,13 @@ export class ReferenceParser {
 
       // 4. Intentar extractores en cascada
       let resultado = this.extraerPorPatron(primerBloque);
+      
       if (!resultado) {
         resultado = this.extraerGenerico(primerBloque);
       }
 
       // 5. Validar resultado
       if (resultado && resultado.nombre && resultado.nombre.length >= 2) {
-        // Log para debugging
-        if (process.env.DEBUG_PARSER) {
-          console.log(`✓ Parser [${idCliente}] extracted:`, {
-            input: comentario.substring(0, 100),
-            nombre: resultado.nombre,
-            celular: resultado.celular,
-            parentesco: resultado.parentesco,
-            direccion: resultado.direccion
-          });
-        }
         return resultado;
       }
 
@@ -160,8 +151,16 @@ export class ReferenceParser {
       return 'vacia';
     }
 
-    // Solo celular (10 dígitos)
+    // Solo celular (10 dígitos, con o sin espacios/guiones)
+    // "3XXXXXXXXX" o "3 XXX XXX XX" o "3-XXX-XXX-XX"
     if (/^(CEL)?\s*(\d{10})(\s|$)/.test(upper) || /^\d{10}(\s|$)/.test(linea)) {
+      return 'complementaria';
+    }
+    
+    // Celular con espacios/guiones: "310 247 7979" o "310-247-7979"
+    const soloDigitosYSeparadores = linea.replace(/[\s\-]/g, '');
+    if (/^3\d{9}$/.test(soloDigitosYSeparadores)) {
+      // Si al remover espacios/guiones queda un celular válido, es complementaria
       return 'complementaria';
     }
 
@@ -190,16 +189,27 @@ export class ReferenceParser {
     const textoCompleto = bloque.join(' | ');
     const upper = textoCompleto.toUpperCase();
 
-    // Patrón 1: "NOMBRE.. PARENTESCO.. UBICACION | CELULAR"
-    // Ej: "MARÍA RAMÍREZ.. ABUELA.. LAS MONTOYAS | 317 375 66"
-    const patron1 = /^([A-ZÁÉÍÓÚÑ\s]+?)\.\.(?:\s+)?([A-ZÁÉÍÓÚÑ\s]+?)(?:\.\.)?(?:\s+)?([A-ZÁÉÍÓÚÑ\s]+?)(?:\s*\|\s*)?(.+)?$/i;
+    // Patrón 1: "NOMBRE.. PARENTESCO.. UBICACION + CELULAR"
+    // Ej: "WILMER LÓPEZ.. HIJO.. BOYACÁ 310 247 7979"
+    // También acepta 3+ puntos: "YANCARLO LÓPEZ... HIJO.. BOYACÁ"
+    // Captura: nombre, parentesco, y TODO lo demás (ubicación + celular)
+    const patron1 = /^([A-ZÁÉÍÓÚÑ\s]+?)\.{2,}(?:\s+)?([A-ZÁÉÍÓÚÑ\s]+?)\.{2,}(?:\s+)?(.+)$/i;
     const match1 = textoCompleto.match(patron1);
     if (match1) {
       const nombre = match1[1]?.trim().toUpperCase();
       const parentesco = match1[2]?.trim().toUpperCase();
-      const ubicacion = match1[3]?.trim().toUpperCase();
+      const restoLinea = match1[3]?.trim() || '';
 
-      const celular = this.extraerCelularDe(textoCompleto);
+      // Buscar celular PRIMERO en el resto de la línea
+      const celular = this.extraerCelularDe(restoLinea);
+      
+      // Ubicación: todo lo que NO es celular (remover números y caracteres especiales incluyendo |)
+      const ubicacion = restoLinea
+        .replace(/[\d\s\-().;\\\|/]/g, ' ') // Remover dígitos, caracteres especiales y |
+        .replace(/\s+/g, ' ') // Limpiar espacios múltiples
+        .trim()
+        .toUpperCase();
+
       const parentescoMatch = this.fuzzyMatchParentesco(parentesco);
 
       if (nombre && nombre.length >= 2) {
@@ -368,35 +378,25 @@ export class ReferenceParser {
 
   /**
    * Extrae celular de un texto (busca 10 dígitos comenzando con 3)
+   * Maneja espacios, guiones, acentos: "310 247 7979" → "3102477979"
    */
   private extraerCelularDe(texto: string): string | null {
     if (!texto || texto.trim().length === 0) return null;
 
-    // Buscar patrones de celular colombiano que empiezan con 3
-    // Intenta: "3XXXXXXXXX" o "3 XXX XXXX" o "3XXX XXX XX" etc
+    // Paso 1: Remover TODOS los caracteres excepto dígitos y espacios/guiones
+    // "BOYACÁ 310 247 7979" → "  310  247 7979"
+    let soloDigitosYSeparadores = texto.replace(/[^0-9\s\-]/g, '');
     
-    // 1. Buscar secuencia de 3 seguido de 9 dígitos (sin espacios)
-    let match = texto.match(/\b(3\d{9})\b/);
-    if (match && match[1]) {
-      return match[1];
-    }
-
-    // 2. Buscar 3 al principio de palabra seguido de dígitos con espacios
-    // Ejemplo: "310 247 7979" → "3102477979"
-    match = texto.match(/\b3[\s\-]?(\d[\s\-]?){9}/i);
-    if (match) {
-      // Limpiar espacios y guiones
-      const cleaned = match[0].replace(/[\s\-]/g, '');
-      if (cleaned.length === 10 && cleaned.startsWith('3')) {
-        return cleaned;
-      }
-    }
-
-    // 3. Último intento: buscar cualquier "3" seguido de 9 dígitos en el texto limpio
-    const textLimpioDeEspacios = texto.replace(/[\s\-]/g, '');
-    const match3 = textLimpioDeEspacios.match(/(3\d{9})/);
-    if (match3 && match3[1]) {
-      return match3[1];
+    // Paso 2: Remover espacios y guiones para obtener secuencia limpia
+    // "  310  247 7979" → "3102477979"
+    const secuenciaLimpia = soloDigitosYSeparadores.replace(/[\s\-]/g, '');
+    
+    // Paso 3: Buscar cualquier secuencia de "3" seguido de 9 dígitos
+    const matches = secuenciaLimpia.match(/3\d{9}/g);
+    
+    if (matches && matches.length > 0) {
+      // Retornar el primer celular encontrado
+      return matches[0];
     }
 
     return null;
