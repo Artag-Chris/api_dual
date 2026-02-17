@@ -1,0 +1,162 @@
+2026-02-17T14:51:21.568Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T14:51:21.589Z info: Found 116 active puntos in legacy database
+2026-02-17T14:51:21.608Z info: Created bodega: 1 - PEREIRA - ASISTIMOTOS 
+2026-02-17T14:51:21.621Z info: Created bodega: 5 - SUPIA - CDA SAN MIGUEL
+2026-02-17T14:51:21.632Z info: Created bodega: 7 - URRAO ANTIOQUIA - CAD CACIQUE TONEE
+2026-02-17T14:51:21.646Z info: Created bodega: 8 - IBAGUE - ASISTIMOTOS 
+2026-02-17T14:51:21.657Z info: Created bodega: 11 - NEIVA - CDA UNIMOTOS
+2026-02-17T14:51:21.669Z info: Created bodega: 16 - SANTA ROSA DE CABAL - MOTO REPUESTOS
+2026-02-17T14:51:21.678Z info: Created bodega: 23 - BUGA - CDA TEAM ADVANCE
+2026-02-17T14:51:21.691Z info: Created bodega: 24 - LA UNION VALLE -  CDA MOTO LA UNION
+2026-02-17T14:51:21.702Z info: Created bodega: 25 - PEREIRA - ESTACION PARQUE OLAYA
+2026-02-17T14:51:21.714Z info: Created bodega: 26 - TULUA - CDA LA PISTA 
+2026-02-17T14:51:21.726Z info: Created bodega: 27 - SOACHA - CDA CEDIPLUS
+2026-02-17T14:51:21.738Z info: Created bodega: 28 - PEREIRA -  CAF
+2026-02-17T14:51:21.751Z info: Created bodega: 29 - BUGA - PUNTO SOAT 
+2026-02-17T14:51:21.763Z info: Created bodega: 30 - IBAGUE - CDA TECNIMOTORS 
+2026-02-17T14:51:21.775Z info: Created bodega: 35 - DOSQUEBRADAS - CDA CARDISEL
+2026-02-17T14:51:21.788Z info: Created bodega: 36 - IBAGUE - PUNTO GORA ASISTIMOTOS
+2026-02-17T14:51:21.799Z info: Created bodega: 37 - IBAGUE - CONTROL MOTOS 
+2026-02-17T14:51:21.810Z info: Created bodega: 39 - BOGOTA -  CDA MAXI MOTO
+2026-02-17T14:51:21.824Z info: Created bodega: 40 - LA DORADA - FIP SEGUROS
+2026-02-17T14:51:21.836Z info: Created bodega: 42 - CHAPARRAL TOLIMA - CDA DEL SUR DEL TOLIMA
+2026-02-17T14:51:21.847Z info: Created bodega: 43 - SAN GIL BUCARAMANGA - CDA MOTOS EL GALLINERAL
+2026-02-17T14:51:21.858Z info: Created bodega: 45 - MARIQUITA INNOVAMOTOS
+2026-02-17T14:51:21.867Z info: Created bodega: 47 - IBAGUÉ CDA CHECK AND GO
+2026-02-17T14:51:21.876Z info: Created bodega: 48 - LA DORADA - FACILCREDITOS SAS
+2026-02-17T14:51:21.885Z info: Created bodega: 49 - LA DORADA - DIAGNOSTICENTRO
+2026-02-17T14:51:21.894Z info: Created bodega: 51 - QUIMBAYA CDA TECNIMOTORS QUIMBAYA
+2026-02-17T14:51:21.905Z info: Created bodega: 52 - IBAGUÉ CDA DEL TOLIMA
+2026-02-17T14:51:21.915Z info: Created bodega: 53 - IBAGUE - CDA AUTO-GASES
+2026-02-17T14:51:21.924Z info: Created bodega: 54 - IBAGUÉ CDA AUTOGASES
+2026-02-17T14:51:21.933Z info: Created bodega: 55 - VILLAVICENCIO - CDA CARLLANOS
+2026-02-17T14:51:21.944Z info: Created bodega: 56 - VILLAVICENCIO CDA TECNO CAR
+2026-02-17T14:51:21.952Z info: Created bodega: 58 - IBAGUÉ CDA DIAGNOSTICAR
+2026-02-17T14:51:21.961Z info: Created bodega: 59 - PEREIRA CARDISEL TURIN
+2026-02-17T14:51:21.970Z info: Created bodega: 60 - MULTINTEGRAL LA 18
+2026-02-17T14:51:21.981Z info: Created bodega: 61 - VILLAVICENCIO - CDA AMBIENTAL CENTER
+2026-02-17T14:51:21.991Z info: Created bodega: 62 - NEIVA - CDA LA PRADERA
+2026-02-17T14:51:22.000Z info: Created bodega: 63 - PALMIRA - CDA PARAISO
+2026-02-17T14:51:22.010Z info: Created bodega: 64 - FUSAGASUGA - CDA CONTROL AUTOS
+2026-02-17T14:51:22.020Z info: Created bodega: 65 - PEREIRA - CDA AUTOMAS PEREIRA
+2026-02-17T14:51:22.030Z info: Created bodega: 66 - MANZANRES - CDA DE LA MONTAÑA
+2026-02-17T14:51:22.040Z info: Created bodega: 67 - BOGOTA - MOTO FULL
+2026-02-17T14:51:22.050Z info: Created bodega: 68 - PALMIRA- CDA LAS PALMAS 
+2026-02-17T14:51:22.060Z info: Created bodega: 69 - BOGOTÀ - CDA AUTOMAS CALLE 13 PERITAR
+2026-02-17T14:51:22.071Z info: Created bodega: 70 - GIRARDOT - CDA CONTROL AUTOS LAS ACACIAS GIRARDOT
+2026-02-17T14:51:22.080Z info: Created bodega: 71 - FLORENCIA - CDA MOTOMAS LTDA
+2026-02-17T14:51:22.089Z info: Created bodega: 72 - BOGOTA - CDA AUTOMAS LTDA CARRERA 46 NO 134-55
+2026-02-17T14:51:22.099Z info: Created bodega: 73 - BOGOTA - CDA AUTOMAS LTDA 1 DE MAYO
+2026-02-17T14:51:22.109Z info: Created bodega: 74 - MEDELLIN - CDA AUTOMAS LAURELES
+2026-02-17T14:51:22.118Z info: Created bodega: 75 - CALI - CDA AUTOMAS CALI AV CANAS GORDAS
+2026-02-17T14:51:22.126Z info: Created bodega: 76 - MEDELLIN - CDA GRUPO AUTOPOR
+2026-02-17T14:51:22.135Z info: Created bodega: 77 - MARIQUITA - CONTROL MOTOS
+2026-02-17T14:51:22.144Z info: Created bodega: 78 - NEIVA - CDA SAN PEDRO
+2026-02-17T14:51:22.153Z info: Created bodega: 79 - IBAGUE - CDA LA REVISION
+2026-02-17T14:51:22.163Z info: Created bodega: 80 - PALMIRA - CDA LAS PALMAS
+2026-02-17T14:51:22.173Z info: Created bodega: 81 - ESPINAL - CDA DIANOSTI MOTOS ESPINAL
+2026-02-17T14:51:22.183Z info: Created bodega: 82 - LA DORADA J&M SEGUROS
+2026-02-17T14:51:22.193Z info: Created bodega: 83 - NEIVA - CDA LA CUARTA
+2026-02-17T14:51:22.202Z info: Created bodega: 84 - GIRARDOT - CDA CERTIMOTOSGIR SAS
+2026-02-17T14:51:22.213Z info: Created bodega: 85 - PEREIRA CDA MOTEROS SAS
+2026-02-17T14:51:22.224Z info: Created bodega: 86 - PEREIRA CDA ANGELES DEL RIO SAS
+2026-02-17T14:51:22.238Z info: Created bodega: 87 - NEIVA ASISTIMOTOS FREELAND
+2026-02-17T14:51:22.247Z info: Created bodega: 89 - RIOSUCIO - FACILCREDITOS SAS
+2026-02-17T14:51:22.255Z info: Created bodega: 90 - PEREIRA - FACILCREDITOS SAS
+2026-02-17T14:51:22.264Z info: Created bodega: 91 - SUPIA - FACILCREDITOS SAS
+2026-02-17T14:51:22.359Z info: Created bodega: 92 - GUATICA - FACILCREDITOS SAS
+2026-02-17T14:51:22.368Z info: Created bodega: 93 - IBAGUE - CENTRO DE DIAGNOSTICO AUTOMOTRIZ MOTO CLUB AMBALA SAS
+2026-02-17T14:51:22.377Z info: Created bodega: 94 - VILLAMARIA - GRUPO PALOGRANDE SA
+2026-02-17T14:51:22.386Z info: Created bodega: 95 - LA DORADA - ASISTIMOTOS CENTRO
+2026-02-17T14:51:22.396Z info: Created bodega: 96 - LA DORADA - ASISTIMOTOS- LAS FERIAS
+2026-02-17T14:51:22.405Z info: Created bodega: 97 - LA VIRGINIA - PUNTO PROPIO
+2026-02-17T14:51:22.414Z info: Created bodega: 98 - SUPIA - CDA SUPIA SAS
+2026-02-17T14:51:22.423Z info: Created bodega: 99 - SUPIA - PUNTO PROPIO
+2026-02-17T14:51:22.449Z info: Created bodega: 108 - CHAPARRAL - FACILCREDITOS SAS
+2026-02-17T14:51:22.459Z info: Created bodega: 109 - IBAGUE GRUPO 2 - FACILCREDITOS SAS
+2026-02-17T14:51:22.483Z info: Created bodega: 119 - BUCARAMANGA JM MULTISISTEMAS ESTRATEGIA REPORT
+2026-02-17T14:51:22.510Z info: Created bodega: 128 - CHAPARRAL - FACILCREDITOS SAS LIBRANZA INFORMAL
+2026-02-17T14:51:22.519Z info: Created bodega: 129 - GUADUAS - FACILCREDITOS SAS LIBRANZA INFORMAL
+2026-02-17T14:51:22.543Z info: Created bodega: 137 - POPAYÁN - FACILCREDITOS SAS LIBRANZA INFORMAL
+2026-02-17T14:51:22.555Z info: Created bodega: 138 - POPAYÁN - FACILCREDITOS SAS ESTRATEGIA REPORT
+2026-02-17T14:51:22.564Z info: Created bodega: 139 - PITALITO - FACILCREDITOS SAS
+2026-02-17T14:51:22.575Z info: Bodega mapping completed: 116 entries
+2026-02-17T14:51:22.575Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T14:51:22.576Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T14:51:22.583Z info: Loaded active credit data for 0 precreditos
+2026-02-17T14:51:22.584Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T14:51:22.637Z info: [MIGRATION] Processing 1 credits...
+2026-02-17T14:51:22.662Z info: [CREDIT] Created detalle_credito 171 for precredito 39631
+2026-02-17T14:51:22.663Z info: [PHASE 11] Generating amortization for prestamo 171...
+2026-02-17T14:51:22.663Z info: Generating 48 cuotas for new credit
+2026-02-17T14:51:22.665Z info: Generated 48 amortization entries for prestamo 171
+2026-02-17T14:51:22.832Z info: [PHASE 11] Generated 48 amortization entries
+2026-02-17T14:51:22.832Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T14:51:22.842Z warn: No ref_productos found for precredito 39631
+2026-02-17T14:51:22.842Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T14:51:22.849Z info: [PHASE 13] Created saldo_inicial for prestamo 171
+2026-02-17T14:51:22.854Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T14:51:22.880Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T14:56:16.281Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T14:56:16.287Z info: Found 116 active puntos in legacy database
+2026-02-17T14:56:16.573Z info: Bodega mapping completed: 116 entries
+2026-02-17T14:56:16.574Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T14:56:16.574Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T14:56:16.579Z info: Loaded active credit data for 0 precreditos
+2026-02-17T14:56:16.579Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T14:56:16.633Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T14:56:16.656Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T14:57:58.513Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T14:57:58.527Z info: Found 116 active puntos in legacy database
+2026-02-17T14:57:58.741Z info: Bodega mapping completed: 116 entries
+2026-02-17T14:57:58.742Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T14:57:58.742Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T14:57:58.752Z info: Loaded active credit data for 1 precreditos
+2026-02-17T14:57:58.752Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T14:57:58.793Z info: [MIGRATION] Processing 1 credits...
+2026-02-17T14:57:58.814Z info: [CREDIT] Created detalle_credito 172 for precredito 37598
+2026-02-17T14:57:58.814Z info: [PHASE 11] Generating amortization for prestamo 172...
+2026-02-17T14:57:58.815Z info: Generating 18 remaining cuotas (6 already paid) starting from cuota 7
+2026-02-17T14:57:58.815Z info: Generated 18 amortization entries for prestamo 172
+2026-02-17T14:57:58.882Z info: [PHASE 11] Generated 18 amortization entries
+2026-02-17T14:57:58.883Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T14:57:58.889Z warn: No ref_productos found for precredito 37598
+2026-02-17T14:57:58.890Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T14:57:58.896Z info: [PHASE 13] Created saldo_inicial for prestamo 172
+2026-02-17T14:57:58.896Z info: [PHASE 14] Migrating payment history...
+2026-02-17T14:57:58.961Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/pago-historico-mapper.ts:67:24
+
+  64 }
+  65 
+  66 // Create payment record in main
+→ 67 await tx.pagos.create({
+       data: {
+         prestamo_id: 172,
+         valor_pago: 8465,
+         fecha_pago: new Date("2025-11-01T13:16:15.000Z"),
+         hora_pago: "00:00:00",
+                    ~~~~~~~~~~
+         canal_pago: "MANUAL",
+         medio_pago: "EFECTIVO",
+         tipo_pago: "CUOTA",
+         numero_cuota: 1,
+         origen: "MIGRADO",
+         estado_pago: "APLICADO",
+         usuario_aplicacion: "MIGRACION_AUTOMATICA",
+         fecha_aplicacion: new Date("2025-11-01T13:16:15.000Z"),
+         observacion: "Pago migrado desde FACILITO",
+         referencia_id_transaccion: undefined
+       }
+     })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T14:57:58.962Z info: [PHASE 14] Migrated 0 payment records
+2026-02-17T14:57:58.969Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T14:57:58.987Z info: [PHASE 10] Created estudios_realizados successfully

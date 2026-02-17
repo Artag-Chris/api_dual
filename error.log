@@ -26968,3 +26968,36 @@ Unique constraint failed on the constraint: `PRIMARY`
     at Wn.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client/runtime/library.js:121:6858)
     at Wn.request (/home/node/app/node_modules/@prisma/client/runtime/library.js:121:6565)
     at l (/home/node/app/node_modules/@prisma/client/runtime/library.js:130:10067)
+2026-02-17T14:57:58.961Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/pago-historico-mapper.ts:67:24
+
+  64 }
+  65 
+  66 // Create payment record in main
+→ 67 await tx.pagos.create({
+       data: {
+         prestamo_id: 172,
+         valor_pago: 8465,
+         fecha_pago: new Date("2025-11-01T13:16:15.000Z"),
+         hora_pago: "00:00:00",
+                    ~~~~~~~~~~
+         canal_pago: "MANUAL",
+         medio_pago: "EFECTIVO",
+         tipo_pago: "CUOTA",
+         numero_cuota: 1,
+         origen: "MIGRADO",
+         estado_pago: "APLICADO",
+         usuario_aplicacion: "MIGRACION_AUTOMATICA",
+         fecha_aplicacion: new Date("2025-11-01T13:16:15.000Z"),
+         observacion: "Pago migrado desde FACILITO",
+         referencia_id_transaccion: undefined
+       }
+     })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
