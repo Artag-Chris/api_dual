@@ -3,6 +3,14 @@ import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service
 import ClienteMapperService from './cliente-mapper';
 import { CreditoMapper } from './credito-mapper';
 import { ReferenceParser } from './reference-parser';
+import { BodegaMapper } from '../../domain/class/bodega-mapper';
+import { CreditosIntegrationMapper } from '../../domain/class/creditos-integration-mapper';
+import { AmortizacionGenerator } from '../../domain/class/amortizacion-generator';
+import { EstudiosRealizadosMapper } from '../../domain/class/estudios-realizados-mapper';
+import { PedidoMapper } from '../../domain/class/pedido-mapper';
+import { SaldoInicialMapper } from '../../domain/class/saldo-inicial-mapper';
+import { PagoHistoricoMapper } from '../../domain/class/pago-historico-mapper';
+import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
 /**************************************************************************************************
  * Servicio para datos Main
@@ -13,8 +21,25 @@ import { ReferenceParser } from './reference-parser';
 
 class MainDataService {
   private static instance: MainDataService;
+  private logger: typeof WinstonAdapter;
+  private bodegaMapper: BodegaMapper;
+  private creditosIntegrationMapper: CreditosIntegrationMapper;
+  private amortizacionGenerator: AmortizacionGenerator;
+  private estudiosRealizadosMapper: EstudiosRealizadosMapper;
+  private pedidoMapper: PedidoMapper;
+  private saldoInicialMapper: SaldoInicialMapper;
+  private pagoHistoricoMapper: PagoHistoricoMapper;
 
-  constructor() {}
+  constructor() {
+    this.logger = WinstonAdapter;
+    this.bodegaMapper = new BodegaMapper(prismaMainService, prismaLegacyService, this.logger);
+    this.creditosIntegrationMapper = new CreditosIntegrationMapper(prismaLegacyService, this.logger);
+    this.amortizacionGenerator = new AmortizacionGenerator(this.logger);
+    this.estudiosRealizadosMapper = new EstudiosRealizadosMapper(prismaLegacyService, this.logger);
+    this.pedidoMapper = new PedidoMapper(prismaMainService, prismaLegacyService, this.logger);
+    this.saldoInicialMapper = new SaldoInicialMapper(this.logger);
+    this.pagoHistoricoMapper = new PagoHistoricoMapper(prismaLegacyService, this.logger);
+  }
 
   public static getInstance(): MainDataService {
     if (!MainDataService.instance) {
@@ -392,6 +417,17 @@ class MainDataService {
       conyugeDto = conyugeMapped;
     }
 
+    // PHASE 0: Create bodega mapping (puntos → bodega)
+    this.logger.info('[PHASE 0] Creating bodega mapping...');
+    const mapeoBodegas = await this.bodegaMapper.crearMapeoBodegas();
+    this.logger.info(`[PHASE 0] Bodega mapping created: ${mapeoBodegas.size} entries`);
+
+    // PHASE 9: Get active credits data (if exists)
+    this.logger.info('[PHASE 9] Fetching active credit data from legacy...');
+    const precreditoIds = precreditosData.map((p: any) => Number(p.id));
+    const datosCreditosActivos = await this.creditosIntegrationMapper.obtenerDatosCreditoActivoLote(precreditoIds);
+    this.logger.info(`[PHASE 9] Loaded ${datosCreditosActivos.size} active credits`);
+
     // 5-12. Iniciar transacción e insertar datos
     try {
       const result = await prismaMainService.$transaction(async (tx) => {
@@ -565,11 +601,25 @@ class MainDataService {
 
         // 10.1 Crear detalle_credito (créditos migrados desde precreditos legacy)
         const detalleCreditos: any[] = [];
+        const amortizaciones: any[] = [];
+        const pedidos: any[] = [];
+        const saldosIniciales: any[] = [];
+        
         if (precreditosData && precreditosData.length > 0) {
+          this.logger.info(`[MIGRATION] Processing ${precreditosData.length} credits...`);
+          
           for (const precredito of precreditosData) {
+            const precreditoId = Number(precredito.id);
+            
+            // Get active credit data
+            const datosCreditoActivo = datosCreditosActivos.get(precreditoId) || null;
+            
             const [error, creditoDto] = await CreditoMapper.mapToCreditoDto(precredito, clienteLegacy);
 
             if (!error && creditoDto) {
+              // Determine final estado (use active credit status if available)
+              const estadoFinal = datosCreditoActivo ? datosCreditoActivo.estado : creditoDto.estado;
+
               // Buscar el tipo de crédito en la lista
               const tipoCredito = await tx.lista_tipo_credito.findFirst({
                 where: { tipo: creditoDto.tipoCredito },
@@ -590,7 +640,7 @@ class MainDataService {
                   },
                   lista_estado_credito: {
                     connect: {
-                      tipo: creditoDto.estado,
+                      tipo: estadoFinal,
                     },
                   },
                   lista_origen_credito: {
@@ -615,8 +665,99 @@ class MainDataService {
               });
 
               detalleCreditos.push(detalleCredito);
+              this.logger.info(`[CREDIT] Created detalle_credito ${detalleCredito.prestamo_ID} for precredito ${precreditoId}`);
+
+              // PHASE 11: Generate amortization
+              this.logger.info(`[PHASE 11] Generating amortization for prestamo ${detalleCredito.prestamo_ID}...`);
+              const cuotasAmortizacion = this.amortizacionGenerator.generarAmortizacion({
+                prestamo_ID: detalleCredito.prestamo_ID,
+                valor_prestamo: parseInt(creditoDto.valor_prestamo),
+                numero_cuotas: parseInt(creditoDto.numero_cuotas),
+                tasa_mensual: parseFloat(creditoDto.tasa),
+                periocidad: creditoDto.periocidad,
+                fecha_inicial: new Date(creditoDto.fechaPago),
+                datosCreditoActivo,
+              });
+
+              // Create amortization records
+              for (const cuota of cuotasAmortizacion) {
+                const amort = await tx.amortizacion.create({
+                  data: {
+                    prestamoID: cuota.prestamo_ID,
+                    documento: documento,
+                    Numero_cuota: String(cuota.numero_cuota),
+                    capital: cuota.capital,
+                    interes: cuota.interes,
+                    aval: cuota.aval,
+                    IVA: cuota.IVA,
+                    total_cuota: cuota.total_cuota,
+                    saldo: String(cuota.saldo),
+                    fecha_pago: cuota.fecha_pago.toISOString().split('T')[0],
+                  },
+                });
+                amortizaciones.push(amort);
+              }
+              
+              this.logger.info(`[PHASE 11] Generated ${cuotasAmortizacion.length} amortization entries`);
+
+              // PHASE 12: Create pedido with products
+              this.logger.info(`[PHASE 12] Creating pedido with products...`);
+              try {
+                const { pedidoId, productos } = await this.pedidoMapper.crearPedidoConProductos(
+                  precreditoId,
+                  userCliente.id,
+                  detalleCredito.prestamo_ID,
+                  mapeoBodegas,
+                  tx
+                );
+                
+                if (pedidoId > 0) {
+                  pedidos.push({ pedidoId, productos });
+                  this.logger.info(`[PHASE 12] Created pedido ${pedidoId} with ${productos} products`);
+                }
+              } catch (pedidoError) {
+                this.logger.warn(`[PHASE 12] Could not create pedido for precredito ${precreditoId}: ${pedidoError}`);
+              }
+
+              // PHASE 13: Create saldo_inicial
+              this.logger.info(`[PHASE 13] Creating saldo_inicial...`);
+              const saldoInicialDto = this.saldoInicialMapper.crearSaldoInicial(
+                detalleCredito.prestamo_ID,
+                documento,
+                parseInt(creditoDto.valor_prestamo),
+                datosCreditoActivo
+              );
+
+              if (saldoInicialDto) {
+                const saldoInicial = await tx.saldo_inicial.create({
+                  data: {
+                    prestamoID: saldoInicialDto.prestamoID,
+                    documento: saldoInicialDto.documento,
+                    saldo_Inicial: saldoInicialDto.saldo_Inicial,
+                    saldo_actual: saldoInicialDto.saldo_actual,
+                  },
+                });
+                saldosIniciales.push(saldoInicial);
+                this.logger.info(`[PHASE 13] Created saldo_inicial for prestamo ${detalleCredito.prestamo_ID}`);
+              }
+
+              // PHASE 14: Migrate payment history
+              if (datosCreditoActivo && datosCreditoActivo.credito_id) {
+                this.logger.info(`[PHASE 14] Migrating payment history...`);
+                try {
+                  const pagosMigrados = await this.pagoHistoricoMapper.migrarHistorialPagos(
+                    datosCreditoActivo.credito_id,
+                    detalleCredito.prestamo_ID,
+                    tx
+                  );
+                  this.logger.info(`[PHASE 14] Migrated ${pagosMigrados} payment records`);
+                } catch (pagoError) {
+                  this.logger.warn(`[PHASE 14] Could not migrate payments: ${pagoError}`);
+                }
+              }
+
             } else {
-              console.warn(`[MAIN-DATA-SERVICE] Error mapeando precredito ${precredito.id}: ${error}`);
+              this.logger.warn(`[MAIN-DATA-SERVICE] Error mapeando precredito ${precredito.id}: ${error}`);
             }
           }
         }
@@ -630,19 +771,43 @@ class MainDataService {
           },
         });
 
-        // 10.3 Crear estudios_realizados  
-        const estudiosRealizados = await tx.estudios_realizados.create({
-          data: {
-            documento: documento,
-            cupo: '0',
-            cupoDisponible: '0',
-            tasa: 0,
-            plazo: 12,
-            creditos_activos: precreditosData.length,
-            creditos_maximos: 2,
-            observacion: 'migrado desde FACILITO',
-          },
-        });
+        // PHASE 10: Crear estudios_realizados con datos reales
+        this.logger.info('[PHASE 10] Creating estudios_realizados with real data...');
+        const estudiosDto = await this.estudiosRealizadosMapper.crearEstudioRealizado(documento);
+        
+        let estudiosRealizados;
+        if (estudiosDto) {
+          estudiosRealizados = await tx.estudios_realizados.create({
+            data: {
+              documento: estudiosDto.documento,
+              cupo: estudiosDto.cupo,
+              cupoDisponible: estudiosDto.cupoDisponible,
+              tasa: estudiosDto.tasa,
+              plazo: estudiosDto.plazo,
+              creditos_activos: estudiosDto.creditos_activos,
+              creditos_maximos: estudiosDto.creditos_maximos,
+              pagare: estudiosDto.pagare,
+              desembolso: estudiosDto.desembolso,
+              observacion: estudiosDto.observacion,
+            },
+          });
+          this.logger.info('[PHASE 10] Created estudios_realizados successfully');
+        } else {
+          // Fallback to default
+          estudiosRealizados = await tx.estudios_realizados.create({
+            data: {
+              documento: documento,
+              cupo: '0',
+              cupoDisponible: '0',
+              tasa: 0,
+              plazo: 12,
+              creditos_activos: precreditosData.length,
+              creditos_maximos: 2,
+              observacion: 'migrado desde FACILITO',
+            },
+          });
+          this.logger.warn('[PHASE 10] Used default estudios_realizados');
+        }
 
         // 11. Crear cónyuge si existe
         let conyuge = null;
@@ -669,7 +834,16 @@ class MainDataService {
           estudioDeCredito,
           estudiosRealizados,
           detalleCreditos,
+          amortizaciones,
+          pedidos,
+          saldosIniciales,
           conyuge,
+          stats: {
+            creditosCreados: detalleCreditos.length,
+            cuotasAmortizacion: amortizaciones.length,
+            pedidosCreados: pedidos.length,
+            saldosCreados: saldosIniciales.length,
+          },
         };
       });
 
@@ -686,6 +860,7 @@ class MainDataService {
           detalle_credito: result.detalleCreditos,
           ...(result.conyuge && { conyuge: result.conyuge }),
         },
+        migration_stats: result.stats,
       };
     } catch (error) {
       // Transacción automáticamente revertida en caso de error

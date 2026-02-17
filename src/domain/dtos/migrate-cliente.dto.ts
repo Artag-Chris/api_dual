@@ -369,3 +369,257 @@ export class DetalleCreditoCreateDto {
     ];
   }
 }
+
+// ==================== AMORTIZACION DTO ====================
+export class AmortizacionCreateDto {
+  private constructor(
+    public readonly prestamo_ID: number,
+    public readonly numero_cuota: number,
+    public readonly capital: number,
+    public readonly interes: number,
+    public readonly aval: number,
+    public readonly IVA: number,
+    public readonly total_cuota: number,
+    public readonly saldo: number,
+    public readonly fecha_pago: Date,
+    public readonly estado: 'PENDIENTE' | 'PAGADO' | 'VENCIDO' = 'PENDIENTE'
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, AmortizacionCreateDto?] {
+    const {
+      prestamo_ID,
+      numero_cuota,
+      capital,
+      interes,
+      aval,
+      IVA,
+      total_cuota,
+      saldo,
+      fecha_pago,
+      estado,
+    } = props;
+
+    if (!prestamo_ID) return ['Prestamo ID is required', undefined];
+    if (numero_cuota === undefined) return ['Numero cuota is required', undefined];
+    if (capital === undefined) return ['Capital is required', undefined];
+    if (interes === undefined) return ['Interes is required', undefined];
+    if (saldo === undefined) return ['Saldo is required', undefined];
+    if (!fecha_pago) return ['Fecha pago is required', undefined];
+
+    return [
+      undefined,
+      new AmortizacionCreateDto(
+        prestamo_ID,
+        numero_cuota,
+        capital || 0,
+        interes || 0,
+        aval || 0,
+        IVA || 0,
+        total_cuota || 0,
+        saldo,
+        new Date(fecha_pago),
+        estado || 'PENDIENTE'
+      ),
+    ];
+  }
+}
+
+// ==================== ESTUDIOS REALIZADOS DTO ====================
+export class EstudiosRealizadosCreateDto {
+  private constructor(
+    public readonly documento: string,
+    public readonly cupo: string,
+    public readonly cupoDisponible: string,
+    public readonly tasa: number,
+    public readonly plazo: number,
+    public readonly creditos_activos?: number,
+    public readonly creditos_maximos: number = 2,
+    public readonly pagare?: string,
+    public readonly desembolso?: string,
+    public readonly observacion?: string
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, EstudiosRealizadosCreateDto?] {
+    const {
+      documento,
+      cupo,
+      cupoDisponible,
+      tasa,
+      plazo,
+      creditos_activos,
+      creditos_maximos,
+      pagare,
+      desembolso,
+      observacion,
+    } = props;
+
+    if (!documento) return ['Documento is required', undefined];
+    if (cupo === undefined) return ['Cupo is required', undefined];
+    if (tasa === undefined) return ['Tasa is required', undefined];
+    if (plazo === undefined) return ['Plazo is required', undefined];
+
+    return [
+      undefined,
+      new EstudiosRealizadosCreateDto(
+        documento,
+        String(cupo),
+        String(cupoDisponible || cupo),
+        tasa,
+        plazo,
+        creditos_activos || 0,
+        creditos_maximos || 2,
+        pagare,
+        desembolso,
+        observacion
+      ),
+    ];
+  }
+}
+
+// ==================== SALDO INICIAL DTO ====================
+export class SaldoInicialCreateDto {
+  private constructor(
+    public readonly prestamoID: number,
+    public readonly documento: string,
+    public readonly saldo_Inicial: number,
+    public readonly saldo_actual: number
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, SaldoInicialCreateDto?] {
+    const { prestamoID, documento, saldo_Inicial, saldo_actual } = props;
+
+    if (!prestamoID) return ['PrestamoID is required', undefined];
+    if (!documento) return ['Documento is required', undefined];
+    if (saldo_Inicial === undefined) return ['Saldo inicial is required', undefined];
+    if (saldo_actual === undefined) return ['Saldo actual is required', undefined];
+
+    return [
+      undefined,
+      new SaldoInicialCreateDto(prestamoID, documento, saldo_Inicial, saldo_actual),
+    ];
+  }
+}
+
+// ==================== PEDIDO DTO ====================
+export class PedidoCreateDto {
+  private constructor(
+    public readonly user_cliente_id: number,
+    public readonly prestamo_ID: number,
+    public readonly cuota_inicial: number,
+    public readonly valor_total: number,
+    public readonly estado: string = 'CREADO',
+    public readonly id_asesor?: number
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, PedidoCreateDto?] {
+    const { user_cliente_id, prestamo_ID, cuota_inicial, valor_total, estado, id_asesor } = props;
+
+    if (!user_cliente_id) return ['User cliente ID is required', undefined];
+    if (!prestamo_ID) return ['Prestamo ID is required', undefined];
+    if (cuota_inicial === undefined) return ['Cuota inicial is required', undefined];
+    if (valor_total === undefined) return ['Valor total is required', undefined];
+
+    return [
+      undefined,
+      new PedidoCreateDto(
+        user_cliente_id,
+        prestamo_ID,
+        cuota_inicial,
+        valor_total,
+        estado || 'CREADO',
+        id_asesor
+      ),
+    ];
+  }
+}
+
+// ==================== PEDIDO PRODUCTO DTO ====================
+export class PedidoProductoCreateDto {
+  private constructor(
+    public readonly pedido_id: number,
+    public readonly product_id: number,
+    public readonly cantidad_selec: number,
+    public readonly costo_final: number,
+    public readonly almacen: number
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, PedidoProductoCreateDto?] {
+    const { pedido_id, product_id, cantidad_selec, costo_final, almacen } = props;
+
+    if (!pedido_id) return ['Pedido ID is required', undefined];
+    if (!product_id) return ['Product ID is required', undefined];
+    if (!cantidad_selec) return ['Cantidad is required', undefined];
+    if (costo_final === undefined) return ['Costo final is required', undefined];
+    if (!almacen) return ['Almacen is required', undefined];
+
+    return [
+      undefined,
+      new PedidoProductoCreateDto(pedido_id, product_id, cantidad_selec, costo_final, almacen),
+    ];
+  }
+}
+
+// ==================== PAGO HISTORICO DTO ====================
+export class PagoHistoricoCreateDto {
+  private constructor(
+    public readonly prestamo_id: number,
+    public readonly valor_pago: number,
+    public readonly fecha_pago: Date,
+    public readonly hora_pago: string,
+    public readonly canal_pago: 'MANUAL' | 'API_PAGOS',
+    public readonly medio_pago: 'EFECTIVO' | 'EFECTY' | 'TRANSFERENCIA' | 'CARD',
+    public readonly tipo_pago: 'CUOTA' | 'PAGO_TOTAL' | 'CUOTA_INICIAL',
+    public readonly numero_cuota: number | null,
+    public readonly origen: string,
+    public readonly estado_pago: 'PENDIENTE' | 'APLICADO' | 'REVERSADO',
+    public readonly usuario_aplicacion: string,
+    public readonly fecha_aplicacion?: Date,
+    public readonly observacion?: string,
+    public readonly referencia_id_transaccion?: string
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, PagoHistoricoCreateDto?] {
+    const {
+      prestamo_id,
+      valor_pago,
+      fecha_pago,
+      hora_pago,
+      canal_pago,
+      medio_pago,
+      tipo_pago,
+      numero_cuota,
+      origen,
+      estado_pago,
+      usuario_aplicacion,
+      fecha_aplicacion,
+      observacion,
+      referencia_id_transaccion,
+    } = props;
+
+    if (!prestamo_id) return ['Prestamo ID is required', undefined];
+    if (valor_pago === undefined) return ['Valor pago is required', undefined];
+    if (!fecha_pago) return ['Fecha pago is required', undefined];
+    if (!estado_pago) return ['Estado pago is required', undefined];
+    if (!usuario_aplicacion) return ['Usuario aplicacion is required', undefined];
+
+    return [
+      undefined,
+      new PagoHistoricoCreateDto(
+        prestamo_id,
+        valor_pago,
+        new Date(fecha_pago),
+        hora_pago || '00:00:00',
+        canal_pago || 'MANUAL',
+        medio_pago || 'EFECTIVO',
+        tipo_pago || 'CUOTA',
+        numero_cuota || null,
+        origen || 'MIGRADO',
+        estado_pago,
+        usuario_aplicacion,
+        fecha_aplicacion ? new Date(fecha_aplicacion) : undefined,
+        observacion,
+        referencia_id_transaccion
+      ),
+    ];
+  }
+}
