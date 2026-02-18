@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import MainDataService from './main-data.service';
+import { BulkMigrationParser } from '../../domain/dtos/bulk-migration.dto';
 
 export class MainDataController {
   constructor(
@@ -276,4 +277,72 @@ export class MainDataController {
       });
     }
   }
+
+  // ==================== AMORTIZACIONES CON ESTADO ====================
+
+  getAmortizacionesConEstado = async (req: Request, res: Response) => {
+    try {
+      const { prestamoID } = req.params;
+      const data = await this.mainDataService.getAmortizacionesConEstado(parseInt(prestamoID));
+      
+      res.status(200).json({
+        success: true,
+        data
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
+        success: false,
+        error: errorMessage
+      });
+    }
+  }
+
+  // ==================== BULK MIGRATION ====================
+
+  bulkMigrateFromExcel = async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        res.status(400).json({
+          success: false,
+          error: 'No file provided. Please upload an Excel file.'
+        });
+        return;
+      }
+
+      // Validate file type (accept .xlsx and .csv)
+      const isValidType = req.file.originalname.endsWith('.xlsx') || req.file.originalname.endsWith('.csv');
+      if (!isValidType) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid file type. Please upload an Excel (.xlsx) or CSV (.csv) file.'
+        });
+        return;
+      }
+
+      // Parse file
+      const parser = new BulkMigrationParser();
+      const rows = await parser.parseFile(req.file.buffer, req.file.originalname);
+
+      // Extract documentos
+      const documentos = rows.map((row) => row.documento);
+
+      // Process bulk migration
+      const resultado = await this.mainDataService.procesarBulkMigracionExcel(documentos);
+
+      res.status(200).json({
+        success: true,
+        message: `Migración masiva completada: ${resultado.exitosos} exitosos, ${resultado.errores} errores`,
+        data: resultado
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({
+        success: false,
+        error: errorMessage
+      });
+    }
+  }
 }
+
+

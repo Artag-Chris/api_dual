@@ -24,6 +24,7 @@ interface AmortizacionParams {
   iva_aval?: number;      // ✅ IVA sobre aval (%)
   seguro_add?: number;    // ✅ Seguro adicional
   pablok?: number;        // ✅ Pablok
+  residual_historial?: number;  // ✅ Residual from payment history (optional override)
 }
 
 export class AmortizacionGenerator {
@@ -51,7 +52,14 @@ export class AmortizacionGenerator {
       iva_aval = 0.19,   // 19% default IVA
       seguro_add = 0,    // Seguro adicional
       pablok = 0,        // Pablok
+      residual_historial = null,  // ✅ Residual from payment history
     } = params;
+
+    // ✅ DEBUG: Log residual_historial value
+    this.logger.info(
+      `[GENERARAMORTIZACION] residual_historial = ${residual_historial} ` +
+      `(type: ${typeof residual_historial})`
+    );
 
     // CRITICAL VALIDATION: Interest rate must be > 0
     if (tasa_mensual <= 0) {
@@ -137,6 +145,26 @@ export class AmortizacionGenerator {
       const numeroCuota = i + 1;
       const esUltimaCuota = i === numero_cuotas - 1;
 
+      // ✅ ADJUST SALDO FOR LAST CUOTA WITH RESIDUAL BEFORE CALCULATING INTEREST
+      // This ensures interest is calculated on the correct remaining balance
+      if (esUltimaCuota && residual_historial !== null && residual_historial !== undefined && residual_historial > 0) {
+        this.logger.info(
+          `[PRE-ADJUST CHECK] Cuota ${numeroCuota}: esUltimaCuota=${esUltimaCuota}, ` +
+          `residual_historial=${residual_historial}, residual > 0: ${residual_historial > 0}`
+        );
+        saldo = residual_historial;
+        this.logger.info(
+          `[ÚLTIMA CUOTA PRE-CALC] ${numeroCuota}: Saldo pre-ajustado a residual=$${saldo} antes de calcular interés`
+        );
+      } else {
+        if (esUltimaCuota) {
+          this.logger.info(
+            `[PRE-ADJUST CHECK] Cuota ${numeroCuota}: esUltimaCuota=${esUltimaCuota}, ` +
+            `residual_historial=${residual_historial} (type:${typeof residual_historial}), NO pre-adjustment applies`
+          );
+        }
+      }
+
       // ✅ Calculate THEORETICAL interest (NEVER adjustable - derived from saldo × tasa)
       // This ensures interés ALWAYS remains positive
       const interesTeorico = saldo * tasaPeriodica;
@@ -197,23 +225,35 @@ export class AmortizacionGenerator {
 
       // ✅ For LAST CUOTA: calculate residual and ensure it's not zero
       if (esUltimaCuota) {
-        // Calculate residual from accumulated truncation
-        const capitalResidual = valor_prestamo - saldoAcumulado;
-        
-        if (capitalResidual <= 0) {
-          // All capital was paid in previous cuotas
-          capitalAjustado = 0;
-          this.logger.warn(
-            `[ÚLTIMA CUOTA] ${numeroCuota}: Residual ≤ 0 ($${capitalResidual}). ` +
-            `Todas las cuotas anteriores pagaron la deuda exactamente.`
+        // ✅ PRIORITY 1: Use residual from payment history if available
+        // NOTE: residual_historial is the REMAINING BALANCE, not capital to subtract
+        if (residual_historial !== null && residual_historial !== undefined && residual_historial > 0) {
+          // Set saldo to residual BEFORE calculating capital
+          // This way, capital will be the remaining balance
+          capitalAjustado = Math.max(0, saldo);  // Pay what's left in current saldo
+          this.logger.info(
+            `[ÚLTIMA CUOTA] ${numeroCuota}: ✅ Historial tiene residual=$${residual_historial}. ` +
+            `Capital actual=$${capitalAjustado}, Saldo will become=$${residual_historial}`
           );
         } else {
-          // Use the residual (ensures last cuota is never $0)
-          capitalAjustado = capitalResidual;
-          this.logger.info(
-            `[ÚLTIMA CUOTA] ${numeroCuota}: Usando residual=$${capitalAjustado} ` +
-            `(suma anterior: $${saldoAcumulado}, total esperado: $${valor_prestamo})`
-          );
+          // PRIORITY 2: Calculate residual from accumulated truncation
+          const capitalResidual = valor_prestamo - saldoAcumulado;
+          
+          if (capitalResidual <= 0) {
+            // All capital was paid in previous cuotas
+            capitalAjustado = 0;
+            this.logger.warn(
+              `[ÚLTIMA CUOTA] ${numeroCuota}: Residual ≤ 0 ($${capitalResidual}). ` +
+              `Todas las cuotas anteriores pagaron la deuda exactamente.`
+            );
+          } else {
+            // Use the residual (ensures last cuota is never $0)
+            capitalAjustado = capitalResidual;
+            this.logger.info(
+              `[ÚLTIMA CUOTA] ${numeroCuota}: Usando residual CALCULADO=$${capitalAjustado} ` +
+              `(suma anterior: $${saldoAcumulado}, total esperado: $${valor_prestamo})`
+            );
+          }
         }
       }
 
@@ -231,7 +271,9 @@ export class AmortizacionGenerator {
       // ✅ Track cumulative capital for residual calculation in last cuota
       saldoAcumulado += capitalTruncado;
 
-      // ✅ Update saldo with TRUNCATED capital
+      // ✅ Update saldo with TRUNCATED capital (normal flow)
+      // For last cuota with residual, saldo was already pre-adjusted at loop start
+      // so we can subtract capital normally
       saldo -= capitalTruncado;
 
       // ✅ CRITICAL VALIDATION: Saldo should NEVER be negative (except rounding at end)

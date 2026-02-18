@@ -30636,3 +30636,309 @@ Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_
     at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
     at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
     at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T17:07:35.211Z error: [BULK] ❌ Error migrando documento 70608195: Error: Cliente no encontrado en base de datos LEGACY: 70608195
+2026-02-18T17:07:35.854Z error: [BULK] ❌ Error migrando documento 1000006445: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:36.364Z error: [BULK] ❌ Error migrando documento 10000451: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:36.698Z error: [BULK] ❌ Error migrando documento 10000556: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:36.762Z error: [BULK] ❌ Error migrando documento 1000064899: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:36.772Z error: [BULK] ❌ Error migrando documento 10000765: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:37.096Z error: [BULK] ❌ Error migrando documento 10000873: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:37.103Z error: [BULK] ❌ Error migrando documento 10000878: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:37.108Z error: [BULK] ❌ Error migrando documento 1000098426: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:37.112Z error: [BULK] ❌ Error migrando documento 10001127: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:37.780Z error: [BULK] ❌ Error migrando documento 1000118531: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:38.529Z error: [BULK] ❌ Error migrando documento 1000124404: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:39.986Z error: [BULK] ❌ Error migrando documento 10001673: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:07:40.903Z error: [BULK] ❌ Error migrando documento 1000188180: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:41.327Z error: [BULK] ❌ Error migrando documento 1000207354: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:42.031Z error: [BULK] ❌ Error migrando documento 10002415: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:42.384Z error: [BULK] ❌ Error migrando documento 1000252013: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:43.141Z error: [BULK] ❌ Error migrando documento 1000287868: Error: Error durante migración de cliente: ❌ Validación CRÍTICA: Cuota 18 (ÚLTIMA) tiene total=$0. Esto indica que la deuda fue pagada en cuotas anteriores. Revisar número de cuotas vs monto de prestamo.
+2026-02-18T17:07:43.910Z error: [BULK] ❌ Error migrando documento 10003054: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:43.947Z error: [BULK] ❌ Error migrando documento 1000311822: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:07:44.374Z error: [BULK] ❌ Error migrando documento 1000324460: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:44.801Z error: [BULK] ❌ Error migrando documento 1000327295: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:45.174Z error: [BULK] ❌ Error migrando documento 1000330950: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:45.497Z error: [BULK] ❌ Error migrando documento 10003357: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.062Z error: [BULK] ❌ Error migrando documento 10003570: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.066Z error: [BULK] ❌ Error migrando documento 1000393195: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.359Z error: [BULK] ❌ Error migrando documento 10003990: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.650Z error: [BULK] ❌ Error migrando documento 1000401535: Error: Error durante migración de cliente: ❌ Validación CRÍTICA: Cuota 24 (ÚLTIMA) tiene total=$0. Esto indica que la deuda fue pagada en cuotas anteriores. Revisar número de cuotas vs monto de prestamo.
+2026-02-18T17:07:46.680Z error: [BULK] ❌ Error migrando documento 1000403111: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:46.715Z error: [BULK] ❌ Error migrando documento 1000405894: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:46.721Z error: [BULK] ❌ Error migrando documento 10004077: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.753Z error: [BULK] ❌ Error migrando documento 1000411651: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:46.759Z error: [BULK] ❌ Error migrando documento 10004285: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:46.764Z error: [BULK] ❌ Error migrando documento 10004364: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:47.117Z error: [BULK] ❌ Error migrando documento 1000438430: Error: Error durante migración de cliente: ❌ Validación CRÍTICA: Cuota 24 (ÚLTIMA) tiene total=$0. Esto indica que la deuda fue pagada en cuotas anteriores. Revisar número de cuotas vs monto de prestamo.
+2026-02-18T17:07:50.465Z error: [BULK] ❌ Error migrando documento 1000517315: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:50.493Z error: [BULK] ❌ Error migrando documento 1000518274: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:50.530Z error: [BULK] ❌ Error migrando documento 1000519106: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:51.122Z error: [BULK] ❌ Error migrando documento 1000566323: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:07:51.450Z error: [BULK] ❌ Error migrando documento 1000572724: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:07:51.478Z error: [BULK] ❌ Error migrando documento 10005782: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:52.040Z error: [BULK] ❌ Error migrando documento 1000594630: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:52.985Z error: [BULK] ❌ Error migrando documento 1000634334: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.precreditos.findMany()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:410:63
+
+  407 // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+  408 let precreditosData: any[] = [];
+  409 if (clienteLegacy.id) {
+→ 410   precreditosData = await prismaLegacyService.precreditos.findMany(
+Value '' not found in enum 'creditos_calificacion'
+2026-02-18T17:07:52.993Z error: [BULK] ❌ Error migrando documento 10006395: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:53.404Z error: [BULK] ❌ Error migrando documento 10006499: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:54.108Z error: [BULK] ❌ Error migrando documento 1000688562: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:07:54.522Z error: [BULK] ❌ Error migrando documento 10007062: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:54.530Z error: [BULK] ❌ Error migrando documento 10007155: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:07:55.213Z error: [BULK] ❌ Error migrando documento 10007215: Error: Error en mapeo UserCliente: Email is required
+2026-02-18T17:17:05.486Z error: [BULK] ❌ Error migrando documento 41952533: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:05.494Z error: [BULK] ❌ Error migrando documento 1077849340: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:05.854Z error: [BULK] ❌ Error migrando documento 1061783136: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:06.582Z error: [BULK] ❌ Error migrando documento 12202644: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:17:06.590Z error: [BULK] ❌ Error migrando documento 26493418: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:13.189Z error: [BULK] ❌ Error migrando documento 10298472: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:17.182Z error: [BULK] ❌ Error migrando documento 1127652800: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:18.222Z error: [BULK] ❌ Error migrando documento 1054539026: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:21.809Z error: [BULK] ❌ Error migrando documento 1081514459: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:21.834Z error: [BULK] ❌ Error migrando documento 26600958: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:17:22.488Z error: [BULK] ❌ Error migrando documento 1081515080: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:23.781Z error: [BULK] ❌ Error migrando documento 7248486: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:17:24.133Z error: [BULK] ❌ Error migrando documento 1216721822: Error: Error en mapeo Cónyuge: Documento Cónyuge is required
+2026-02-18T17:17:24.501Z error: [BULK] ❌ Error migrando documento 40769344: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:29.175Z error: [BULK] ❌ Error migrando documento 1007583164: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:29.186Z error: [BULK] ❌ Error migrando documento 1006697122: PrismaClientUnknownRequestError: 
+Invalid `prismaLegacyService.conyuges.findUnique()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:335:62
+
+  332 
+  333 // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
+  334 if (clienteLegacy.conyuge_id) {
+→ 335   const conyugeData = await prismaLegacyService.conyuges.findUnique(
+Value '' not found in enum 'conyuges_tipo_docy'
+2026-02-18T17:17:33.038Z error: [BULK] ❌ Error migrando documento 1065097796: Error: Error en mapeo Cónyuge: Documento Cónyuge is required

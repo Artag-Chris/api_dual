@@ -63,16 +63,6 @@ export class HistorialPagosMapper {
         return stats;
       }
 
-      // Fetch amortization schedule to link payments correctly
-      const amortizaciones = await tx.amortizacion.findMany({
-        where: {
-          prestamoID: prestamoIDMain,
-        },
-        orderBy: {
-          Numero_cuota: 'asc',
-        },
-      });
-
       this.logger.info(
         `Processing ${pagosLegacy.length} payments for credito ${creditoIdLegacy} → prestamo ${prestamoIDMain}`
       );
@@ -80,12 +70,6 @@ export class HistorialPagosMapper {
       for (const pagoLegacy of pagosLegacy) {
         const numeroCuota = this.extraerNumeroCuota(pagoLegacy.num_cuota);
         const estadoPago = pagoLegacy.estado;
-
-        // Find matching amortization (if numero_cuota is available)
-        let amortizacion = null;
-        if (numeroCuota && numeroCuota > 0) {
-          amortizacion = amortizaciones.find((a: any) => parseInt(a.Numero_cuota) === numeroCuota);
-        }
 
         if (estadoPago === 'Ok' || estadoPago === 'Finalizado') {
           // APPLIED PAYMENT: Create in all three tables
@@ -95,7 +79,6 @@ export class HistorialPagosMapper {
             userClienteId,
             documento,
             numeroCuota,
-            amortizacion,
             tx,
             stats
           );
@@ -136,7 +119,6 @@ export class HistorialPagosMapper {
     userClienteId: number,
     documento: string,
     numeroCuota: number | null,
-    amortizacion: any | null,
     tx: any,
     stats: MigrationStats
   ): Promise<void> {
@@ -192,22 +174,24 @@ export class HistorialPagosMapper {
 
       stats.pagosAplicados++;
 
-      // Step 2: Create historial_pagos record
-      if (amortizacion && numeroCuota) {
+      // Step 2: Create historial_pagos record (using legacy payment data, NOT amortizacion)
+      // NOTE: Legacy pagos don't have component breakdown, so we use the total payment amount
+      if (numeroCuota) {
+        const totalPagado = Math.round(pagoLegacy.abono || 0);
         const [errorHistorial, historialDto] = HistorialPagosCreateDto.create({
           documento,
           prestamoID: prestamoIDMain,
           Numero_cuota: numeroCuota,
-          capital: amortizacion.capital,
-          interes: amortizacion.interes,
-          aval: amortizacion.aval,
-          IVA: amortizacion.IVA,
+          capital: 0, // Legacy system doesn't track components
+          interes: 0,
+          aval: 0,
+          IVA: 0,
           pablok: 0,
           sanciones: 0,
           prejuridico: 0,
           juridico: 0,
           seguro: 0,
-          total_pagado: amortizacion.total_cuota,
+          total_pagado: totalPagado,
           recibo: `FACILITO-${pagoLegacy.id}`,
           agente_creador: 'MIGRACION_AUTOMATICA',
           bolsa: null,
@@ -222,6 +206,9 @@ export class HistorialPagosMapper {
             `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
           );
         } else {
+          this.logger.info(
+            `[PHASE 14] Creating historial_pagos for cuota ${numeroCuota}, total_pagado=${totalPagado}`
+          );
           await tx.historial_pagos.create({
             data: {
               documento: historialDto.documento,
@@ -250,17 +237,17 @@ export class HistorialPagosMapper {
           stats.historialCreados++;
         }
 
-        // Step 3: Create historial_pagos_detallado linking pago to amortizacion
+        // Step 3: Create historial_pagos_detallado linking pago to payment history
         const [errorDetallado, detalladoDto] = HistorialPagosDetalladoCreateDto.create({
           id_pago: pagoCreado.id_pago,
           prestamo_id: prestamoIDMain,
           id_cliente: userClienteId,
           documento,
           numero_cuota: numeroCuota,
-          capital_pagado: amortizacion.capital,
-          interes_pagado: amortizacion.interes,
-          aval_pagado: amortizacion.aval,
-          iva_pagado: amortizacion.IVA,
+          capital_pagado: 0,
+          interes_pagado: 0,
+          aval_pagado: 0,
+          iva_pagado: 0,
           pablok: 0,
           sancion_pagada: 0,
           descuento_capital: 0,
@@ -268,7 +255,7 @@ export class HistorialPagosMapper {
           descuento_aval: 0,
           descuento_iva: 0,
           descuento_sancion: 0,
-          total_pagado: amortizacion.total_cuota,
+          total_pagado: totalPagado,
           total_descuento: 0,
           tipo_pago: 'CUOTA',
           id_bolsa_asignada: null,
