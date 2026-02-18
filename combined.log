@@ -4982,3 +4982,113 @@ Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_
   📊 Cuotas de amortización: 24
   📦 Pedidos migrados: 0
   💵 Saldos iniciales: 1
+2026-02-18T13:51:01.449Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T13:51:01.457Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T13:51:01.468Z info: Found 116 active puntos in legacy database
+2026-02-18T13:51:01.833Z info: Bodega mapping completed: 116 entries
+2026-02-18T13:51:01.834Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T13:51:01.835Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T13:51:01.841Z info: Loaded active credit data for 1 precreditos
+2026-02-18T13:51:01.842Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T13:51:01.842Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T13:51:01.893Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T13:51:01.918Z info: [CREDIT] Created detalle_credito 202 for precredito 34390
+2026-02-18T13:51:01.919Z info: [PHASE 11] Generating amortization for prestamo 202...
+2026-02-18T13:51:01.919Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T13:51:01.922Z info: [PRESTAMO 202] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T13:51:01.981Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T13:51:01.982Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T13:51:01.982Z info: [PRIMERA CUOTA] Componentes exactos: Capital Aprox=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T13:53:03.718Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T13:53:03.724Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T13:53:03.733Z info: Found 116 active puntos in legacy database
+2026-02-18T13:53:04.044Z info: Bodega mapping completed: 116 entries
+2026-02-18T13:53:04.046Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T13:53:04.047Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T13:53:04.057Z info: Loaded active credit data for 1 precreditos
+2026-02-18T13:53:04.058Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T13:53:04.059Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T13:53:04.125Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T13:53:04.159Z info: [CREDIT] Created detalle_credito 203 for precredito 34390
+2026-02-18T13:53:04.160Z info: [PHASE 11] Generating amortization for prestamo 203...
+2026-02-18T13:53:04.160Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T13:53:04.163Z info: [PRESTAMO 203] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T13:53:04.217Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T13:53:04.218Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T13:53:04.218Z info: [PRIMERA CUOTA] Componentes exactos: Capital Aprox=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T13:53:04.219Z warn: [Cuota 17] Capital calculado ($126361) excede saldo ($45121). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.220Z warn: [Cuota 18] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.220Z warn: [Cuota 19] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.221Z warn: [Cuota 20] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.221Z warn: [Cuota 21] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.221Z warn: [Cuota 22] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.222Z warn: [Cuota 23] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.222Z warn: [Cuota 24] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:53:04.222Z info: [ÚLTIMA CUOTA] 24: Capital=$0, Interés=$0, Total=$0 (puede ser diferente de otras cuotas)
+2026-02-18T13:53:04.223Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 203: 24 cuotas
+   💰 Capital: $1,780,000 (esperado: $1,780,000)
+   📊 Interés: $301,160 (mínimo: $0)
+   🤝 Aval: $0
+   🧾 IVA: $0
+   💵 Total: $2,925,600
+2026-02-18T13:53:04.340Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T13:53:04.340Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T13:53:04.351Z warn: No ref_productos found for precredito 34390
+2026-02-18T13:53:04.352Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T13:53:04.360Z info: [PHASE 13] Created saldo_inicial for prestamo 203
+2026-02-18T13:53:04.361Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T13:53:04.379Z info: Processing 36 payments for credito 25089 → prestamo 203
+2026-02-18T13:53:04.911Z info: Payment migration complete for credito 25089:
+2026-02-18T13:53:04.912Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T13:53:04.920Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T13:53:04.952Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T13:53:04.965Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T13:58:51.257Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T13:58:51.264Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T13:58:51.275Z info: Found 116 active puntos in legacy database
+2026-02-18T13:58:51.569Z info: Bodega mapping completed: 116 entries
+2026-02-18T13:58:51.571Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T13:58:51.573Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T13:58:51.584Z info: Loaded active credit data for 1 precreditos
+2026-02-18T13:58:51.585Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T13:58:51.585Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T13:58:51.653Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T13:58:51.682Z info: [CREDIT] Created detalle_credito 204 for precredito 34390
+2026-02-18T13:58:51.683Z info: [PHASE 11] Generating amortization for prestamo 204...
+2026-02-18T13:58:51.685Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T13:58:51.688Z info: [PRESTAMO 204] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T13:58:51.756Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T13:58:51.757Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T13:58:51.758Z info: [PRIMERA CUOTA] Componentes exactos: Capital Aprox=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T13:58:51.760Z warn: [Cuota 17] Capital calculado ($126361) excede saldo ($45121). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.760Z warn: [Cuota 18] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.762Z warn: [Cuota 19] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.763Z warn: [Cuota 20] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.764Z warn: [Cuota 21] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.766Z warn: [Cuota 22] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.766Z warn: [Cuota 23] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.767Z warn: [Cuota 24] Capital calculado ($127200) excede saldo ($0). Limitando a saldo exacto para prevenir saldo negativo.
+2026-02-18T13:58:51.768Z warn: [ÚLTIMA CUOTA] 24: Residual ≤ 0 ($0). Todas las cuotas anteriores pagaron la deuda exactamente.

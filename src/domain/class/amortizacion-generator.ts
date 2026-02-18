@@ -131,61 +131,120 @@ export class AmortizacionGenerator {
     let saldo = valor_prestamo;
     let fechaPago = new Date(fecha_inicial);
     let cuotaTotalFija: number | null = null;
+    let saldoAcumulado = 0;  // ✅ Track cumulative capital to detect residuals
 
     for (let i = 0; i < numero_cuotas; i++) {
       const numeroCuota = i + 1;
       const esUltimaCuota = i === numero_cuotas - 1;
 
-      // ✅ Calculate capital: cuotaFija - interés teórico
-      let capitalFijo: number;
-      if (esUltimaCuota) {
-        // Last cuota: pay exactly remaining balance
-        capitalFijo = saldo;
-      } else {
-        // Regular cuota: capital = cuotaFija - interest
-        const interesTeorico = saldo * tasaPeriodica;
-        capitalFijo = cuotaFija - interesTeorico;
-      }
-
-      // ✅ Calculate theoretical interest
+      // ✅ Calculate THEORETICAL interest (NEVER adjustable - derived from saldo × tasa)
+      // This ensures interés ALWAYS remains positive
       const interesTeorico = saldo * tasaPeriodica;
 
       // ✅ FIRST CUOTA: Set fixed cuota total
       if (i === 0) {
+        // For first cuota: calculate expected capital without cargos
+        let capitalAproximado: number;
+        if (esUltimaCuota) {
+          capitalAproximado = saldo;
+        } else {
+          capitalAproximado = cuotaFija - interesTeorico;
+        }
+
         // Sum all components with exact decimals
-        const sumaComponentes = capitalFijo + interesTeorico + avalExacto + ivaExacto + 
+        const sumaComponentes = capitalAproximado + interesTeorico + avalExacto + ivaExacto + 
                                pablokExacto + seguroExacto;
         // Round only the total cuota to 100
         cuotaTotalFija = Math.round(sumaComponentes / 100) * 100;
 
         this.logger.info(
-          `[PRIMERA CUOTA] Componentes exactos: Capital=$${capitalFijo.toFixed(2)}, ` +
+          `[PRIMERA CUOTA] Componentes exactos: Capital Aprox=$${capitalAproximado.toFixed(2)}, ` +
           `Interés=$${interesTeorico.toFixed(2)}, Total sin redondear=$${sumaComponentes.toFixed(2)}, ` +
           `Total redondeado=$${cuotaTotalFija}`
         );
       }
 
-      // ✅ Calculate truncated values (NO rounding)
-      const capitalTruncado = Math.trunc(capitalFijo);
+      // ✅ Calculate FIXED interest (truncated, NEVER adjusted to avoid negatives)
+      // Interés is ALWAYS: saldo × tasaPeriodica, truncated
+      const interesTruncado = Math.trunc(interesTeorico);
+
+      // ✅ CRITICAL VALIDATION: Interés can NEVER be negative
+      if (interesTruncado < 0) {
+        throw new Error(
+          `❌ CRÍTICO: Interés NEGATIVO en cuota ${numeroCuota}: $${interesTruncado}. ` +
+          `Esto indica un error en el cálculo de tasa. Tasa: ${tasa_mensual}%, Saldo: $${saldo}`
+        );
+      }
+
+      // ✅ Calculate truncated values for cargos (aval, iva) - NO rounding
       const avalTruncado = Math.trunc(avalExacto);
       const ivaTruncado = Math.trunc(ivaExacto);
 
-      // ✅ Calculate decimals lost
-      const decimalesCapital = capitalFijo - capitalTruncado;
-      const decimalesAval = avalExacto - avalTruncado;
-      const decimalesIva = ivaExacto - ivaTruncado;
+      // ✅ Calculate ADJUSTABLE capital (this absorbs all rounding differences)
+      // Capital = Cuota Total Fija - Interés - Cargos (fijos)
+      // This ensures: capital + interes + cargos = cuota total exactly
+      let capitalAjustado = cuotaTotalFija! - interesTruncado - avalTruncado - ivaTruncado - pablokExacto - seguroExacto;
 
-      // ✅ Adjust interest to absorb ALL rounding differences
-      // Sum of truncated values
-      const sumaTruncada = capitalTruncado + Math.trunc(interesTeorico) + 
-                          avalTruncado + ivaTruncado + pablokExacto + seguroExacto;
-      const diferenciaFinal = cuotaTotalFija! - sumaTruncada;
+      // ✅ CRITICAL FIX: Ensure capital NEVER exceeds remaining balance
+      // This prevents saldo from becoming negative which would cause negative interest
+      if (capitalAjustado > saldo) {
+        this.logger.warn(
+          `[Cuota ${numeroCuota}] Capital calculado ($${capitalAjustado}) excede saldo ($${saldo}). ` +
+          `Limitando a saldo exacto para prevenir saldo negativo.`
+        );
+        capitalAjustado = Math.max(0, saldo);
+      }
 
-      // Interest with compensation
-      const interesConCompensacion = Math.trunc(interesTeorico) + Math.round(diferenciaFinal);
+      // ✅ For LAST CUOTA: calculate residual and ensure it's not zero
+      if (esUltimaCuota) {
+        // Calculate residual from accumulated truncation
+        const capitalResidual = valor_prestamo - saldoAcumulado;
+        
+        if (capitalResidual <= 0) {
+          // All capital was paid in previous cuotas
+          capitalAjustado = 0;
+          this.logger.warn(
+            `[ÚLTIMA CUOTA] ${numeroCuota}: Residual ≤ 0 ($${capitalResidual}). ` +
+            `Todas las cuotas anteriores pagaron la deuda exactamente.`
+          );
+        } else {
+          // Use the residual (ensures last cuota is never $0)
+          capitalAjustado = capitalResidual;
+          this.logger.info(
+            `[ÚLTIMA CUOTA] ${numeroCuota}: Usando residual=$${capitalAjustado} ` +
+            `(suma anterior: $${saldoAcumulado}, total esperado: $${valor_prestamo})`
+          );
+        }
+      }
 
-      // ✅ Update saldo with TRUNCATED capital (this ensures last cuota is exact)
+      // ✅ VALIDATION: Capital should NEVER be negative
+      if (capitalAjustado < 0) {
+        throw new Error(
+          `❌ CRÍTICO: Capital NEGATIVO en cuota ${numeroCuota}: $${capitalAjustado}. ` +
+          `Cuota fija ($${cuotaTotalFija}) es muy pequeña para cubrir interés + cargos. ` +
+          `Aumentar cuota fija o reducir tasa/cargos.`
+        );
+      }
+
+      const capitalTruncado = Math.trunc(Math.max(0, capitalAjustado));
+
+      // ✅ Track cumulative capital for residual calculation in last cuota
+      saldoAcumulado += capitalTruncado;
+
+      // ✅ Update saldo with TRUNCATED capital
       saldo -= capitalTruncado;
+
+      // ✅ CRITICAL VALIDATION: Saldo should NEVER be negative (except rounding at end)
+      if (saldo < -1) {  // Allow -1 for tiny rounding errors
+        throw new Error(
+          `❌ CRÍTICO: Saldo NEGATIVO en cuota ${numeroCuota}: $${saldo}. ` +
+          `Esto indica que el capital acumulado excede el préstamo inicial. ` +
+          `Revisar parámetros de entrada o cálculo de cuota fija.`
+        );
+      }
+
+      // Normalize small negative saldo to 0
+      saldo = Math.max(0, saldo);
 
       // ✅ Determine estado
       const estado: 'PAGADO' | 'PENDIENTE' | 'VENCIDO' = 
@@ -194,15 +253,24 @@ export class AmortizacionGenerator {
       // ✅ Calculate remaining balance
       const saldoRestante = Math.max(0, saldo);
 
+      // ✅ For last cuota: use exact capitalAjustado (residual), not truncated
+      // This ensures last cuota is NEVER $0
+      const capitalFinal = esUltimaCuota ? Math.max(0, capitalAjustado) : capitalTruncado;
+
+      // ✅ Final cuota total (use cuotaTotalFija for regular cuotas, recalculate for last)
+      const cuotaTotalFinal = esUltimaCuota 
+        ? capitalFinal + interesTruncado + avalTruncado + ivaTruncado + pablokExacto + seguroExacto
+        : cuotaTotalFija!;
+
       // ✅ Create amortizacion DTO
       const [error, amortizacionDto] = AmortizacionCreateDto.create({
         prestamo_ID,
         numero_cuota: numeroCuota,
-        capital: capitalTruncado,
-        interes: interesConCompensacion,
+        capital: capitalFinal,
+        interes: interesTruncado,  // ✅ NUNCA NEGATIVO: derivado de saldo × tasa
         aval: avalTruncado,
         IVA: ivaTruncado,
-        total_cuota: cuotaTotalFija!,
+        total_cuota: cuotaTotalFinal,
         saldo: saldoRestante,
         fecha_pago: fechaPago,
         estado,
@@ -213,34 +281,101 @@ export class AmortizacionGenerator {
         continue;
       }
 
+      // ✅ TRIPLE VALIDATION before pushing
+      if (amortizacionDto.interes < 0) {
+        throw new Error(
+          `❌ Validación: Interés NEGATIVO detectado en cuota ${numeroCuota}: $${amortizacionDto.interes}`
+        );
+      }
+      if (amortizacionDto.capital < 0) {
+        throw new Error(
+          `❌ Validación: Capital NEGATIVO detectado en cuota ${numeroCuota}: $${amortizacionDto.capital}`
+        );
+      }
+      
+      // ✅ CRITICAL: Last cuota should NEVER have $0 total
+      if (esUltimaCuota && amortizacionDto.total_cuota === 0) {
+        throw new Error(
+          `❌ Validación CRÍTICA: Cuota ${numeroCuota} (ÚLTIMA) tiene total=$0. ` +
+          `Esto indica que la deuda fue pagada en cuotas anteriores. ` +
+          `Revisar número de cuotas vs monto de prestamo.`
+        );
+      }
+
       cuotas.push(amortizacionDto);
       fechaPago = this.calcularSiguienteFechaPago(fechaPago, periocidad);
     }
 
     // ════════════════════════════════════════════════════════════════════════
-    // PHASE 4: FINAL VERIFICATION
+    // PHASE 4: FINAL VERIFICATION - GUARANTEE NO NEGATIVE VALUES
     // ════════════════════════════════════════════════════════════════════════
 
     const sumCapitales = cuotas.reduce((sum, c) => sum + c.capital, 0);
     const diferencialCapital = valor_prestamo - sumCapitales;
-
-    if (Math.abs(diferencialCapital) > 0) {
-      this.logger.warn(
-        `⚠️  Capital mismatch: Expected $${valor_prestamo.toLocaleString()}, ` +
-        `Got $${sumCapitales.toLocaleString()}, Difference: $${diferencialCapital}`
-      );
-      // Note: The algorithm should prevent this with proper truncation and interest adjustment
-    }
-
     const sumInteres = cuotas.reduce((sum, c) => sum + c.interes, 0);
     const sumAval = cuotas.reduce((sum, c) => sum + c.aval, 0);
     const sumIVA = cuotas.reduce((sum, c) => sum + c.IVA, 0);
     const sumTotal = cuotas.reduce((sum, c) => sum + c.total_cuota, 0);
 
+    // ✅ CRITICAL VALIDATION: Check for negative interest or capital
+    for (let idx = 0; idx < cuotas.length; idx++) {
+      const cuota = cuotas[idx];
+      const esUltima = idx === cuotas.length - 1;
+      
+      if (cuota.interes < 0) {
+        this.logger.error(
+          `❌ CRÍTICO: Cuota ${cuota.numero_cuota} tiene INTERÉS NEGATIVO: $${cuota.interes}`
+        );
+        throw new Error(
+          `Generación de amortización FALLIDA: Cuota ${cuota.numero_cuota} con interés negativo ($${cuota.interes}). ` +
+          `Esto indica que la cuota fija es insuficiente. Aumentar cuota fija o reducir tasa/cargos.`
+        );
+      }
+
+      if (cuota.capital < 0) {
+        this.logger.error(
+          `❌ CRÍTICO: Cuota ${cuota.numero_cuota} tiene CAPITAL NEGATIVO: $${cuota.capital}`
+        );
+        throw new Error(
+          `Generación de amortización FALLIDA: Cuota ${cuota.numero_cuota} con capital negativo ($${cuota.capital}).`
+        );
+      }
+
+      // ✅ CRITICAL: No cuota should have $0 total, especially the last one
+      if (cuota.total_cuota === 0) {
+        this.logger.error(
+          `❌ CRÍTICO: Cuota ${cuota.numero_cuota} tiene total_cuota=$0${esUltima ? ' (ÚLTIMA CUOTA)' : ''}`
+        );
+        throw new Error(
+          `Generación de amortización FALLIDA: Cuota ${cuota.numero_cuota} con total_cuota=$0. ` +
+          `${esUltima ? 'La última cuota NUNCA debe ser $0.' : 'Ninguna cuota debe ser $0.'}`
+        );
+      }
+    }
+
+    // ✅ VALIDATION: Sum of interest should be positive
+    if (sumInteres < 0) {
+      throw new Error(
+        `❌ CRÍTICO: Suma total de intereses NEGATIVA: $${sumInteres}. ` +
+        `Esto indica un error crítico en el algoritmo.`
+      );
+    }
+
+    // ⚠️ Report capital difference if any
+    if (Math.abs(diferencialCapital) > 0) {
+      this.logger.warn(
+        `⚠️  Capital mismatch: Expected $${valor_prestamo.toLocaleString()}, ` +
+        `Got $${sumCapitales.toLocaleString()}, Difference: $${diferencialCapital}`
+      );
+    }
+
     this.logger.info(
-      `✅ [GENERACIÓN COMPLETADA] Prestamo ${prestamo_ID}: ${cuotas.length} cuotas, ` +
-      `Capital: $${sumCapitales.toLocaleString()}, Interés: $${sumInteres.toLocaleString()}, ` +
-      `Total: $${sumTotal.toLocaleString()}`
+      `✅ [GENERACIÓN COMPLETADA] Prestamo ${prestamo_ID}: ${cuotas.length} cuotas\n` +
+      `   💰 Capital: $${sumCapitales.toLocaleString()} (esperado: $${valor_prestamo.toLocaleString()})\n` +
+      `   📊 Interés: $${sumInteres.toLocaleString()} (mínimo: $0)\n` +
+      `   🤝 Aval: $${sumAval.toLocaleString()}\n` +
+      `   🧾 IVA: $${sumIVA.toLocaleString()}\n` +
+      `   💵 Total: $${sumTotal.toLocaleString()}`
     );
 
     return cuotas;
