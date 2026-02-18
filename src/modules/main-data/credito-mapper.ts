@@ -24,22 +24,66 @@ export class CreditoMapper {
 
   /**
    * Calcula la fecha de primer pago
-   * Si viene p_fecha del legacy, la usa; sino calcula 30 días desde hoy
+   * ESTRATEGIA:
+   * - Para créditos DESEMBOLSADOS: usar created_at del crédito + días según periodicidad
+   * - Para créditos PENDIENTES: usar s_fecha o created_at del precredito
+   * - NUNCA usar p_fecha (puede ser muy antigua - fecha de simulación)
    */
-  private static calcularFechaPago(fechaLegacy?: string): string {
+  private static calcularFechaPago(
+    precreditoLegacy: any,
+    creditoLegacy?: any
+  ): string {
     try {
-      if (fechaLegacy) {
-        // Intentar parsear la fecha legacy (puede ser string en varios formatos)
-        const fecha = new Date(fechaLegacy);
+      // CRÉDITOS DESEMBOLSADOS: usar fecha REAL de desembolso
+      if (creditoLegacy?.created_at) {
+        const fechaDesembolso = new Date(creditoLegacy.created_at);
+        const periocidad = precreditoLegacy.periodo?.toUpperCase() || 'MENSUAL';
+        
+        // Calcular días hasta primera cuota según periodicidad
+        let diasHastaPrimeraCuota = 30; // default MENSUAL
+        if (periocidad === 'QUINCENAL' || periocidad === 'DECADAL') {
+          diasHastaPrimeraCuota = 15;
+        } else if (periocidad === 'SEMANAL') {
+          diasHastaPrimeraCuota = 7;
+        }
+        
+        fechaDesembolso.setDate(fechaDesembolso.getDate() + diasHastaPrimeraCuota);
+        return fechaDesembolso.toISOString().split('T')[0];
+      }
+      
+      // CRÉDITOS PENDIENTES: usar s_fecha (segunda fecha) si existe
+      if (precreditoLegacy.s_fecha) {
+        const fecha = new Date(precreditoLegacy.s_fecha);
+        if (!isNaN(fecha.getTime())) {
+          return fecha.toISOString().split('T')[0];
+        }
+      }
+      
+      // Alternativa: usar created_at del precredito + 30 días
+      if (precreditoLegacy.created_at) {
+        const fecha = new Date(precreditoLegacy.created_at);
+        if (!isNaN(fecha.getTime())) {
+          fecha.setDate(fecha.getDate() + 30);
+          return fecha.toISOString().split('T')[0];
+        }
+      }
+      
+      // ÚLTIMO RECURSO: p_fecha (con warning)
+      console.warn(
+        `[CREDITO-MAPPER] Usando p_fecha para precredito ${precreditoLegacy.id} - ` +
+        `Verificar si es correcta (puede ser fecha muy antigua)`
+      );
+      if (precreditoLegacy.p_fecha) {
+        const fecha = new Date(precreditoLegacy.p_fecha);
         if (!isNaN(fecha.getTime())) {
           return fecha.toISOString().split('T')[0];
         }
       }
     } catch (e) {
-      // Si falla el parsing, usar default
+      console.error(`[CREDITO-MAPPER] Error calculando fecha de pago:`, e);
     }
 
-    // Default: 30 días desde hoy
+    // Fallback extremo (no debería llegar aquí)
     const hoy = new Date();
     hoy.setDate(hoy.getDate() + 30);
     return hoy.toISOString().split('T')[0];
@@ -51,6 +95,8 @@ export class CreditoMapper {
   static async mapToCreditoDto(
     precreditoLegacy: any,
     clienteLegacy: any,
+    prismaLegacyService: any,
+    creditoLegacy?: any,
     diaPagoOverride?: string,
     fechaPagoOverride?: string
   ): Promise<[string?, DetalleCreditoCreateDto?]> {
@@ -64,12 +110,24 @@ export class CreditoMapper {
         return ['Cliente legacy with num_doc is required', undefined];
       }
 
-      // Mapear estado: PENDIENTE/APROBADO/RECHAZADO → EN ESTUDIO/APROBADO/RECHAZADO
+      // Mapear estado: Usar valores correctos del enum precreditos_aprobado
       let estado = 'EN ESTUDIO';
-      if (precreditoLegacy.aprobado === 'APROBADO' || precreditoLegacy.aprobado === 'Aprobado') {
-        estado = 'APROBADO';
-      } else if (precreditoLegacy.aprobado === 'RECHAZADO' || precreditoLegacy.aprobado === 'Rechazado') {
-        estado = 'RECHAZADO';
+      switch (precreditoLegacy.aprobado) {
+        case 'Si':
+          estado = 'APROBADO';
+          break;
+        case 'No':
+          estado = 'RECHAZADO';
+          break;
+        case 'En_estudio':
+          estado = 'EN ESTUDIO';
+          break;
+        case 'Desistio':
+          estado = 'CANCELADO';
+          break;
+        default:
+          // Log warning but continue with default estado
+          estado = 'EN ESTUDIO';
       }
 
       // Mapear período: CORTO_PLAZO/LARGO_PLAZO → meses
@@ -77,18 +135,91 @@ export class CreditoMapper {
       const meses = precreditoLegacy.meses || 12;
       const plazo = `${meses} ${meses === 1 ? 'MES' : 'MESES'}`;
 
-      // Calcular tasa si no viene en precredito (asumir 0 si no viene)
-      const tasa = precreditoLegacy.tasa || '0';
+      // CRÍTICO: La tasa está en la tabla carteras, NO en precreditos
+      // Usar la tasa de la cartera relacionada
+      const tasa = precreditoLegacy.carteras?.tasa?.toString() || '0';
+      
+      // Validar que la tasa sea válida
+      if (!precreditoLegacy.carteras || !precreditoLegacy.carteras.tasa) {
+        console.warn(
+          `[CREDITO-MAPPER] Precredito ${precreditoLegacy.id} sin cartera o sin tasa. ` +
+          `Esto no debería pasar si los filtros están correctos.`
+        );
+      }
 
       // Calcular día de pago y fecha de pago
-      const periocidad = precreditoLegacy.periodo || 'MENSUAL';
+      // ✅ NORMALIZAR periodicidad a MAYÚSCULAS para comparaciones
+      const periocidad = (precreditoLegacy.periodo || 'MENSUAL').toUpperCase();
       const diaPago = diaPagoOverride || this.calcularDiaPago(periocidad);
-      const fechaPago = fechaPagoOverride || this.calcularFechaPago(precreditoLegacy.p_fecha);
+      const fechaPago = fechaPagoOverride || this.calcularFechaPago(precreditoLegacy, creditoLegacy);
+
+      // ============ CAMPOS CALCULADOS DESDE AMORTIZACIONES (QUERY RAW) ============
+      // Consultar tabla amortizaciones directamente sin modificar schema
+      let seguro = 0;
+      let iva_aval = '0';
+      let seguro_add = '0';
+      
+      try {
+        const amortizacionesRaw: any[] = await prismaLegacyService.$queryRaw`
+          SELECT porc_seguro, porc_iva_aval 
+          FROM amortizaciones 
+          WHERE precredito_id = ${precreditoLegacy.id}
+          LIMIT 1
+        `;
+
+        if (amortizacionesRaw && amortizacionesRaw.length > 0) {
+          const amortizacion = amortizacionesRaw[0];
+          const vlr_fin = precreditoLegacy.vlr_fin;
+
+          // Calcular seguro: porcentaje del valor del crédito
+          if (amortizacion.porc_seguro) {
+            seguro = Math.round(vlr_fin * (amortizacion.porc_seguro / 100));
+          }
+
+          // Calcular IVA del aval: porcentaje del valor del crédito
+          if (amortizacion.porc_iva_aval) {
+            iva_aval = (vlr_fin * (amortizacion.porc_iva_aval / 100)).toFixed(2);
+          }
+
+          // Seguro adicional: usar mismo porcentaje de seguro
+          if (amortizacion.porc_seguro) {
+            seguro_add = (vlr_fin * (amortizacion.porc_seguro / 100)).toFixed(2);
+          }
+        } else {
+          console.warn(
+            `[CREDITO-MAPPER] Precredito ${precreditoLegacy.id} sin amortizaciones. ` +
+            `Los campos seguro, iva_aval y seguro_add serán 0.`
+          );
+        }
+      } catch (error) {
+        console.error(
+          `[CREDITO-MAPPER] Error consultando amortizaciones para precredito ${precreditoLegacy.id}:`,
+          error
+        );
+      }
+
+      // ============ CAMPOS DE AUDITORÍA ============
+      // Creador del crédito: nombre del funcionario que lo creó
+      const creador = precreditoLegacy.users_precreditos_funcionario_idTousers?.name 
+        || 'SISTEMA_LEGACY';
+
+      // ============ CAMPOS DE NEGOCIO ============
+      // Tipo de crédito dinámico según la cartera
+      const tipoCredito = precreditoLegacy.carteras?.nombre || 'CREDITO EXPRESS';
+
+      // Origen: verificar si es refinanciamiento
+      let origen = 'NUEVO';
+      if (precreditoLegacy.creditos && precreditoLegacy.creditos.length > 0) {
+        const credito = precreditoLegacy.creditos[0];
+        if (credito.refinanciacion === 'Si') {
+          origen = 'REFINANCIADO';
+        }
+      }
 
       // Crear el DTO
       const [error, dto] = DetalleCreditoCreateDto.create({
         documento: clienteLegacy.num_doc,
-        tipoCredito: 'CREDITO EXPRESS',
+        tipoCredito: tipoCredito,                  // ✅ Dinámico desde carteras
         valor_prestamo: precreditoLegacy.vlr_fin,
         inicial: precreditoLegacy.cuota_inicial || 0,
         plazo: plazo,
@@ -97,11 +228,11 @@ export class CreditoMapper {
         periocidad: periocidad,
         tasa: tasa,
         estado: estado,
-        origen: 'NUEVO',
-        seguro: 0,
-        iva_aval: '0',
-        pablok: 0,
-        seguro_add: '0',
+        origen: origen,                            // ✅ Check refinanciamiento
+        seguro: seguro,                            // ✅ Calculado desde amortizaciones (query raw)
+        iva_aval: iva_aval,                        // ✅ Calculado desde amortizaciones (query raw)
+        pablok: 0,                                 // TODO: Pendiente investigación
+        seguro_add: seguro_add,                    // ✅ Calculado desde amortizaciones (query raw)
         diaPago: diaPago,
         fechaPago: fechaPago,
       });
@@ -124,12 +255,14 @@ export class CreditoMapper {
    */
   static async mapPrecreditosCliente(
     clienteLegacy: any,
-    precreditosLegacy: any[]
+    precreditosLegacy: any[],
+    prismaLegacyService: any
   ): Promise<DetalleCreditoCreateDto[]> {
     const creditos: DetalleCreditoCreateDto[] = [];
 
     for (const precredito of precreditosLegacy) {
-      const [error, dto] = await this.mapToCreditoDto(precredito, clienteLegacy);
+      const creditoLegacy = precredito.creditos?.[0];
+      const [error, dto] = await this.mapToCreditoDto(precredito, clienteLegacy, prismaLegacyService, creditoLegacy);
 
       if (!error && dto) {
         creditos.push(dto);

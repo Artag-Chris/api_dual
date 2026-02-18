@@ -623,3 +623,186 @@ export class PagoHistoricoCreateDto {
     ];
   }
 }
+
+/**
+ * DTO para migrar historial de pagos (tabla historial_pagos)
+ * Registra pagos aplicados con desglose de conceptos
+ */
+export class HistorialPagosCreateDto {
+  private constructor(
+    public readonly documento: string,
+    public readonly prestamoID: number,
+    public readonly Numero_cuota: number,
+    public readonly capital: number,
+    public readonly interes: number,
+    public readonly aval: number,
+    public readonly IVA: number,
+    public readonly pablok: number,
+    public readonly sanciones: number,
+    public readonly prejuridico: number,
+    public readonly juridico: number,
+    public readonly seguro: number,
+    public readonly total_pagado: number,
+    public readonly recibo: string,
+    public readonly agente_creador: string,
+    public readonly bolsa: string,
+    public readonly canal: string,
+    public readonly tipo_pago: string,
+    public readonly creador: string,
+    public readonly fecha_registro: Date
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, HistorialPagosCreateDto?] {
+    const {
+      documento,
+      prestamoID,
+      Numero_cuota,
+      capital,
+      interes,
+      aval,
+      IVA,
+      pablok,
+      sanciones,
+      prejuridico,
+      juridico,
+      seguro,
+      total_pagado,
+      recibo,
+      agente_creador,
+      bolsa,
+      canal,
+      tipo_pago,
+      creador,
+      fecha_registro,
+    } = props;
+
+    if (!documento) return ['Documento is required', undefined];
+    if (!prestamoID) return ['Prestamo ID is required', undefined];
+    if (Numero_cuota === undefined) return ['Numero cuota is required', undefined];
+    if (total_pagado === undefined) return ['Total pagado is required', undefined];
+    if (!recibo) return ['Recibo is required', undefined];
+    if (!agente_creador) return ['Agente creador is required', undefined];
+
+    return [
+      undefined,
+      new HistorialPagosCreateDto(
+        documento,
+        prestamoID,
+        Numero_cuota,
+        capital || 0,
+        interes || 0,
+        aval || 0,
+        IVA || 0,
+        pablok || 0,
+        sanciones || 0,
+        prejuridico || 0,
+        juridico || 0,
+        seguro || 0,
+        total_pagado,
+        recibo,
+        agente_creador,
+        bolsa || '',
+        canal || 'MANUAL',
+        tipo_pago || 'Cuota',
+        creador || 'MIGRACION',
+        fecha_registro ? new Date(fecha_registro) : new Date()
+      ),
+    ];
+  }
+}
+
+/**
+ * DTO para migrar historial de pagos detallado (tabla historial_pagos_detallado)
+ * Vincula pagos de la tabla pagos con desglose detallado
+ */
+export class HistorialPagosDetalladoCreateDto {
+  private constructor(
+    public readonly id_pago: number,
+    public readonly prestamo_id: number,
+    public readonly id_cliente: number,
+    public readonly documento: string,
+    public readonly numero_cuota: number | null,
+    public readonly capital_pagado: number,
+    public readonly interes_pagado: number,
+    public readonly aval_pagado: number,
+    public readonly iva_pagado: number,
+    public readonly pablok: number,
+    public readonly sancion_pagada: number,
+    public readonly descuento_capital: number,
+    public readonly descuento_interes: number,
+    public readonly descuento_aval: number,
+    public readonly descuento_iva: number,
+    public readonly descuento_sancion: number,
+    public readonly total_pagado: number,
+    public readonly total_descuento: number,
+    public readonly tipo_pago: 'Cuota' | 'Cuota_Inicial' | 'Pago_Total' | 'Mora' | 'Parcial',
+    public readonly id_bolsa_asignada: number | null,
+    public readonly usuario_aplicacion: string,
+    public readonly fecha_aplicacion: Date,
+    public readonly observaciones: string | null
+  ) {}
+
+  static create(props: { [key: string]: any }): [string?, HistorialPagosDetalladoCreateDto?] {
+    const {
+      id_pago,
+      prestamo_id,
+      id_cliente,
+      documento,
+      numero_cuota,
+      capital_pagado,
+      interes_pagado,
+      aval_pagado,
+      iva_pagado,
+      pablok,
+      sancion_pagada,
+      descuento_capital,
+      descuento_interes,
+      descuento_aval,
+      descuento_iva,
+      descuento_sancion,
+      total_pagado,
+      total_descuento,
+      tipo_pago,
+      id_bolsa_asignada,
+      usuario_aplicacion,
+      fecha_aplicacion,
+      observaciones,
+    } = props;
+
+    if (!id_pago) return ['ID pago is required', undefined];
+    if (!prestamo_id) return ['Prestamo ID is required', undefined];
+    if (!id_cliente) return ['ID cliente is required', undefined];
+    if (!documento) return ['Documento is required', undefined];
+    if (total_pagado === undefined) return ['Total pagado is required', undefined];
+    if (!usuario_aplicacion) return ['Usuario aplicacion is required', undefined];
+
+    return [
+      undefined,
+      new HistorialPagosDetalladoCreateDto(
+        id_pago,
+        prestamo_id,
+        id_cliente,
+        documento,
+        numero_cuota || null,
+        capital_pagado || 0,
+        interes_pagado || 0,
+        aval_pagado || 0,
+        iva_pagado || 0,
+        pablok || 0,
+        sancion_pagada || 0,
+        descuento_capital || 0,
+        descuento_interes || 0,
+        descuento_aval || 0,
+        descuento_iva || 0,
+        descuento_sancion || 0,
+        total_pagado,
+        total_descuento || 0,
+        tipo_pago || 'Cuota',
+        id_bolsa_asignada || null,
+        usuario_aplicacion,
+        fecha_aplicacion ? new Date(fecha_aplicacion) : new Date(),
+        observaciones || null
+      ),
+    ];
+  }
+}

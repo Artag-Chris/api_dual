@@ -27001,3 +27001,745 @@ Invalid value for argument `hora_pago`: input contains invalid characters. Expec
     at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
     at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
     at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:02:52.435Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 176,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:18:04.819Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 177,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:29:34.616Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 178,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:45:45.753Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 179,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T22:06:57.847Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 180,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T22:08:58.989Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 181,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:48:40.100Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 182,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:55:26.716Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 183,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:59:32.965Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 184,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:10:38.439Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 185,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:15:17.886Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 186,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:38:50.444Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 187,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:53:43.850Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $1,904,055
+2026-02-18T00:53:44.027Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 188,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:03:51.006Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $1,904,055
+2026-02-18T01:03:51.214Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 189,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:12:08.312Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $2,670,021
+2026-02-18T01:12:08.491Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 190,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:17:53.510Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $2,332,112
+2026-02-18T01:17:53.692Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 191,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:28:49.551Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 192,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:31:46.612Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 193,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
