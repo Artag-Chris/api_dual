@@ -9,7 +9,7 @@ import { AmortizacionGenerator } from '../../domain/class/amortizacion-generator
 import { EstudiosRealizadosMapper } from '../../domain/class/estudios-realizados-mapper';
 import { PedidoMapper } from '../../domain/class/pedido-mapper';
 import { SaldoInicialMapper } from '../../domain/class/saldo-inicial-mapper';
-import { PagoHistoricoMapper } from '../../domain/class/pago-historico-mapper';
+import { HistorialPagosMapper } from '../../domain/class/historial-pagos-mapper';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
 /**************************************************************************************************
@@ -28,7 +28,7 @@ class MainDataService {
   private estudiosRealizadosMapper: EstudiosRealizadosMapper;
   private pedidoMapper: PedidoMapper;
   private saldoInicialMapper: SaldoInicialMapper;
-  private pagoHistoricoMapper: PagoHistoricoMapper;
+  private historialPagosMapper: HistorialPagosMapper;
 
   constructor() {
     this.logger = WinstonAdapter;
@@ -38,7 +38,7 @@ class MainDataService {
     this.estudiosRealizadosMapper = new EstudiosRealizadosMapper(prismaLegacyService, this.logger);
     this.pedidoMapper = new PedidoMapper(prismaMainService, prismaLegacyService, this.logger);
     this.saldoInicialMapper = new SaldoInicialMapper(this.logger);
-    this.pagoHistoricoMapper = new PagoHistoricoMapper(prismaLegacyService, this.logger);
+    this.historialPagosMapper = new HistorialPagosMapper(prismaLegacyService, this.logger);
   }
 
   public static getInstance(): MainDataService {
@@ -403,12 +403,54 @@ class MainDataService {
     if (infoReferenciasError) throw new Error(`Error en mapeo InfoReferencias: ${infoReferenciasError}`);
 
     // 4.6 Obtener precreditos del cliente legacy para migrar a detalle_credito
+    // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
     let precreditosData: any[] = [];
     if (clienteLegacy.id) {
       precreditosData = await prismaLegacyService.precreditos.findMany({
-        where: { cliente_id: clienteLegacy.id },
+        where: {
+          cliente_id: clienteLegacy.id,
+          aprobado: 'Si',                    // ✅ Solo créditos aprobados
+          vlr_fin: { gt: 0 },                // ✅ Monto mayor a 0
+          cuotas: { gt: 0 },                 // ✅ Tiene cuotas
+          vlr_cuota: { gt: 0 },              // ✅ Cuota válida
+          carteras: {
+            estado: 'Activo',                // ✅ Cartera activa
+            tasa: { gt: 0 }                  // ✅ SOLO con interés (excluye tasa=0)
+          }
+        },
+        include: {
+          carteras: true,
+          creditos: {
+            where: {
+              valor_credito: { gt: 0 },
+              estado: {
+                in: [
+                  'Al_dia',
+                  'Mora',
+                  'Prejuridico',
+                  'Juridico',
+                  'Cancelado',
+                  'Cancelado_por_refinanciacion'
+                ]
+              }
+            }
+          },
+          users_precreditos_funcionario_idTousers: {  // ✅ Para creador
+            select: { 
+              id: true,
+              name: true 
+            }
+          }
+        }
       });
     }
+
+    this.logger.info(
+      `📊 PRECREDITOS FILTRADOS para cliente ${documento}:` +
+      `\n  ✅ Aprobados con interés (tasa > 0): ${precreditosData.length}` +
+      `\n  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), ` +
+      `Sin interés (tasa=0), Sin cuotas válidas`
+    );
 
     let conyugeDto: any = null;
     if (clienteLegacy.conyuges && clienteLegacy.conyuges.length > 0) {
@@ -427,6 +469,27 @@ class MainDataService {
     const precreditoIds = precreditosData.map((p: any) => Number(p.id));
     const datosCreditosActivos = await this.creditosIntegrationMapper.obtenerDatosCreditoActivoLote(precreditoIds);
     this.logger.info(`[PHASE 9] Loaded ${datosCreditosActivos.size} active credits`);
+
+    // PHASE 9.1: Classify precreditos by disbursement status
+    const precreditosDesembolsados: any[] = [];
+    const precreditosPendientesDesembolso: any[] = [];
+
+    for (const precredito of precreditosData) {
+      if (precredito.creditos && precredito.creditos.length > 0) {
+        // Has creditos record = DISBURSED
+        precreditosDesembolsados.push(precredito);
+      } else {
+        // Approved but no disbursement = PENDING
+        precreditosPendientesDesembolso.push(precredito);
+      }
+    }
+
+    this.logger.info(
+      `📊 CLASIFICACIÓN DE CRÉDITOS para cliente ${documento}:` +
+      `\n  💰 Desembolsados (con amortización completa): ${precreditosDesembolsados.length}` +
+      `\n  ⏳ Aprobados pendientes desembolso (sin amortización): ${precreditosPendientesDesembolso.length}` +
+      `\n  📝 Total a migrar: ${precreditosData.length}`
+    );
 
     // 5-12. Iniciar transacción e insertar datos
     try {
@@ -605,16 +668,25 @@ class MainDataService {
         const pedidos: any[] = [];
         const saldosIniciales: any[] = [];
         
-        if (precreditosData && precreditosData.length > 0) {
-          this.logger.info(`[MIGRATION] Processing ${precreditosData.length} credits...`);
+        // Process DISBURSED credits (with complete amortization, payments, etc.)
+        if (precreditosDesembolsados && precreditosDesembolsados.length > 0) {
+          this.logger.info(`[MIGRATION] Processing ${precreditosDesembolsados.length} DISBURSED credits...`);
           
-          for (const precredito of precreditosData) {
+          for (const precredito of precreditosDesembolsados) {
             const precreditoId = Number(precredito.id);
             
             // Get active credit data
             const datosCreditoActivo = datosCreditosActivos.get(precreditoId) || null;
             
-            const [error, creditoDto] = await CreditoMapper.mapToCreditoDto(precredito, clienteLegacy);
+            // Get credito data for fecha calculation
+            const creditoLegacy = precredito.creditos?.[0];
+            
+            const [error, creditoDto] = await CreditoMapper.mapToCreditoDto(
+              precredito, 
+              clienteLegacy,
+              prismaLegacyService,
+              creditoLegacy
+            );
 
             if (!error && creditoDto) {
               // Determine final estado (use active credit status if available)
@@ -624,6 +696,20 @@ class MainDataService {
               const tipoCredito = await tx.lista_tipo_credito.findFirst({
                 where: { tipo: creditoDto.tipoCredito },
               });
+
+              // Obtener campos adicionales desde precredito
+              const creador = precredito.users_precreditos_funcionario_idTousers?.name || 'SISTEMA_LEGACY';
+              const fechaRegistro = precredito.created_at || new Date();
+              const fechaActualizacion = precredito.updated_at;
+              
+              // Verificar si el crédito fue castigado (si existe en creditos)
+              let castigo = 'NO';
+              if (datosCreditoActivo && datosCreditoActivo.credito_id) {
+                const creditoLegacy = precredito.creditos?.[0];
+                if (creditoLegacy?.castigada === 'Si') {
+                  castigo = 'SI';
+                }
+              }
 
               // Crear el registro de crédito
               const detalleCredito = await tx.detalle_credito.create({
@@ -661,6 +747,10 @@ class MainDataService {
                   iva_aval: creditoDto.iva_aval as any,
                   pablok: creditoDto.pablok,
                   seguro_add: creditoDto.seguro_add as any,
+                  creador: creador,                          // ✅ Funcionario que creó
+                  fecha_registro: fechaRegistro,             // ✅ Fecha original
+                  fecha_actualizacion: fechaActualizacion,   // ✅ Fecha última actualización
+                  castigo: castigo as any,                   // ✅ Si fue castigado
                 },
               });
 
@@ -669,6 +759,30 @@ class MainDataService {
 
               // PHASE 11: Generate amortization
               this.logger.info(`[PHASE 11] Generating amortization for prestamo ${detalleCredito.prestamo_ID}...`);
+              
+              // ✅ Extract amortization parameters from cartera
+              let seguroAval = 0.1;     // Default 10% aval
+              let ivaAval = 0.19;       // Default 19% IVA
+              
+              if (precredito?.carteras) {
+                try {
+                  const amortizacionConfig = precredito.carteras.amortizacion;
+                  if (typeof amortizacionConfig === 'string') {
+                    const config = JSON.parse(amortizacionConfig);
+                    // Extract from cartera JSON: {"seguro": X, "porc_iva_aval": Y}
+                    if (config.seguro !== undefined) seguroAval = config.seguro / 100;
+                    if (config.porc_iva_aval !== undefined) ivaAval = config.porc_iva_aval / 100;
+                    
+                    this.logger.info(
+                      `[CARTERA] Using amortization params: seguro/aval=` +
+                      `${(seguroAval * 100).toFixed(1)}%, iva=${(ivaAval * 100).toFixed(1)}%`
+                    );
+                  }
+                } catch (err) {
+                  this.logger.warn(`[CARTERA] Could not parse amortizacion JSON: ${err}`);
+                }
+              }
+              
               const cuotasAmortizacion = this.amortizacionGenerator.generarAmortizacion({
                 prestamo_ID: detalleCredito.prestamo_ID,
                 valor_prestamo: parseInt(creditoDto.valor_prestamo),
@@ -677,6 +791,11 @@ class MainDataService {
                 periocidad: creditoDto.periocidad,
                 fecha_inicial: new Date(creditoDto.fechaPago),
                 datosCreditoActivo,
+                valor_cuota_fija: parseFloat(creditoDto.valor_cuota),
+                seguro: seguroAval,           // ✅ Aval % from cartera
+                iva_aval: ivaAval,            // ✅ IVA % from cartera
+                seguro_add: 0,                // ✅ No seguro adicional for now
+                pablok: 0,                    // ✅ No pablok for now
               });
 
               // Create amortization records
@@ -741,16 +860,20 @@ class MainDataService {
                 this.logger.info(`[PHASE 13] Created saldo_inicial for prestamo ${detalleCredito.prestamo_ID}`);
               }
 
-              // PHASE 14: Migrate payment history
+              // PHASE 14: Migrate complete payment history (improved)
               if (datosCreditoActivo && datosCreditoActivo.credito_id) {
-                this.logger.info(`[PHASE 14] Migrating payment history...`);
+                this.logger.info(`[PHASE 14] Migrating complete payment history...`);
                 try {
-                  const pagosMigrados = await this.pagoHistoricoMapper.migrarHistorialPagos(
+                  const stats = await this.historialPagosMapper.migrarHistorialPagosCompleto(
                     datosCreditoActivo.credito_id,
                     detalleCredito.prestamo_ID,
+                    userCliente.id,
+                    documento,
                     tx
                   );
-                  this.logger.info(`[PHASE 14] Migrated ${pagosMigrados} payment records`);
+                  this.logger.info(
+                    `[PHASE 14] Payment migration complete - Applied: ${stats.pagosAplicados}, Pending: ${stats.pagosPendientes}, Historial: ${stats.historialCreados}, Detallados: ${stats.detalladosCreados}`
+                  );
                 } catch (pagoError) {
                   this.logger.warn(`[PHASE 14] Could not migrate payments: ${pagoError}`);
                 }
@@ -758,6 +881,89 @@ class MainDataService {
 
             } else {
               this.logger.warn(`[MAIN-DATA-SERVICE] Error mapeando precredito ${precredito.id}: ${error}`);
+            }
+          }
+        }
+
+        // Process PENDING DISBURSEMENT credits (approved but not yet disbursed)
+        // These will NOT have amortization, saldo_inicial, or payment history
+        if (precreditosPendientesDesembolso && precreditosPendientesDesembolso.length > 0) {
+          this.logger.info(
+            `[MIGRATION] Processing ${precreditosPendientesDesembolso.length} PENDING DISBURSEMENT credits...`
+          );
+
+          for (const precredito of precreditosPendientesDesembolso) {
+            // No creditoLegacy for pending disbursements
+            const [error, creditoDto] = await CreditoMapper.mapToCreditoDto(
+              precredito, 
+              clienteLegacy,
+              prismaLegacyService,
+              undefined  // No credito for pending disbursements
+            );
+
+            if (!error && creditoDto) {
+              // Buscar el tipo de crédito
+              const tipoCredito = await tx.lista_tipo_credito.findFirst({
+                where: { tipo: creditoDto.tipoCredito },
+              });
+
+              // Obtener campos adicionales desde precredito
+              const creador = precredito.users_precreditos_funcionario_idTousers?.name || 'SISTEMA_LEGACY';
+              const fechaRegistro = precredito.created_at || new Date();
+              const fechaActualizacion = precredito.updated_at;
+
+              // Crear registro sin amortización
+              const detalleCredito = await tx.detalle_credito.create({
+                data: {
+                  user_cliente: {
+                    connect: {
+                      documento: creditoDto.documento,
+                    },
+                  },
+                  lista_tipo_credito: {
+                    connect: {
+                      tipo: tipoCredito?.tipo || 'CREDITO EXPRESS',
+                    },
+                  },
+                  lista_estado_credito: {
+                    connect: {
+                      tipo: 'APROBADO',  // Estado aprobado
+                    },
+                  },
+                  lista_origen_credito: {
+                    connect: {
+                      tipo: creditoDto.origen,
+                    },
+                  },
+                  valor_prestamo: creditoDto.valor_prestamo,
+                  inicial: creditoDto.inicial,
+                  numero_cuotas: creditoDto.numero_cuotas,
+                  valor_cuota: creditoDto.valor_cuota,
+                  fecha_Pago: creditoDto.fechaPago,
+                  plazo: creditoDto.plazo,
+                  tasa: creditoDto.tasa,
+                  periocidad: creditoDto.periocidad,
+                  dia_pago: creditoDto.diaPago,
+                  seguro: creditoDto.seguro || 0,
+                  iva_aval: creditoDto.iva_aval as any || '0',
+                  pablok: creditoDto.pablok || 0,
+                  seguro_add: creditoDto.seguro_add as any || '0',
+                  creador: creador,
+                  fecha_registro: fechaRegistro,
+                  fecha_actualizacion: fechaActualizacion,
+                  castigo: 'NO', // Pendiente de desembolso nunca está castigado
+                  // Observación: Crédito aprobado en FACILITO pero PENDIENTE DE DESEMBOLSO
+                },
+              });
+
+              detalleCreditos.push(detalleCredito);
+              this.logger.info(
+                `[MIGRATION] Precredito ${precredito.id} migrated as PENDING_DISBURSEMENT (no amortization) - prestamo_ID: ${detalleCredito.prestamo_ID}`
+              );
+            } else {
+              this.logger.warn(
+                `[MAIN-DATA-SERVICE] Error mapeando precredito pendiente ${precredito.id}: ${error}`
+              );
             }
           }
         }
@@ -840,12 +1046,26 @@ class MainDataService {
           conyuge,
           stats: {
             creditosCreados: detalleCreditos.length,
+            creditosDesembolsados: precreditosDesembolsados.length,
+            creditosPendientesDesembolso: precreditosPendientesDesembolso.length,
             cuotasAmortizacion: amortizaciones.length,
             pedidosCreados: pedidos.length,
             saldosCreados: saldosIniciales.length,
           },
         };
       });
+
+      // Log final migration summary
+      this.logger.info(
+        `\n✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente ${documento}:` +
+        `\n  👤 User Cliente: ${result.userCliente.nombre_completo}` +
+        `\n  💳 Créditos totales: ${result.stats.creditosCreados}` +
+        `\n     ├─ 💰 Desembolsados (con amortización): ${result.stats.creditosDesembolsados}` +
+        `\n     └─ ⏳ Pendientes desembolso (sin amortización): ${result.stats.creditosPendientesDesembolso}` +
+        `\n  📊 Cuotas de amortización: ${result.stats.cuotasAmortizacion}` +
+        `\n  📦 Pedidos migrados: ${result.stats.pedidosCreados}` +
+        `\n  💵 Saldos iniciales: ${result.stats.saldosCreados}`
+      );
 
       // 13. Retornar usuario completado con relaciones anidadas
       return {

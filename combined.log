@@ -160,3 +160,1588 @@ Invalid value for argument `hora_pago`: input contains invalid characters. Expec
 2026-02-17T14:57:58.962Z info: [PHASE 14] Migrated 0 payment records
 2026-02-17T14:57:58.969Z info: [PHASE 10] Creating estudios_realizados with real data...
 2026-02-17T14:57:58.987Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T15:58:01.494Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T15:58:01.511Z info: Found 116 active puntos in legacy database
+2026-02-17T15:58:01.864Z info: Bodega mapping completed: 116 entries
+2026-02-17T15:58:01.866Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T15:58:01.868Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T15:58:01.879Z info: Loaded active credit data for 0 precreditos
+2026-02-17T15:58:01.880Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T15:58:01.950Z info: [MIGRATION] Processing 1 credits...
+2026-02-17T15:58:01.975Z info: [CREDIT] Created detalle_credito 173 for precredito 39644
+2026-02-17T15:58:01.977Z info: [PHASE 11] Generating amortization for prestamo 173...
+2026-02-17T15:58:01.979Z info: Generating 48 cuotas for new credit (all PENDIENTE)
+2026-02-17T15:58:01.980Z info: Generated 48 amortization entries for prestamo 173 (0 PAGADO, 48 PENDIENTE)
+2026-02-17T15:58:02.180Z info: [PHASE 11] Generated 48 amortization entries
+2026-02-17T15:58:02.181Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T15:58:02.190Z warn: No ref_productos found for precredito 39644
+2026-02-17T15:58:02.191Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T15:58:02.198Z info: [PHASE 13] Created saldo_inicial for prestamo 173
+2026-02-17T15:58:02.205Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T15:58:02.235Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T16:05:33.876Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T16:05:33.886Z info: Found 116 active puntos in legacy database
+2026-02-17T16:05:34.189Z info: Bodega mapping completed: 116 entries
+2026-02-17T16:05:34.190Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T16:05:34.191Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T16:05:34.196Z info: Loaded active credit data for 0 precreditos
+2026-02-17T16:05:34.197Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T16:05:34.248Z info: [MIGRATION] Processing 1 credits...
+2026-02-17T16:05:34.269Z info: [CREDIT] Created detalle_credito 174 for precredito 39622
+2026-02-17T16:05:34.269Z info: [PHASE 11] Generating amortization for prestamo 174...
+2026-02-17T16:05:34.269Z info: Generating 12 cuotas for new credit (all PENDIENTE)
+2026-02-17T16:05:34.270Z info: Generated 12 amortization entries for prestamo 174 (0 PAGADO, 12 PENDIENTE)
+2026-02-17T16:05:34.318Z info: [PHASE 11] Generated 12 amortization entries
+2026-02-17T16:05:34.319Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T16:05:34.324Z warn: No ref_productos found for precredito 39622
+2026-02-17T16:05:34.325Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T16:05:34.330Z info: [PHASE 13] Created saldo_inicial for prestamo 174
+2026-02-17T16:05:34.336Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T16:05:34.357Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T16:54:55.011Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T16:54:55.019Z info: Found 116 active puntos in legacy database
+2026-02-17T16:54:55.318Z info: Bodega mapping completed: 116 entries
+2026-02-17T16:54:55.318Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T16:54:55.319Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T16:54:55.327Z info: Loaded active credit data for 0 precreditos
+2026-02-17T16:54:55.327Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T16:54:55.385Z info: [MIGRATION] Processing 1 credits...
+2026-02-17T16:54:55.410Z info: [CREDIT] Created detalle_credito 175 for precredito 39623
+2026-02-17T16:54:55.412Z info: [PHASE 11] Generating amortization for prestamo 175...
+2026-02-17T16:54:55.412Z info: Generating 48 cuotas for new credit (all PENDIENTE)
+2026-02-17T16:54:55.413Z info: Generated 48 amortization entries for prestamo 175 (0 PAGADO, 48 PENDIENTE)
+2026-02-17T16:54:55.653Z info: [PHASE 11] Generated 48 amortization entries
+2026-02-17T16:54:55.654Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T16:54:55.660Z warn: No ref_productos found for precredito 39623
+2026-02-17T16:54:55.661Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T16:54:55.668Z info: [PHASE 13] Created saldo_inicial for prestamo 175
+2026-02-17T16:54:55.676Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T16:54:55.704Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T20:46:43.362Z info: 📊 PRECREDITOS FILTRADOS para cliente 15362903:
+  ✅ Aprobados con interés (tasa > 0): 0
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T20:46:43.368Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T20:46:43.377Z info: Found 116 active puntos in legacy database
+2026-02-17T20:46:43.640Z info: Bodega mapping completed: 116 entries
+2026-02-17T20:46:43.641Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T20:46:43.642Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T20:46:43.649Z info: Loaded active credit data for 0 precreditos
+2026-02-17T20:46:43.649Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T20:46:43.650Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 15362903:
+  💰 Desembolsados (con amortización completa): 0
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 0
+2026-02-17T20:46:43.710Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T20:46:43.739Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T20:46:43.756Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 15362903:
+  👤 User Cliente: Jorge  Lopez
+  💳 Créditos totales: 0
+     ├─ 💰 Desembolsados (con amortización): 0
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 0
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 0
+2026-02-17T20:47:33.479Z info: 📊 PRECREDITOS FILTRADOS para cliente 1103672309:
+  ✅ Aprobados con interés (tasa > 0): 0
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T20:47:33.480Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T20:47:33.485Z info: Found 116 active puntos in legacy database
+2026-02-17T20:47:33.763Z info: Bodega mapping completed: 116 entries
+2026-02-17T20:47:33.764Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T20:47:33.765Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T20:47:33.769Z info: Loaded active credit data for 0 precreditos
+2026-02-17T20:47:33.770Z info: [PHASE 9] Loaded 0 active credits
+2026-02-17T20:47:33.770Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 1103672309:
+  💰 Desembolsados (con amortización completa): 0
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 0
+2026-02-17T20:47:33.817Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T20:47:33.834Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T20:47:33.840Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 1103672309:
+  👤 User Cliente: Maria Triana 
+  💳 Créditos totales: 0
+     ├─ 💰 Desembolsados (con amortización): 0
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 0
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 0
+2026-02-17T20:58:44.050Z info: 📊 PRECREDITOS FILTRADOS para cliente 26592383:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T20:58:44.053Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T20:58:44.059Z info: Found 116 active puntos in legacy database
+2026-02-17T20:58:44.350Z info: Bodega mapping completed: 116 entries
+2026-02-17T20:58:44.350Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T20:58:44.351Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T20:58:44.359Z info: Loaded active credit data for 1 precreditos
+2026-02-17T20:58:44.360Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T20:58:44.361Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 26592383:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T20:58:44.429Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T21:02:51.821Z info: 📊 PRECREDITOS FILTRADOS para cliente 26592383:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T21:02:51.827Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T21:02:51.837Z info: Found 116 active puntos in legacy database
+2026-02-17T21:02:52.129Z info: Bodega mapping completed: 116 entries
+2026-02-17T21:02:52.130Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T21:02:52.132Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T21:02:52.140Z info: Loaded active credit data for 1 precreditos
+2026-02-17T21:02:52.141Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T21:02:52.141Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 26592383:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T21:02:52.213Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T21:02:52.244Z info: [CREDIT] Created detalle_credito 176 for precredito 38921
+2026-02-17T21:02:52.245Z info: [PHASE 11] Generating amortization for prestamo 176...
+2026-02-17T21:02:52.246Z info: Generating 24 TOTAL cuotas (1 marked as PAGADO, 23 as PENDIENTE)
+2026-02-17T21:02:52.248Z info: Generated 24 amortization entries for prestamo 176 (1 PAGADO, 23 PENDIENTE)
+2026-02-17T21:02:52.355Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T21:02:52.355Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T21:02:52.364Z warn: No ref_productos found for precredito 38921
+2026-02-17T21:02:52.365Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T21:02:52.371Z info: [PHASE 13] Created saldo_inicial for prestamo 176
+2026-02-17T21:02:52.372Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T21:02:52.435Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 176,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:02:52.436Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T21:02:52.443Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T21:02:52.469Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T21:02:52.481Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 26592383:
+  👤 User Cliente: Elizabeth Trujillo
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T21:18:04.241Z info: 📊 PRECREDITOS FILTRADOS para cliente 26592383:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T21:18:04.248Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T21:18:04.258Z info: Found 116 active puntos in legacy database
+2026-02-17T21:18:04.547Z info: Bodega mapping completed: 116 entries
+2026-02-17T21:18:04.548Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T21:18:04.550Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T21:18:04.560Z info: Loaded active credit data for 1 precreditos
+2026-02-17T21:18:04.561Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T21:18:04.562Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 26592383:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T21:18:04.624Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T21:18:04.655Z info: [CREDIT] Created detalle_credito 177 for precredito 38921
+2026-02-17T21:18:04.655Z info: [PHASE 11] Generating amortization for prestamo 177...
+2026-02-17T21:18:04.657Z info: Generating 24 TOTAL cuotas (1 marked as PAGADO, 23 as PENDIENTE)
+2026-02-17T21:18:04.658Z info: Generated 24 amortization entries for prestamo 177 (1 PAGADO, 23 PENDIENTE)
+2026-02-17T21:18:04.756Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T21:18:04.756Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T21:18:04.763Z warn: No ref_productos found for precredito 38921
+2026-02-17T21:18:04.764Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T21:18:04.770Z info: [PHASE 13] Created saldo_inicial for prestamo 177
+2026-02-17T21:18:04.770Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T21:18:04.819Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 177,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:18:04.820Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T21:18:04.826Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T21:18:04.850Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T21:18:04.861Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 26592383:
+  👤 User Cliente: Elizabeth Trujillo
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T21:29:33.992Z info: 📊 PRECREDITOS FILTRADOS para cliente 26592383:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T21:29:34.000Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T21:29:34.009Z info: Found 116 active puntos in legacy database
+2026-02-17T21:29:34.366Z info: Bodega mapping completed: 116 entries
+2026-02-17T21:29:34.367Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T21:29:34.368Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T21:29:34.377Z info: Loaded active credit data for 1 precreditos
+2026-02-17T21:29:34.377Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T21:29:34.378Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 26592383:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T21:29:34.442Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T21:29:34.469Z info: [CREDIT] Created detalle_credito 178 for precredito 38921
+2026-02-17T21:29:34.470Z info: [PHASE 11] Generating amortization for prestamo 178...
+2026-02-17T21:29:34.471Z info: [TASA] Tasa mensual: 1.86%, Periodicidad: QUINCENAL, Tasa por período: 0.9300%
+2026-02-17T21:29:34.471Z info: Generating 24 TOTAL cuotas (1 marked as PAGADO, 23 as PENDIENTE)
+2026-02-17T21:29:34.472Z info: Generated 24 amortization entries for prestamo 178 (1 PAGADO, 23 PENDIENTE)
+2026-02-17T21:29:34.557Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T21:29:34.558Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T21:29:34.569Z warn: No ref_productos found for precredito 38921
+2026-02-17T21:29:34.569Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T21:29:34.575Z info: [PHASE 13] Created saldo_inicial for prestamo 178
+2026-02-17T21:29:34.576Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T21:29:34.616Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 178,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:29:34.617Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T21:29:34.624Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T21:29:34.646Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T21:29:34.657Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 26592383:
+  👤 User Cliente: Elizabeth Trujillo
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T21:45:45.243Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T21:45:45.246Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T21:45:45.255Z info: Found 116 active puntos in legacy database
+2026-02-17T21:45:45.538Z info: Bodega mapping completed: 116 entries
+2026-02-17T21:45:45.539Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T21:45:45.540Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T21:45:45.545Z info: Loaded active credit data for 1 precreditos
+2026-02-17T21:45:45.546Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T21:45:45.546Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T21:45:45.601Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T21:45:45.629Z info: [CREDIT] Created detalle_credito 179 for precredito 34390
+2026-02-17T21:45:45.630Z info: [PHASE 11] Generating amortization for prestamo 179...
+2026-02-17T21:45:45.630Z info: [TASA] Tasa mensual: 1.86%, Periodicidad: MENSUAL, Tasa por período: 1.8600%
+2026-02-17T21:45:45.630Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T21:45:45.631Z info: Generated 24 amortization entries for prestamo 179 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T21:45:45.716Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T21:45:45.717Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T21:45:45.722Z warn: No ref_productos found for precredito 34390
+2026-02-17T21:45:45.723Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T21:45:45.730Z info: [PHASE 13] Created saldo_inicial for prestamo 179
+2026-02-17T21:45:45.731Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T21:45:45.753Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 179,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T21:45:45.754Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T21:45:45.760Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T21:45:45.782Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T21:45:45.793Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T22:06:57.301Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T22:06:57.303Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T22:06:57.311Z info: Found 116 active puntos in legacy database
+2026-02-17T22:06:57.558Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T22:06:57.559Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T22:06:57.564Z info: Found 116 active puntos in legacy database
+2026-02-17T22:06:57.656Z info: Bodega mapping completed: 116 entries
+2026-02-17T22:06:57.656Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T22:06:57.657Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T22:06:57.661Z info: Loaded active credit data for 1 precreditos
+2026-02-17T22:06:57.662Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T22:06:57.662Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T22:06:57.706Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T22:06:57.730Z info: [CREDIT] Created detalle_credito 180 for precredito 34390
+2026-02-17T22:06:57.730Z info: [PHASE 11] Generating amortization for prestamo 180...
+2026-02-17T22:06:57.731Z info: [TASA] Tasa mensual: 1.86%, Periodicidad: MENSUAL, Tasa por período: 1.8600%
+2026-02-17T22:06:57.731Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T22:06:57.731Z info: Generated 24 amortization entries for prestamo 180 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T22:06:57.816Z info: Bodega mapping completed: 116 entries
+2026-02-17T22:06:57.816Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T22:06:57.817Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T22:06:57.821Z info: Loaded active credit data for 1 precreditos
+2026-02-17T22:06:57.821Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T22:06:57.821Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T22:06:57.824Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T22:06:57.825Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T22:06:57.829Z warn: No ref_productos found for precredito 34390
+2026-02-17T22:06:57.829Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T22:06:57.835Z info: [PHASE 13] Created saldo_inicial for prestamo 180
+2026-02-17T22:06:57.836Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T22:06:57.847Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 180,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T22:06:57.847Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T22:06:57.855Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T22:06:57.875Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T22:06:57.886Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T22:08:58.527Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T22:08:58.528Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T22:08:58.533Z info: Found 116 active puntos in legacy database
+2026-02-17T22:08:58.798Z info: Bodega mapping completed: 116 entries
+2026-02-17T22:08:58.799Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T22:08:58.799Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T22:08:58.803Z info: Loaded active credit data for 1 precreditos
+2026-02-17T22:08:58.804Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T22:08:58.805Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T22:08:58.852Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T22:08:58.875Z info: [CREDIT] Created detalle_credito 181 for precredito 34390
+2026-02-17T22:08:58.875Z info: [PHASE 11] Generating amortization for prestamo 181...
+2026-02-17T22:08:58.876Z info: [TASA] Tasa mensual: 1.86%, Periodicidad: MENSUAL, Tasa por período: 1.8600%
+2026-02-17T22:08:58.876Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T22:08:58.876Z info: Generated 24 amortization entries for prestamo 181 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T22:08:58.963Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T22:08:58.964Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T22:08:58.968Z warn: No ref_productos found for precredito 34390
+2026-02-17T22:08:58.968Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T22:08:58.975Z info: [PHASE 13] Created saldo_inicial for prestamo 181
+2026-02-17T22:08:58.976Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T22:08:58.989Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 181,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T22:08:58.990Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T22:08:58.997Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T22:08:59.014Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T22:08:59.025Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T23:48:39.510Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T23:48:39.514Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T23:48:39.519Z info: Found 116 active puntos in legacy database
+2026-02-17T23:48:39.731Z info: Bodega mapping completed: 116 entries
+2026-02-17T23:48:39.732Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T23:48:39.733Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T23:48:39.740Z info: Loaded active credit data for 1 precreditos
+2026-02-17T23:48:39.740Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T23:48:39.741Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T23:48:39.793Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T23:48:39.822Z info: [CREDIT] Created detalle_credito 182 for precredito 34390
+2026-02-17T23:48:39.822Z info: [PHASE 11] Generating amortization for prestamo 182...
+2026-02-17T23:48:39.919Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-17T23:48:39.919Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T23:48:39.921Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 182: Esperado: $1,780,000, Calculado: $2,315,178, Diferencia: $535,178 (30.07%)
+2026-02-17T23:48:39.921Z info: Generated 24 amortization entries for prestamo 182 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T23:48:40.021Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T23:48:40.022Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T23:48:40.031Z warn: No ref_productos found for precredito 34390
+2026-02-17T23:48:40.031Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T23:48:40.037Z info: [PHASE 13] Created saldo_inicial for prestamo 182
+2026-02-17T23:48:40.038Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T23:48:40.100Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 182,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:48:40.101Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T23:48:40.111Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T23:48:40.145Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T23:48:40.160Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T23:55:26.114Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T23:55:26.121Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T23:55:26.131Z info: Found 116 active puntos in legacy database
+2026-02-17T23:55:26.412Z info: Bodega mapping completed: 116 entries
+2026-02-17T23:55:26.413Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T23:55:26.414Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T23:55:26.423Z info: Loaded active credit data for 1 precreditos
+2026-02-17T23:55:26.424Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T23:55:26.425Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T23:55:26.482Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T23:55:26.509Z info: [CREDIT] Created detalle_credito 183 for precredito 34390
+2026-02-17T23:55:26.509Z info: [PHASE 11] Generating amortization for prestamo 183...
+2026-02-17T23:55:26.554Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-17T23:55:26.555Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T23:55:26.557Z info: [ÚLTIMA CUOTA] Cuota 24: Capital faltante calculado = $-535,178, Capital asignado = $0, Total cuota = $0
+2026-02-17T23:55:26.557Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 183: Esperado: $1,780,000, Calculado: $2,315,178, Diferencia: $535,178 (30.07%)
+2026-02-17T23:55:26.558Z info: Generated 24 amortization entries for prestamo 183 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T23:55:26.655Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T23:55:26.655Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T23:55:26.663Z warn: No ref_productos found for precredito 34390
+2026-02-17T23:55:26.664Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T23:55:26.672Z info: [PHASE 13] Created saldo_inicial for prestamo 183
+2026-02-17T23:55:26.673Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T23:55:26.716Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 183,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:55:26.717Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T23:55:26.727Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T23:55:26.753Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T23:55:26.763Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-17T23:59:32.205Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-17T23:59:32.212Z info: [PHASE 0] Creating bodega mapping...
+2026-02-17T23:59:32.222Z info: Found 116 active puntos in legacy database
+2026-02-17T23:59:32.568Z info: Bodega mapping completed: 116 entries
+2026-02-17T23:59:32.570Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-17T23:59:32.572Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-17T23:59:32.584Z info: Loaded active credit data for 1 precreditos
+2026-02-17T23:59:32.586Z info: [PHASE 9] Loaded 1 active credits
+2026-02-17T23:59:32.586Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-17T23:59:32.660Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-17T23:59:32.707Z info: [CREDIT] Created detalle_credito 184 for precredito 34390
+2026-02-17T23:59:32.708Z info: [PHASE 11] Generating amortization for prestamo 184...
+2026-02-17T23:59:32.761Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-17T23:59:32.765Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-17T23:59:32.768Z info: [ÚLTIMA CUOTA] Cuota 24: Capital faltante calculado = $-535,178, Capital asignado = $0, Total cuota = $0
+2026-02-17T23:59:32.768Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 184: Esperado: $1,780,000, Calculado: $2,315,178, Diferencia: $535,178 (30.07%)
+2026-02-17T23:59:32.769Z info: Generated 24 amortization entries for prestamo 184 (10 PAGADO, 14 PENDIENTE)
+2026-02-17T23:59:32.887Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-17T23:59:32.888Z info: [PHASE 12] Creating pedido with products...
+2026-02-17T23:59:32.900Z warn: No ref_productos found for precredito 34390
+2026-02-17T23:59:32.901Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-17T23:59:32.909Z info: [PHASE 13] Created saldo_inicial for prestamo 184
+2026-02-17T23:59:32.909Z info: [PHASE 14] Migrating complete payment history...
+2026-02-17T23:59:32.965Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 184,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-17T23:59:32.966Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-17T23:59:32.976Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-17T23:59:33.005Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-17T23:59:33.017Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T00:10:37.842Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T00:10:37.846Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T00:10:37.852Z info: Found 116 active puntos in legacy database
+2026-02-18T00:10:38.194Z info: Bodega mapping completed: 116 entries
+2026-02-18T00:10:38.195Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T00:10:38.195Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T00:10:38.201Z info: Loaded active credit data for 1 precreditos
+2026-02-18T00:10:38.202Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T00:10:38.202Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T00:10:38.245Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T00:10:38.267Z info: [CREDIT] Created detalle_credito 185 for precredito 34390
+2026-02-18T00:10:38.268Z info: [PHASE 11] Generating amortization for prestamo 185...
+2026-02-18T00:10:38.300Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-18T00:10:38.301Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-18T00:10:38.303Z info: [ÚLTIMA CUOTA] Cuota 24: Capital faltante calculado = $-535,178, Capital asignado = $0, Total cuota = $0
+2026-02-18T00:10:38.303Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 185: Esperado: $1,780,000, Calculado: $2,315,178, Diferencia: $535,178 (30.07%)
+2026-02-18T00:10:38.304Z info: Generated 24 amortization entries for prestamo 185 (10 PAGADO, 14 PENDIENTE)
+2026-02-18T00:10:38.378Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T00:10:38.379Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T00:10:38.388Z warn: No ref_productos found for precredito 34390
+2026-02-18T00:10:38.389Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T00:10:38.397Z info: [PHASE 13] Created saldo_inicial for prestamo 185
+2026-02-18T00:10:38.397Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T00:10:38.439Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 185,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:10:38.440Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T00:10:38.447Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T00:10:38.472Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T00:10:38.484Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T00:15:17.144Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T00:15:17.152Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T00:15:17.161Z info: Found 116 active puntos in legacy database
+2026-02-18T00:15:17.484Z info: Bodega mapping completed: 116 entries
+2026-02-18T00:15:17.486Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T00:15:17.487Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T00:15:17.495Z info: Loaded active credit data for 1 precreditos
+2026-02-18T00:15:17.496Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T00:15:17.497Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T00:15:17.564Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T00:15:17.597Z info: [CREDIT] Created detalle_credito 186 for precredito 34390
+2026-02-18T00:15:17.598Z info: [PHASE 11] Generating amortization for prestamo 186...
+2026-02-18T00:15:17.662Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-18T00:15:17.663Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-18T00:15:17.666Z info: [ÚLTIMA CUOTA] Cuota 24: Capital faltante calculado = $-552,129, Capital asignado = $0, Total cuota = $-10,270
+2026-02-18T00:15:17.666Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 186: Esperado: $1,780,000, Calculado: $2,332,129, Diferencia: $552,129 (31.02%)
+2026-02-18T00:15:17.667Z info: Generated 24 amortization entries for prestamo 186 (10 PAGADO, 14 PENDIENTE)
+2026-02-18T00:15:17.793Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T00:15:17.794Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T00:15:17.804Z warn: No ref_productos found for precredito 34390
+2026-02-18T00:15:17.806Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T00:15:17.814Z info: [PHASE 13] Created saldo_inicial for prestamo 186
+2026-02-18T00:15:17.815Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T00:15:17.886Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 186,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:15:17.887Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T00:15:17.896Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T00:15:17.929Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T00:15:17.944Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T00:38:49.804Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T00:38:49.811Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T00:38:49.821Z info: Found 116 active puntos in legacy database
+2026-02-18T00:38:50.113Z info: Bodega mapping completed: 116 entries
+2026-02-18T00:38:50.115Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T00:38:50.116Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T00:38:50.124Z info: Loaded active credit data for 1 precreditos
+2026-02-18T00:38:50.125Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T00:38:50.126Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T00:38:50.188Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T00:38:50.219Z info: [CREDIT] Created detalle_credito 187 for precredito 34390
+2026-02-18T00:38:50.220Z info: [PHASE 11] Generating amortization for prestamo 187...
+2026-02-18T00:38:50.266Z info: [CUOTA FIJA] Usando Sistema Francés con cuota fija de legacy: $127,190 (Tasa período: 1.8600%)
+2026-02-18T00:38:50.267Z info: Generating 24 TOTAL cuotas (10 marked as PAGADO, 14 as PENDIENTE)
+2026-02-18T00:38:50.269Z info: [ÚLTIMA CUOTA] Cuota 24: Saldo restante = $-552,129, Capital = $0, Total cuota = $-10,270
+2026-02-18T00:38:50.269Z warn: ⚠️  [VALIDACIÓN] Diferencia en amortización prestamo 187: Esperado: $1,780,000, Calculado: $2,332,129, Diferencia: $552,129 (31.02%)
+2026-02-18T00:38:50.269Z info: Generated 24 amortization entries for prestamo 187 (10 PAGADO, 14 PENDIENTE)
+2026-02-18T00:38:50.370Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T00:38:50.371Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T00:38:50.383Z warn: No ref_productos found for precredito 34390
+2026-02-18T00:38:50.384Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T00:38:50.393Z info: [PHASE 13] Created saldo_inicial for prestamo 187
+2026-02-18T00:38:50.394Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T00:38:50.444Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 187,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:38:50.445Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T00:38:50.457Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T00:38:50.484Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T00:38:50.501Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T00:53:43.300Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T00:53:43.305Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T00:53:43.313Z info: Found 116 active puntos in legacy database
+2026-02-18T00:53:43.721Z info: Bodega mapping completed: 116 entries
+2026-02-18T00:53:43.722Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T00:53:43.722Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T00:53:43.729Z info: Loaded active credit data for 1 precreditos
+2026-02-18T00:53:43.729Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T00:53:43.730Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T00:53:43.786Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T00:53:43.813Z info: [CREDIT] Created detalle_credito 188 for precredito 34390
+2026-02-18T00:53:43.813Z info: [PHASE 11] Generating amortization for prestamo 188...
+2026-02-18T00:53:43.847Z info: [PRESTAMO 188] Sistema Francés - Cuota Fija: $127,190, Tasa período: 1.8600%, Cuotas: 24
+2026-02-18T00:53:43.848Z info: [FIRST CUOTA] Calculated cuotaFija: $100,200 (average: $100235.17, rounded to 100)
+2026-02-18T00:53:43.849Z info: [LAST CUOTA] Cuota 24: Saldo=-124055, Capital=0, Interés=100200, Total=$100200
+2026-02-18T00:53:43.849Z warn: ⚠️  Capital Mismatch: Expected $1,780,000, Got $1,904,055, Difference: $124055 - Will adjust in next migration run
+2026-02-18T00:53:43.850Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 188: 24 cuotas, Capital: $1,904,055, Interés: $282,168, Total: $2,412,783
+2026-02-18T00:53:43.850Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $1,904,055
+2026-02-18T00:53:43.941Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T00:53:43.942Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T00:53:43.952Z warn: No ref_productos found for precredito 34390
+2026-02-18T00:53:43.952Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T00:53:43.959Z info: [PHASE 13] Created saldo_inicial for prestamo 188
+2026-02-18T00:53:43.960Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T00:53:44.027Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 188,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T00:53:44.028Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T00:53:44.037Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T00:53:44.064Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T00:53:44.077Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T01:03:50.563Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T01:03:50.572Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T01:03:50.582Z info: Found 116 active puntos in legacy database
+2026-02-18T01:03:50.839Z info: Bodega mapping completed: 116 entries
+2026-02-18T01:03:50.840Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T01:03:50.840Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T01:03:50.848Z info: Loaded active credit data for 1 precreditos
+2026-02-18T01:03:50.848Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T01:03:50.849Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T01:03:50.904Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T01:03:50.936Z info: [CREDIT] Created detalle_credito 189 for precredito 34390
+2026-02-18T01:03:50.937Z info: [PHASE 11] Generating amortization for prestamo 189...
+2026-02-18T01:03:51.001Z info: [PRESTAMO 189] Sistema Francés - Cuota Fija: $127,190, Tasa período: 1.8600%, Cuotas: 24
+2026-02-18T01:03:51.002Z info: [FIRST CUOTA] Calculated cuotaFija: $100,200 (average: $100235.17, rounded to 100)
+2026-02-18T01:03:51.004Z info: [LAST CUOTA] Cuota 24: Saldo=-124055, Capital=0, Interés=100200, Total=$100200
+2026-02-18T01:03:51.005Z warn: ⚠️  Capital Mismatch: Expected $1,780,000, Got $1,904,055, Difference: $124055 - Will adjust in next migration run
+2026-02-18T01:03:51.006Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 189: 24 cuotas, Capital: $1,904,055, Interés: $282,168, Total: $2,412,783
+2026-02-18T01:03:51.006Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $1,904,055
+2026-02-18T01:03:51.119Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T01:03:51.121Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T01:03:51.138Z warn: No ref_productos found for precredito 34390
+2026-02-18T01:03:51.138Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T01:03:51.145Z info: [PHASE 13] Created saldo_inicial for prestamo 189
+2026-02-18T01:03:51.146Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T01:03:51.214Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 189,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:03:51.215Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T01:03:51.225Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T01:03:51.251Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T01:03:51.263Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T01:12:07.776Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T01:12:07.781Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T01:12:07.790Z info: Found 116 active puntos in legacy database
+2026-02-18T01:12:08.156Z info: Bodega mapping completed: 116 entries
+2026-02-18T01:12:08.157Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T01:12:08.158Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T01:12:08.169Z info: Loaded active credit data for 1 precreditos
+2026-02-18T01:12:08.170Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T01:12:08.171Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T01:12:08.232Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T01:12:08.259Z info: [CREDIT] Created detalle_credito 190 for precredito 34390
+2026-02-18T01:12:08.260Z info: [PHASE 11] Generating amortization for prestamo 190...
+2026-02-18T01:12:08.309Z info: [PRESTAMO 190] Sistema Francés - Usando cuota fija del legacy: $127,190, Tasa período: 1.8600%, Cuotas: 24
+2026-02-18T01:12:08.310Z info: [AMORTIZACION] Using cuotaFija FROM LEGACY: $127,190 para todas las 24 cuotas
+2026-02-18T01:12:08.311Z info: [ÚLTIMA CUOTA] Cuota 24: Saldo=-890021, Capital=0, Total=$-16554
+2026-02-18T01:12:08.311Z warn: ⚠️  Capital Mismatch: Expected $1,780,000, Got $2,670,021, Difference: $890021 - Will adjust in next migration run
+2026-02-18T01:12:08.312Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 190: 24 cuotas, Capital: $2,670,021, Interés: $238,795, Total: $2,908,816
+2026-02-18T01:12:08.312Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $2,670,021
+2026-02-18T01:12:08.401Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T01:12:08.402Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T01:12:08.409Z warn: No ref_productos found for precredito 34390
+2026-02-18T01:12:08.409Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T01:12:08.417Z info: [PHASE 13] Created saldo_inicial for prestamo 190
+2026-02-18T01:12:08.418Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T01:12:08.491Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 190,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:12:08.495Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T01:12:08.503Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T01:12:08.531Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T01:12:08.543Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T01:17:53.017Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T01:17:53.022Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T01:17:53.030Z info: Found 116 active puntos in legacy database
+2026-02-18T01:17:53.333Z info: Bodega mapping completed: 116 entries
+2026-02-18T01:17:53.334Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T01:17:53.335Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T01:17:53.343Z info: Loaded active credit data for 1 precreditos
+2026-02-18T01:17:53.345Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T01:17:53.346Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T01:17:53.412Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T01:17:53.444Z info: [CREDIT] Created detalle_credito 191 for precredito 34390
+2026-02-18T01:17:53.445Z info: [PHASE 11] Generating amortization for prestamo 191...
+2026-02-18T01:17:53.506Z info: [PRESTAMO 191] Sistema Francés - Usando cuota fija del legacy: $127,190, Tasa período: 1.8600%, Cuotas: 24
+2026-02-18T01:17:53.506Z info: [AMORTIZACION] Using cuotaFija FROM LEGACY: $127,190 para todas las 24 cuotas
+2026-02-18T01:17:53.509Z info: [ÚLTIMA CUOTA] Cuota 24: Saldo=-552112, Capital=0, Total=$-10269
+2026-02-18T01:17:53.509Z warn: ⚠️  Capital Mismatch: Expected $1,780,000, Got $2,332,112, Difference: $552112 - Will adjust in next migration run
+2026-02-18T01:17:53.510Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 191: 24 cuotas, Capital: $2,332,112, Interés: $305,455, Total: $2,915,101
+2026-02-18T01:17:53.510Z error: ❌ CAPITAL VERIFICATION FAILED: Expected $1,780,000, Got $2,332,112
+2026-02-18T01:17:53.608Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T01:17:53.608Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T01:17:53.618Z warn: No ref_productos found for precredito 34390
+2026-02-18T01:17:53.618Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T01:17:53.625Z info: [PHASE 13] Created saldo_inicial for prestamo 191
+2026-02-18T01:17:53.625Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T01:17:53.692Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 191,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:17:53.694Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T01:17:53.702Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T01:17:53.733Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T01:17:53.745Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T01:28:48.900Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T01:28:48.909Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T01:28:48.922Z info: Found 116 active puntos in legacy database
+2026-02-18T01:28:49.230Z info: Bodega mapping completed: 116 entries
+2026-02-18T01:28:49.231Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T01:28:49.232Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T01:28:49.239Z info: Loaded active credit data for 1 precreditos
+2026-02-18T01:28:49.240Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T01:28:49.241Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T01:28:49.294Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T01:28:49.323Z info: [CREDIT] Created detalle_credito 192 for precredito 34390
+2026-02-18T01:28:49.324Z info: [PHASE 11] Generating amortization for prestamo 192...
+2026-02-18T01:28:49.326Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T01:28:49.328Z info: [PRESTAMO 192] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T01:28:49.329Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T01:28:49.330Z info: [FASE 2] Cuota francesa calculada: $92624.64
+2026-02-18T01:28:49.330Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$59516.64, Interés=$33108.00, Total sin redondear=$92624.64, Total redondeado=$92600
+2026-02-18T01:28:49.393Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 192: 24 cuotas, Capital: $1,780,000, Interés: $442,400, Total: $2,222,400
+2026-02-18T01:28:49.486Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T01:28:49.486Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T01:28:49.494Z warn: No ref_productos found for precredito 34390
+2026-02-18T01:28:49.494Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T01:28:49.500Z info: [PHASE 13] Created saldo_inicial for prestamo 192
+2026-02-18T01:28:49.500Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T01:28:49.551Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 192,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:28:49.552Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T01:28:49.559Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T01:28:49.583Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T01:28:49.592Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T01:31:45.858Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T01:31:45.862Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T01:31:45.870Z info: Found 116 active puntos in legacy database
+2026-02-18T01:31:46.191Z info: Bodega mapping completed: 116 entries
+2026-02-18T01:31:46.192Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T01:31:46.193Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T01:31:46.203Z info: Loaded active credit data for 1 precreditos
+2026-02-18T01:31:46.204Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T01:31:46.204Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T01:31:46.286Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T01:31:46.324Z info: [CREDIT] Created detalle_credito 193 for precredito 34390
+2026-02-18T01:31:46.324Z info: [PHASE 11] Generating amortization for prestamo 193...
+2026-02-18T01:31:46.325Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T01:31:46.327Z info: [PRESTAMO 193] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T01:31:46.391Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T01:31:46.391Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T01:31:46.392Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T01:31:46.395Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 193: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T01:31:46.519Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T01:31:46.520Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T01:31:46.531Z warn: No ref_productos found for precredito 34390
+2026-02-18T01:31:46.532Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T01:31:46.540Z info: [PHASE 13] Created saldo_inicial for prestamo 193
+2026-02-18T01:31:46.541Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T01:31:46.612Z error: PrismaClientValidationError: 
+Invalid `tx.amortizacion.findMany()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:67:52
+
+  64 }
+  65 
+  66 // Fetch amortization schedule to link payments correctly
+→ 67 const amortizaciones = await tx.amortizacion.findMany({
+       where: {
+         prestamo_ID: 193,
+         ~~~~~~~~~~~
+     ?   AND?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   OR?: amortizacionWhereInput[],
+     ?   NOT?: amortizacionWhereInput | amortizacionWhereInput[],
+     ?   id?: IntFilter | Int,
+     ?   prestamoID?: IntFilter | Int,
+     ?   documento?: StringFilter | String,
+     ?   Numero_cuota?: StringFilter | String,
+     ?   capital?: IntNullableFilter | Int | Null,
+     ?   interes?: IntNullableFilter | Int | Null,
+     ?   aval?: IntNullableFilter | Int | Null,
+     ?   IVA?: IntFilter | Int,
+     ?   pablok?: IntFilter | Int,
+     ?   seguro?: IntNullableFilter | Int | Null,
+     ?   sancion?: IntNullableFilter | Int | Null,
+     ?   total_cuota?: IntNullableFilter | Int | Null,
+     ?   saldo?: StringNullableFilter | String | Null,
+     ?   fecha_pago?: StringFilter | String,
+     ?   detalle_credito?: Detalle_creditoScalarRelationFilter | detalle_creditoWhereInput
+       },
+       orderBy: {
+         numero_cuota: "asc"
+       }
+     })
+
+Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are marked with ?.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T01:31:46.614Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T01:31:46.628Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T01:31:46.663Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T01:31:46.679Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
