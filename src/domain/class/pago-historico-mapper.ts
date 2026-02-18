@@ -40,11 +40,12 @@ export class PagoHistoricoMapper {
       let pagosMigrados = 0;
 
       for (const pagoLegacy of pagosLegacy) {
-        // Map payment data
+        // Map payment data - use pago_desde for actual payment period date
+        const fechaPago = pagoLegacy.pago_desde || pagoLegacy.created_at || new Date();
         const [error, pagoDto] = PagoHistoricoCreateDto.create({
           prestamo_id: prestamoIDMain,
           valor_pago: Math.round(pagoLegacy.abono || 0),
-          fecha_pago: pagoLegacy.created_at || new Date(),
+          fecha_pago: fechaPago,
           hora_pago: '00:00:00',
           canal_pago: 'MANUAL',
           medio_pago: 'EFECTIVO',
@@ -53,7 +54,7 @@ export class PagoHistoricoMapper {
           origen: 'MIGRADO',
           estado_pago: this.mapearEstadoPago(pagoLegacy.estado),
           usuario_aplicacion: 'MIGRACION_AUTOMATICA',
-          fecha_aplicacion: pagoLegacy.created_at || new Date(),
+          fecha_aplicacion: fechaPago,
           observacion: pagoLegacy.descripcion || 'Pago migrado desde FACILITO',
           referencia_id_transaccion: pagoLegacy.abono_pago_id || undefined,
         });
