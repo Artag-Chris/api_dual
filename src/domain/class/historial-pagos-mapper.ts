@@ -66,10 +66,10 @@ export class HistorialPagosMapper {
       // Fetch amortization schedule to link payments correctly
       const amortizaciones = await tx.amortizacion.findMany({
         where: {
-          prestamo_ID: prestamoIDMain,
+          prestamoID: prestamoIDMain,
         },
         orderBy: {
-          numero_cuota: 'asc',
+          Numero_cuota: 'asc',
         },
       });
 
@@ -84,7 +84,7 @@ export class HistorialPagosMapper {
         // Find matching amortization (if numero_cuota is available)
         let amortizacion = null;
         if (numeroCuota && numeroCuota > 0) {
-          amortizacion = amortizaciones.find((a: any) => a.numero_cuota === numeroCuota);
+          amortizacion = amortizaciones.find((a: any) => parseInt(a.Numero_cuota) === numeroCuota);
         }
 
         if (estadoPago === 'Ok' || estadoPago === 'Finalizado') {
@@ -164,12 +164,16 @@ export class HistorialPagosMapper {
         return;
       }
 
+      // Build hora_pago as DateTime at midnight
+      const horaDateTime = new Date(pagoDto.fecha_pago);
+      horaDateTime.setHours(0, 0, 0, 0);
+
       const pagoCreado = await tx.pagos.create({
         data: {
           prestamo_id: pagoDto.prestamo_id,
           valor_pago: pagoDto.valor_pago,
           fecha_pago: pagoDto.fecha_pago,
-          hora_pago: pagoDto.hora_pago,
+          hora_pago: horaDateTime,
           canal_pago: pagoDto.canal_pago,
           medio_pago: pagoDto.medio_pago,
           tipo_pago: pagoDto.tipo_pago,
@@ -203,9 +207,9 @@ export class HistorialPagosMapper {
           total_pagado: amortizacion.total_cuota,
           recibo: `FACILITO-${pagoLegacy.id}`,
           agente_creador: 'MIGRACION_AUTOMATICA',
-          bolsa: '',
+          bolsa: null,
           canal: 'MANUAL',
-          tipo_pago: 'Cuota',
+          tipo_pago: 'CUOTA',
           creador: 'MIGRACION',
           fecha_registro: pagoLegacy.created_at || new Date(),
         });
@@ -232,7 +236,7 @@ export class HistorialPagosMapper {
               total_pagado: historialDto.total_pagado,
               recibo: historialDto.recibo,
               agente_creador: historialDto.agente_creador,
-              bolsa: historialDto.bolsa,
+              bolsa: historialDto.bolsa || null,
               canal: historialDto.canal,
               tipo_pago: historialDto.tipo_pago,
               creador: historialDto.creador,
@@ -263,7 +267,7 @@ export class HistorialPagosMapper {
           descuento_sancion: 0,
           total_pagado: amortizacion.total_cuota,
           total_descuento: 0,
-          tipo_pago: 'Cuota',
+          tipo_pago: 'CUOTA',
           id_bolsa_asignada: null,
           usuario_aplicacion: 'MIGRACION_AUTOMATICA',
           fecha_aplicacion: pagoLegacy.created_at || new Date(),
@@ -323,6 +327,7 @@ export class HistorialPagosMapper {
     stats: MigrationStats
   ): Promise<void> {
     try {
+      // Step 1: Create payment record in pagos table
       const [errorPago, pagoDto] = PagoHistoricoCreateDto.create({
         prestamo_id: prestamoIDMain,
         valor_pago: Math.round(pagoLegacy.abono || 0),
@@ -345,12 +350,16 @@ export class HistorialPagosMapper {
         return;
       }
 
+      // Build hora_pago as DateTime at midnight
+      const horaDateTime = new Date(pagoDto.fecha_pago);
+      horaDateTime.setHours(0, 0, 0, 0);
+
       await tx.pagos.create({
         data: {
           prestamo_id: pagoDto.prestamo_id,
           valor_pago: pagoDto.valor_pago,
           fecha_pago: pagoDto.fecha_pago,
-          hora_pago: pagoDto.hora_pago,
+          hora_pago: horaDateTime,
           canal_pago: pagoDto.canal_pago,
           medio_pago: pagoDto.medio_pago,
           tipo_pago: pagoDto.tipo_pago,
