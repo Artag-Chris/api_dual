@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { MainDataController } from './main-data.controller';
+import multer from 'multer';
 
 export class MainDataRoutes {
   static get routes(): Router {
     const router = Router();
     const controller = new MainDataController();
+    const upload = multer({ storage: multer.memoryStorage() });
 
     // ==================== USER CLIENTE ====================
     router.get('/usuarios', controller.getAllUserClientes);
@@ -40,10 +42,14 @@ export class MainDataRoutes {
     // ==================== HISTORIAL PAGOS ====================
     router.get('/historial-pagos', controller.getAllHistorialPagos);
 
+    // ==================== AMORTIZACIONES CON ESTADO ====================
+    router.get('/amortizaciones/:prestamoID', controller.getAmortizacionesConEstado);
+
     // ==================== ESTADÍSTICAS ====================
     router.get('/stats', controller.getEstadisticas);
 
     // ==================== MIGRACIÓN ====================
+    router.post('/migrate/bulk-excel', upload.single('file'), controller.bulkMigrateFromExcel);
     router.post('/migrate/:documento', controller.migrateClienteFromLegacy);
 
     return router;

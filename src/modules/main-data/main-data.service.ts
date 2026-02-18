@@ -10,6 +10,7 @@ import { EstudiosRealizadosMapper } from '../../domain/class/estudios-realizados
 import { PedidoMapper } from '../../domain/class/pedido-mapper';
 import { SaldoInicialMapper } from '../../domain/class/saldo-inicial-mapper';
 import { HistorialPagosMapper } from '../../domain/class/historial-pagos-mapper';
+import { AmortizacionCreateDto } from '../../domain/dtos/migrate-cliente.dto';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
 /**************************************************************************************************
@@ -783,6 +784,34 @@ class MainDataService {
                 }
               }
               
+              // ✅ CALCULATE RESIDUAL FROM PAYMENT HISTORY
+              let residualHistorial: number | null = null;
+              try {
+                const creditoLegacyId = creditoLegacy?.id;
+                if (creditoLegacyId) {
+                  // Sum all payments (abono) from legacy pagos table
+                  const pagosRealizados = await prismaLegacyService.pagos.findMany({
+                    where: { credito_id: creditoLegacyId },
+                    select: { abono: true },
+                  });
+                  
+                  const sumaPagos = pagosRealizados.reduce((sum: number, pago: any) => sum + (pago.abono || 0), 0);
+                  const montoOriginal = parseInt(creditoDto.valor_prestamo);
+                  residualHistorial = Math.max(0, montoOriginal - sumaPagos);
+                  
+                  this.logger.info(
+                    `[RESIDUAL] Crédito ${creditoLegacyId}: ` +
+                    `Monto original=$${montoOriginal}, Pagos realizados=$${sumaPagos}, ` +
+                    `Residual=$${residualHistorial}, ` +
+                    `typeof residual=${typeof residualHistorial}`
+                  );
+                }
+              } catch (err) {
+                this.logger.warn(`[RESIDUAL] Error calculating residual from payment history: ${err}`);
+              }
+              
+              this.logger.info(`[PARAM CHECK] Pasando residual_historial=${residualHistorial} al amortizador`);
+              
               const cuotasAmortizacion = this.amortizacionGenerator.generarAmortizacion({
                 prestamo_ID: detalleCredito.prestamo_ID,
                 valor_prestamo: parseInt(creditoDto.valor_prestamo),
@@ -796,10 +825,143 @@ class MainDataService {
                 iva_aval: ivaAval,            // ✅ IVA % from cartera
                 seguro_add: 0,                // ✅ No seguro adicional for now
                 pablok: 0,                    // ✅ No pablok for now
+                residual_historial: residualHistorial ?? undefined,  // ✅ Pass residual if available (0 is valid!)
               });
 
-              // Create amortization records
-              for (const cuota of cuotasAmortizacion) {
+              this.logger.info(`[PHASE 11] Generated ${cuotasAmortizacion.length} amortization DTOs (not yet persisted)`);
+
+              // PHASE 14: Migrate payment history FIRST
+              // This ensures historial_pagos is populated before PHASE 11B enrichment
+              if (datosCreditoActivo && datosCreditoActivo.credito_id) {
+                this.logger.info(`[PHASE 14] Migrating complete payment history...`);
+                try {
+                  // ✅ DEBUG: Log which credito ID we're migrating from
+                  this.logger.info(`[PHASE 14] DEBUG - credito_id=${datosCreditoActivo.credito_id}, prestamo_ID=${detalleCredito.prestamo_ID}`);
+                  
+                  const stats = await this.historialPagosMapper.migrarHistorialPagosCompleto(
+                    datosCreditoActivo.credito_id,
+                    detalleCredito.prestamo_ID,
+                    userCliente.id,
+                    documento,
+                    tx
+                  );
+                  
+                  // ✅ DEBUG: Verify records were actually created in tx
+                  const verificacion = await tx.historial_pagos.findMany({
+                    where: { prestamoID: detalleCredito.prestamo_ID },
+                    select: { Numero_cuota: true, total_pagado: true }
+                  });
+                  this.logger.info(`[PHASE 14] DEBUG - Verification: Found ${verificacion.length} historial_pagos records in tx`);
+                  
+                  this.logger.info(
+                    `[PHASE 14] ✅ Payment migration complete - Applied: ${stats.pagosAplicados}, Pending: ${stats.pagosPendientes}, Historial: ${stats.historialCreados}, Detallados: ${stats.detalladosCreados}`
+                  );
+                } catch (pagoError) {
+                  this.logger.error(`[PHASE 14] ❌ Error migrating payments: ${pagoError}`);
+                  this.logger.error(`[PHASE 14] Stack: ${(pagoError as any).stack}`);
+                }
+              } else {
+                this.logger.warn(`[PHASE 14] Skipped - no datosCreditoActivo or credito_id`);
+              }
+
+              // PHASE 11B: Enrich cuotas - zero out component fields for paid cuotas
+              // Legacy system pattern: mark PAGADA by setting capital=0, interes=0, aval=0, IVA=0, etc.
+              let cuotasEnriquecidas = [...cuotasAmortizacion];
+              try {
+                this.logger.info(`[PHASE 11B] Enriching cuotas - checking payment history to mark paid cuotas (date + cuota matching, ±7 days)...`);
+                
+                // Get all payment records for this prestamo (from PHASE 14, within tx context)
+                const pagasHistoricas = await tx.historial_pagos.findMany({
+                  where: { prestamoID: detalleCredito.prestamo_ID },
+                  select: { Numero_cuota: true, total_pagado: true, fecha_registro: true }
+                });
+                
+                // ✅ Normalize all cuota numbers to string for consistent VARCHAR comparison
+                const pagasNormalizadas = pagasHistoricas.map(p => ({
+                  ...p,
+                  Numero_cuota: String(p.Numero_cuota)
+                }));
+                
+                if (pagasNormalizadas.length > 0) {
+                  const sample = pagasNormalizadas.slice(0, 3).map(p => `#${p.Numero_cuota} (${p.fecha_registro})`).join(', ');
+                  this.logger.info(
+                    `[PHASE 11B] Found ${pagasNormalizadas.length} payment records. Sample: ${sample}. Matching by cuota number + date proximity (±7 days)...`
+                  );
+                  
+                  let marcadasPagadas = 0;
+                  
+                  // Enrich cuotas: zero out components for paid ones (legacy pattern)
+                  cuotasEnriquecidas = cuotasAmortizacion.map(cuota => {
+                    const cuotaFecha = new Date(cuota.fecha_pago);
+                    const fechaMin = new Date(cuotaFecha);
+                    fechaMin.setDate(fechaMin.getDate() - 7);  // 7 days before
+                    const fechaMax = new Date(cuotaFecha);
+                    fechaMax.setDate(fechaMax.getDate() + 7);  // 7 days after
+
+                    // Search for payment with matching cuota number AND within date range
+                    // ✅ STRING-to-STRING comparison for VARCHAR(100) Numero_cuota
+                    const pagoEncontrado = pagasNormalizadas.find(pago => {
+                      const pagoFecha = new Date(pago.fecha_registro);
+                      const numeroCuotaStr = String(cuota.numero_cuota);
+                      const esNumeroCuotaIgual = String(pago.Numero_cuota) === numeroCuotaStr;
+                      const estaDentroRango = pagoFecha >= fechaMin && pagoFecha <= fechaMax;
+                      return esNumeroCuotaIgual && estaDentroRango;
+                    });
+
+                    if (pagoEncontrado) {
+                      marcadasPagadas++;
+                      const cuotaDateStr = cuota.fecha_pago.toISOString().split('T')[0];
+                      const pagoDateStr = pagoEncontrado.fecha_registro instanceof Date 
+                        ? pagoEncontrado.fecha_registro.toISOString().split('T')[0]
+                        : String(pagoEncontrado.fecha_registro).split('T')[0];
+                      this.logger.info(
+                        `[PHASE 11B] ✓ Cuota #${cuota.numero_cuota} (type: ${typeof cuota.numero_cuota}, match: "${String(pagoEncontrado.Numero_cuota)}") (due: ${cuotaDateStr}) → PAGADO (received: ${pagoDateStr}, amount: $${pagoEncontrado.total_pagado})`
+                      );
+                      
+                      // Zero out component fields to mark as PAGADA (legacy system pattern)
+                      const enrichedCuota = {
+                        ...cuota,
+                        capital: 0,
+                        interes: 0,
+                        aval: 0,
+                        IVA: 0,
+                        pablok: 0,
+                        seguro: 0,
+                        sancion: 0,
+                        total_cuota: 0,
+                        // ✅ Keep saldo as is (residual balance from amortizador)
+                      };
+                      
+                      // ✅ DEBUG: Verify enrichment values before returning
+                      this.logger.info(
+                        `[PHASE 11B] DEBUG Enrich #${cuota.numero_cuota}: capital=${enrichedCuota.capital}, interes=${enrichedCuota.interes}, total_cuota=${enrichedCuota.total_cuota}, saldo=${enrichedCuota.saldo}`
+                      );
+                      
+                      return enrichedCuota;
+                    }
+                    
+                    // Return unchanged if not paid
+                    return cuota;
+                  });
+                  
+                  this.logger.info(`[PHASE 11B] ✅ Enriched ${marcadasPagadas}/${cuotasAmortizacion.length} cuotas marked as PAGADA`);
+                } else {
+                  this.logger.info(`[PHASE 11B] No payment history found. All cuotas remain PENDIENTE`);
+                }
+              } catch (err) {
+                this.logger.warn(`[PHASE 11B] Error enriching cuotas: ${err}`);
+              }
+
+              // Create amortization records (AFTER enrichment with paid status)
+              for (const cuota of cuotasEnriquecidas) {
+                // ✅ DEBUG: Log exactly what we're persisting to verify enrichment worked
+                const shouldBeZero = cuota.capital === 0 && cuota.interes === 0 && cuota.total_cuota === 0;
+                if (shouldBeZero) {
+                  this.logger.info(
+                    `[PHASE 11B→DB] Cuota #${cuota.numero_cuota} PAGADA: capital=${cuota.capital}, interes=${cuota.interes}, total_cuota=${cuota.total_cuota}, saldo=${cuota.saldo}`
+                  );
+                }
+                
                 const amort = await tx.amortizacion.create({
                   data: {
                     prestamoID: cuota.prestamo_ID,
@@ -817,7 +979,7 @@ class MainDataService {
                 amortizaciones.push(amort);
               }
               
-              this.logger.info(`[PHASE 11] Generated ${cuotasAmortizacion.length} amortization entries`);
+              this.logger.info(`[PHASE 11B→Persist] Created ${cuotasEnriquecidas.length} amortization records (with paid status applied)`);
 
               // PHASE 12: Create pedido with products
               this.logger.info(`[PHASE 12] Creating pedido with products...`);
@@ -860,24 +1022,7 @@ class MainDataService {
                 this.logger.info(`[PHASE 13] Created saldo_inicial for prestamo ${detalleCredito.prestamo_ID}`);
               }
 
-              // PHASE 14: Migrate complete payment history (improved)
-              if (datosCreditoActivo && datosCreditoActivo.credito_id) {
-                this.logger.info(`[PHASE 14] Migrating complete payment history...`);
-                try {
-                  const stats = await this.historialPagosMapper.migrarHistorialPagosCompleto(
-                    datosCreditoActivo.credito_id,
-                    detalleCredito.prestamo_ID,
-                    userCliente.id,
-                    documento,
-                    tx
-                  );
-                  this.logger.info(
-                    `[PHASE 14] Payment migration complete - Applied: ${stats.pagosAplicados}, Pending: ${stats.pagosPendientes}, Historial: ${stats.historialCreados}, Detallados: ${stats.detalladosCreados}`
-                  );
-                } catch (pagoError) {
-                  this.logger.warn(`[PHASE 14] Could not migrate payments: ${pagoError}`);
-                }
-              }
+              // PHASE 14: Already executed before PHASE 11B (see above)
 
             } else {
               this.logger.warn(`[MAIN-DATA-SERVICE] Error mapeando precredito ${precredito.id}: ${error}`);
@@ -1086,6 +1231,126 @@ class MainDataService {
       // Transacción automáticamente revertida en caso de error
       throw new Error(`Error durante migración de cliente: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  // ==================== AMORTIZACIONES CON ESTADO ====================
+
+  /**
+   * Get amortizaciones with estado derived from historial_pagos
+   * Matches cuotas by number + date proximity (±7 days) to determine if PAGADA or PENDIENTE
+   */
+  async getAmortizacionesConEstado(prestamoID: number) {
+    try {
+      // 1. Get all amortizaciones
+      const amortizaciones = await prismaMainService.amortizacion.findMany({
+        where: { prestamoID },
+        orderBy: { Numero_cuota: 'asc' }
+      });
+
+      // 2. Get all payment history records
+      const pagasHistoricas = await prismaMainService.historial_pagos.findMany({
+        where: { prestamoID },
+        select: { 
+          Numero_cuota: true, 
+          total_pagado: true, 
+          fecha_registro: true,
+          recibo: true
+        }
+      });
+
+      // 3. Enrich each cuota with estado derived from payment history
+      const cuotasEnriquecidas = amortizaciones.map(cuota => {
+        const cuotaFecha = new Date(cuota.fecha_pago);
+        const fechaMin = new Date(cuotaFecha);
+        fechaMin.setDate(fechaMin.getDate() - 7);  // 7 days before
+        const fechaMax = new Date(cuotaFecha);
+        fechaMax.setDate(fechaMax.getDate() + 7);  // 7 days after
+
+        // Search for payment with matching cuota number AND within date range
+        const pagoEncontrado = pagasHistoricas.find(pago => {
+          const pagoFecha = new Date(pago.fecha_registro);
+          const esNumeroCuotaIgual = pago.Numero_cuota === parseInt(cuota.Numero_cuota);
+          const estaDentroRango = pagoFecha >= fechaMin && pagoFecha <= fechaMax;
+          return esNumeroCuotaIgual && estaDentroRango;
+        });
+
+        return {
+          ...cuota,
+          estado_pago: pagoEncontrado ? 'PAGADA' : 'PENDIENTE',
+          pago_info: pagoEncontrado ? {
+            total_pagado: pagoEncontrado.total_pagado,
+            fecha_pago: pagoEncontrado.fecha_registro,
+            recibo: pagoEncontrado.recibo
+          } : null
+        };
+      });
+
+      return cuotasEnriquecidas;
+    } catch (error) {
+      this.logger.warn(`Error getting amortizaciones with estado: ${error}`);
+      throw error;
+    }
+  }
+
+  /**
+   * BULK MIGRATION: Process multiple documents from Excel file
+   * Secuentially migrates each documento by calling migrateClienteFromLegacy()
+   * Returns report with successful and failed migrations
+   */
+  async procesarBulkMigracionExcel(
+    documentos: string[]
+  ): Promise<{ exitosos: number; errores: number; totalProcesados: number; detalles: any[] }> {
+    const detalles: any[] = [];
+    let exitosos = 0;
+    let errores = 0;
+
+    this.logger.info(`[BULK] Iniciando migración masiva de ${documentos.length} documentos`);
+
+    for (let i = 0; i < documentos.length; i++) {
+      const documento = documentos[i];
+
+      try {
+        this.logger.info(`[BULK] Procesando documento ${i + 1}/${documentos.length}: ${documento}`);
+
+        // Call existing migration method for each document
+        const resultado = await this.migrateClienteFromLegacy(documento);
+
+        exitosos++;
+        detalles.push({
+          documento,
+          prestamo_ID: resultado.prestamo_ID || '-',
+          usuario: resultado.usuario || '-',
+          cuotas: resultado.cuotas_totales || '-',
+          estado: 'EXITOSO',
+          timestamp: new Date().toISOString()
+        });
+
+        this.logger.info(`[BULK] ✅ Migración exitosa para documento ${documento}`);
+      } catch (error) {
+        errores++;
+        detalles.push({
+          documento,
+          estado: 'ERROR',
+          error: error instanceof Error ? error.message : String(error),
+          timestamp: new Date().toISOString()
+        });
+
+        this.logger.error(`[BULK] ❌ Error migrando documento ${documento}: ${error}`);
+      }
+    }
+
+    const resumen = {
+      exitosos,
+      errores,
+      totalProcesados: documentos.length,
+      detalles
+    };
+
+    this.logger.info(
+      `[BULK] Migración masiva completada: ${exitosos} exitosos, ${errores} errores de ${documentos.length} documentos`
+    );
+
+    return resumen;
   }
 }
 
