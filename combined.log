@@ -4810,3 +4810,175 @@ Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_
   📊 Cuotas de amortización: 24
   📦 Pedidos migrados: 0
   💵 Saldos iniciales: 1
+2026-02-18T02:44:16.655Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:44:16.659Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:44:16.666Z info: Found 116 active puntos in legacy database
+2026-02-18T02:44:16.994Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:44:16.995Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:44:16.995Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:44:17.001Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:44:17.001Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:44:17.002Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:44:17.054Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:44:17.081Z info: [CREDIT] Created detalle_credito 198 for precredito 34390
+2026-02-18T02:44:17.081Z info: [PHASE 11] Generating amortization for prestamo 198...
+2026-02-18T02:44:17.082Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:44:17.083Z info: [PRESTAMO 198] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:44:17.115Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:44:17.116Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:44:17.116Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:44:17.118Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 198: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:44:17.210Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:44:17.211Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:44:17.218Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:44:17.219Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:44:17.225Z info: [PHASE 13] Created saldo_inicial for prestamo 198
+2026-02-18T02:44:17.227Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:44:17.244Z info: Processing 36 payments for credito 25089 → prestamo 198
+2026-02-18T02:44:17.605Z info: Payment migration complete for credito 25089:
+2026-02-18T02:44:17.606Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T02:44:17.611Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:44:17.632Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:44:17.644Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T02:57:49.655Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:57:49.663Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:57:49.673Z info: Found 116 active puntos in legacy database
+2026-02-18T02:57:50.005Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:57:50.007Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:57:50.008Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:57:50.019Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:57:50.020Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:57:50.020Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:57:50.075Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:57:50.102Z info: [CREDIT] Created detalle_credito 199 for precredito 34390
+2026-02-18T02:57:50.104Z info: [PHASE 11] Generating amortization for prestamo 199...
+2026-02-18T02:57:50.105Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:57:50.107Z info: [PRESTAMO 199] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:57:50.231Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:57:50.232Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:57:50.233Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:57:50.236Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 199: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:57:50.321Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:57:50.322Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:57:50.328Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:57:50.329Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:57:50.336Z info: [PHASE 13] Created saldo_inicial for prestamo 199
+2026-02-18T02:57:50.338Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:57:50.353Z info: Processing 36 payments for credito 25089 → prestamo 199
+2026-02-18T02:57:50.813Z info: Payment migration complete for credito 25089:
+2026-02-18T02:57:50.814Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T02:57:50.820Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:57:50.845Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:57:50.857Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T03:13:40.094Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T03:13:40.094Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T03:13:40.100Z info: Found 116 active puntos in legacy database
+2026-02-18T03:13:40.369Z info: Bodega mapping completed: 116 entries
+2026-02-18T03:13:40.369Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T03:13:40.370Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T03:13:40.375Z info: Loaded active credit data for 1 precreditos
+2026-02-18T03:13:40.376Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T03:13:40.376Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T03:13:40.429Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T03:13:40.454Z info: [CREDIT] Created detalle_credito 200 for precredito 34390
+2026-02-18T03:13:40.455Z info: [PHASE 11] Generating amortization for prestamo 200...
+2026-02-18T03:13:40.455Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T03:13:40.456Z info: [PRESTAMO 200] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T03:13:40.456Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T03:13:40.456Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T03:13:40.457Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T03:13:40.457Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 200: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T03:13:40.559Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T03:13:40.560Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T03:13:40.566Z warn: No ref_productos found for precredito 34390
+2026-02-18T03:13:40.567Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T03:13:40.573Z info: [PHASE 13] Created saldo_inicial for prestamo 200
+2026-02-18T03:13:40.574Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T03:13:40.587Z info: Processing 36 payments for credito 25089 → prestamo 200
+2026-02-18T03:13:41.048Z info: Payment migration complete for credito 25089:
+2026-02-18T03:13:41.048Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T03:13:41.056Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T03:13:41.081Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T03:13:41.094Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T13:21:48.067Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T13:21:48.072Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T13:21:48.078Z info: Found 116 active puntos in legacy database
+2026-02-18T13:21:48.292Z info: Bodega mapping completed: 116 entries
+2026-02-18T13:21:48.293Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T13:21:48.293Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T13:21:48.299Z info: Loaded active credit data for 1 precreditos
+2026-02-18T13:21:48.300Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T13:21:48.300Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T13:21:48.347Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T13:21:48.366Z info: [CREDIT] Created detalle_credito 201 for precredito 34390
+2026-02-18T13:21:48.367Z info: [PHASE 11] Generating amortization for prestamo 201...
+2026-02-18T13:21:48.367Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T13:21:48.368Z info: [PRESTAMO 201] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T13:21:48.399Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T13:21:48.400Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T13:21:48.400Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T13:21:48.402Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 201: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T13:21:48.493Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T13:21:48.494Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T13:21:48.502Z warn: No ref_productos found for precredito 34390
+2026-02-18T13:21:48.503Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T13:21:48.509Z info: [PHASE 13] Created saldo_inicial for prestamo 201
+2026-02-18T13:21:48.510Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T13:21:48.524Z info: Processing 36 payments for credito 25089 → prestamo 201
+2026-02-18T13:21:48.973Z info: Payment migration complete for credito 25089:
+2026-02-18T13:21:48.974Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T13:21:48.981Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T13:21:49.008Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T13:21:49.020Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1

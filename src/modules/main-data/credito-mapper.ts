@@ -34,20 +34,11 @@ export class CreditoMapper {
     creditoLegacy?: any
   ): string {
     try {
-      // CRÉDITOS DESEMBOLSADOS: usar fecha REAL de desembolso
+      // CRÉDITOS DESEMBOLSADOS: usar fecha REAL de desembolso como fecha_inicial
+      // ✅ CRITICAL FIX: NO sumar días adicionales - la fecha de desembolso ES la fecha inicial
+      // Esto permite que la amortización calcule correctamente la primera cuota
       if (creditoLegacy?.created_at) {
         const fechaDesembolso = new Date(creditoLegacy.created_at);
-        const periocidad = precreditoLegacy.periodo?.toUpperCase() || 'MENSUAL';
-        
-        // Calcular días hasta primera cuota según periodicidad
-        let diasHastaPrimeraCuota = 30; // default MENSUAL
-        if (periocidad === 'QUINCENAL' || periocidad === 'DECADAL') {
-          diasHastaPrimeraCuota = 15;
-        } else if (periocidad === 'SEMANAL') {
-          diasHastaPrimeraCuota = 7;
-        }
-        
-        fechaDesembolso.setDate(fechaDesembolso.getDate() + diasHastaPrimeraCuota);
         return fechaDesembolso.toISOString().split('T')[0];
       }
       
@@ -59,11 +50,10 @@ export class CreditoMapper {
         }
       }
       
-      // Alternativa: usar created_at del precredito + 30 días
+      // Alternativa: usar created_at del precredito
       if (precreditoLegacy.created_at) {
         const fecha = new Date(precreditoLegacy.created_at);
         if (!isNaN(fecha.getTime())) {
-          fecha.setDate(fecha.getDate() + 30);
           return fecha.toISOString().split('T')[0];
         }
       }
@@ -84,9 +74,7 @@ export class CreditoMapper {
     }
 
     // Fallback extremo (no debería llegar aquí)
-    const hoy = new Date();
-    hoy.setDate(hoy.getDate() + 30);
-    return hoy.toISOString().split('T')[0];
+    return new Date().toISOString().split('T')[0];
   }
 
   /**

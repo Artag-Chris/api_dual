@@ -141,11 +141,14 @@ export class HistorialPagosMapper {
     stats: MigrationStats
   ): Promise<void> {
     try {
+      // Use pago_desde for actual payment period date, fallback to created_at
+      const fechaPago = pagoLegacy.pago_desde || pagoLegacy.created_at || new Date();
+      
       // Step 1: Create payment record in pagos table
       const [errorPago, pagoDto] = PagoHistoricoCreateDto.create({
         prestamo_id: prestamoIDMain,
         valor_pago: Math.round(pagoLegacy.abono || 0),
-        fecha_pago: pagoLegacy.created_at || new Date(),
+        fecha_pago: fechaPago,
         hora_pago: '00:00:00',
         canal_pago: 'MANUAL',
         medio_pago: 'EFECTIVO',
@@ -154,7 +157,7 @@ export class HistorialPagosMapper {
         origen: 'MIGRADO',
         estado_pago: 'APLICADO',
         usuario_aplicacion: 'MIGRACION_AUTOMATICA',
-        fecha_aplicacion: pagoLegacy.created_at || new Date(),
+        fecha_aplicacion: fechaPago,
         observacion: pagoLegacy.descripcion || 'Pago migrado desde FACILITO',
         referencia_id_transaccion: pagoLegacy.abono_pago_id || undefined,
       });
@@ -327,11 +330,14 @@ export class HistorialPagosMapper {
     stats: MigrationStats
   ): Promise<void> {
     try {
+      // Use pago_desde for actual payment period date, fallback to created_at
+      const fechaPago = pagoLegacy.pago_desde || pagoLegacy.created_at || new Date();
+      
       // Step 1: Create payment record in pagos table
       const [errorPago, pagoDto] = PagoHistoricoCreateDto.create({
         prestamo_id: prestamoIDMain,
         valor_pago: Math.round(pagoLegacy.abono || 0),
-        fecha_pago: pagoLegacy.created_at || new Date(),
+        fecha_pago: fechaPago,
         hora_pago: '00:00:00',
         canal_pago: 'MANUAL',
         medio_pago: 'EFECTIVO',
