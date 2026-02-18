@@ -1745,3 +1745,3068 @@ Unknown argument `prestamo_ID`. Did you mean `prestamoID`? Available options are
   📊 Cuotas de amortización: 24
   📦 Pedidos migrados: 0
   💵 Saldos iniciales: 1
+2026-02-18T02:09:39.810Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:09:39.814Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:09:39.821Z info: Found 116 active puntos in legacy database
+2026-02-18T02:09:40.191Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:09:40.192Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:09:40.193Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:09:40.203Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:09:40.204Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:09:40.204Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:09:40.266Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:09:40.293Z info: [CREDIT] Created detalle_credito 194 for precredito 34390
+2026-02-18T02:09:40.294Z info: [PHASE 11] Generating amortization for prestamo 194...
+2026-02-18T02:09:40.294Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:09:40.296Z info: [PRESTAMO 194] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:09:40.354Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:09:40.354Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:09:40.355Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:09:40.357Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 194: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:09:40.455Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:09:40.455Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:09:40.464Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:09:40.464Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:09:40.470Z info: [PHASE 13] Created saldo_inicial for prestamo 194
+2026-02-18T02:09:40.471Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:09:40.486Z info: Processing 36 payments for credito 25089 → prestamo 194
+2026-02-18T02:09:40.531Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 93729,
+          fecha_pago: new Date("2025-03-22T15:31:44.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 1,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.539Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-03-22T15:31:44.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 1,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.549Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 10,
+          fecha_pago: new Date("2025-03-22T15:31:44.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 2,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.553Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-04-21T13:37:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 2,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-04-21T13:37:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.562Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 93539,
+          fecha_pago: new Date("2025-04-21T13:37:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 2,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-04-21T13:37:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.568Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 189,
+          fecha_pago: new Date("2025-05-06T13:23:56.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 2,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.573Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-05-06T13:23:56.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 3,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.580Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 93350,
+          fecha_pago: new Date("2025-05-06T13:23:56.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 3,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.585Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 3000,
+          fecha_pago: new Date("2025-06-09T13:23:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: null,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.589Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 378,
+          fecha_pago: new Date("2025-06-09T13:23:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 3,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.594Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-06-09T13:23:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 4,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.598Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 90161,
+          fecha_pago: new Date("2025-06-09T13:23:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 4,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.605Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 15000,
+          fecha_pago: new Date("2025-07-21T13:58:45.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: null,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.609Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 3567,
+          fecha_pago: new Date("2025-07-21T13:58:45.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 4,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.613Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-07-21T13:58:45.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 5,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.617Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 87972,
+          fecha_pago: new Date("2025-07-21T13:58:45.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 5,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.622Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 87783,
+          fecha_pago: new Date("2025-08-04T13:58:57.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 6,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.630Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 5756,
+          fecha_pago: new Date("2025-08-04T13:58:57.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 5,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.633Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-08-04T13:58:57.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 6,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.635Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 5945,
+          fecha_pago: new Date("2025-09-06T13:32:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 6,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.638Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-09-06T13:32:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 7,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.641Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 87594,
+          fecha_pago: new Date("2025-09-06T13:32:32.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 7,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.646Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 6134,
+          fecha_pago: new Date("2025-10-06T13:35:05.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 7,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.649Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-10-06T13:35:05.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 8,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.651Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 87405,
+          fecha_pago: new Date("2025-10-06T13:35:05.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 8,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.654Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 6323,
+          fecha_pago: new Date("2025-11-10T13:17:34.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 8,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.657Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 83216,
+          fecha_pago: new Date("2025-11-10T13:17:34.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 9,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.660Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-11-10T13:17:34.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 9,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.664Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 4000,
+          fecha_pago: new Date("2025-11-10T13:17:34.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: null,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.668Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 2000,
+          fecha_pago: new Date("2025-12-09T14:44:16.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: null,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.671Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 10512,
+          fecha_pago: new Date("2025-12-09T14:44:16.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 9,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.679Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2025-12-09T14:44:16.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 10,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.684Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 81027,
+          fecha_pago: new Date("2025-12-09T14:44:16.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 10,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.692Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 12701,
+          fecha_pago: new Date("2026-01-05T13:34:37.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 10,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2026-01-05T13:34:37.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.696Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:167:41
+
+  164   return;
+  165 }
+  166 
+→ 167 const pagoCreado = await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 33461,
+          fecha_pago: new Date("2026-01-05T13:34:37.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 11,
+          origen: "MIGRADO",
+          estado_pago: "APLICADO",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: new Date("2026-01-05T13:34:37.000Z"),
+          observacion: "Pago migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.702Z error: PrismaClientValidationError: 
+Invalid `tx.pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:348:22
+
+  345   return;
+  346 }
+  347 
+→ 348 await tx.pagos.create({
+        data: {
+          prestamo_id: 194,
+          valor_pago: 80838,
+          fecha_pago: new Date("2026-01-05T13:34:37.000Z"),
+          hora_pago: "00:00:00",
+                     ~~~~~~~~~~
+          canal_pago: "MANUAL",
+          medio_pago: "EFECTIVO",
+          tipo_pago: "CUOTA",
+          numero_cuota: 11,
+          origen: "MIGRADO",
+          estado_pago: "PENDIENTE",
+          usuario_aplicacion: "MIGRACION_AUTOMATICA",
+          fecha_aplicacion: undefined,
+          observacion: "Pago pendiente migrado desde FACILITO",
+          referencia_id_transaccion: undefined
+        }
+      })
+
+Invalid value for argument `hora_pago`: input contains invalid characters. Expected ISO-8601 DateTime.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:09:40.703Z info: Payment migration complete for credito 25089:
+2026-02-18T02:09:40.703Z info: [PHASE 14] Payment migration complete - Applied: 0, Pending: 0, Historial: 0, Detallados: 0
+2026-02-18T02:09:40.712Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:09:40.742Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:09:40.755Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T02:12:35.516Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:12:35.522Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:12:35.531Z info: Found 116 active puntos in legacy database
+2026-02-18T02:12:35.794Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:12:35.796Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:12:35.797Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:12:35.805Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:12:35.806Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:12:35.806Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:12:35.861Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:12:35.887Z info: [CREDIT] Created detalle_credito 195 for precredito 34390
+2026-02-18T02:12:35.887Z info: [PHASE 11] Generating amortization for prestamo 195...
+2026-02-18T02:12:35.888Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:12:35.889Z info: [PRESTAMO 195] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:12:35.948Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:12:35.949Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:12:35.949Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:12:35.952Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 195: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:12:36.050Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:12:36.050Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:12:36.059Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:12:36.060Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:12:36.067Z info: [PHASE 13] Created saldo_inicial for prestamo 195
+2026-02-18T02:12:36.068Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:12:36.083Z info: Processing 36 payments for credito 25089 → prestamo 195
+2026-02-18T02:12:36.152Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.170Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.184Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.198Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.211Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.224Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.239Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.253Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.271Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.283Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.297Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.318Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.329Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.341Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.355Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.370Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.389Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.400Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.411Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.421Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.431Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.441Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.453Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.462Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.472Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.482Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.501Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.510Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.518Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.529Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.542Z error: PrismaClientKnownRequestError: 
+Invalid `tx.historial_pagos.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:222:36
+
+  219     `Error creating historial DTO for legacy pago ${pagoLegacy.id}: ${errorHistorial}`
+  220   );
+  221 } else {
+→ 222   await tx.historial_pagos.create(
+Foreign key constraint violated on the fields: (`bolsa`)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:7268)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:12:36.550Z info: Payment migration complete for credito 25089:
+2026-02-18T02:12:36.551Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 0, Detallados: 0
+2026-02-18T02:12:36.560Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:12:36.590Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:12:36.601Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T02:18:30.909Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:18:30.916Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:18:30.924Z info: Found 116 active puntos in legacy database
+2026-02-18T02:18:31.173Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:18:31.174Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:18:31.175Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:18:31.182Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:18:31.183Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:18:31.183Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:18:31.243Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:18:31.278Z info: [CREDIT] Created detalle_credito 196 for precredito 34390
+2026-02-18T02:18:31.279Z info: [PHASE 11] Generating amortization for prestamo 196...
+2026-02-18T02:18:31.279Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:18:31.281Z info: [PRESTAMO 196] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:18:31.343Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:18:31.344Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:18:31.344Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:18:31.347Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 196: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:18:31.450Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:18:31.451Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:18:31.458Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:18:31.458Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:18:31.463Z info: [PHASE 13] Created saldo_inicial for prestamo 196
+2026-02-18T02:18:31.463Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:18:31.474Z info: Processing 36 payments for credito 25089 → prestamo 196
+2026-02-18T02:18:31.542Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 141,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 1,
+            capital_pagado: 94082,
+            interes_pagado: 33118,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 452959"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.563Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 142,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 1,
+            capital_pagado: 94082,
+            interes_pagado: 33118,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 452958"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.579Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 143,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 2,
+            capital_pagado: 95831,
+            interes_pagado: 31369,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-03-22T15:31:44.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 452960"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.591Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 144,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 2,
+            capital_pagado: 95831,
+            interes_pagado: 31369,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-04-21T13:37:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 462673"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.611Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 145,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 2,
+            capital_pagado: 95831,
+            interes_pagado: 31369,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-04-21T13:37:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 462674"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.626Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 146,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 2,
+            capital_pagado: 95831,
+            interes_pagado: 31369,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 469339"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.642Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 147,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 3,
+            capital_pagado: 97614,
+            interes_pagado: 29586,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 469340"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.655Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 148,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 3,
+            capital_pagado: 97614,
+            interes_pagado: 29586,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-05-06T13:23:56.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 469341"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.676Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 150,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 3,
+            capital_pagado: 97614,
+            interes_pagado: 29586,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 482486"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.690Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 151,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 4,
+            capital_pagado: 99430,
+            interes_pagado: 27770,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 482487"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.705Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 152,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 4,
+            capital_pagado: 99430,
+            interes_pagado: 27770,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-06-09T13:23:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 482488"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.724Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 154,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 4,
+            capital_pagado: 99430,
+            interes_pagado: 27770,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 500348"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.736Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 155,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 5,
+            capital_pagado: 101279,
+            interes_pagado: 25921,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 500349"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.749Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 156,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 5,
+            capital_pagado: 101279,
+            interes_pagado: 25921,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-07-21T13:58:45.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 500350"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.767Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 157,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 6,
+            capital_pagado: 103163,
+            interes_pagado: 24037,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 505938"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.778Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 158,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 5,
+            capital_pagado: 101279,
+            interes_pagado: 25921,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 505936"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.788Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 159,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 6,
+            capital_pagado: 103163,
+            interes_pagado: 24037,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-08-04T13:58:57.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 505937"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.800Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 160,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 6,
+            capital_pagado: 103163,
+            interes_pagado: 24037,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 523834"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.814Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 161,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 7,
+            capital_pagado: 105082,
+            interes_pagado: 22118,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 523835"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.825Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 162,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 7,
+            capital_pagado: 105082,
+            interes_pagado: 22118,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-09-06T13:32:32.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 523836"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.838Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 163,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 7,
+            capital_pagado: 105082,
+            interes_pagado: 22118,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 539527"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.849Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 164,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 8,
+            capital_pagado: 107036,
+            interes_pagado: 20164,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 539528"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.860Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 165,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 8,
+            capital_pagado: 107036,
+            interes_pagado: 20164,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-10-06T13:35:05.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 539529"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.872Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 166,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 8,
+            capital_pagado: 107036,
+            interes_pagado: 20164,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 559798"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.887Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 167,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 9,
+            capital_pagado: 109027,
+            interes_pagado: 18173,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 559800"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.898Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 168,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 9,
+            capital_pagado: 109027,
+            interes_pagado: 18173,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-11-10T13:17:34.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 559799"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.919Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 171,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 9,
+            capital_pagado: 109027,
+            interes_pagado: 18173,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 576794"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.934Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 172,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 10,
+            capital_pagado: 111055,
+            interes_pagado: 16145,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 576795"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.947Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 173,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 10,
+            capital_pagado: 111055,
+            interes_pagado: 16145,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2025-12-09T14:44:16.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 576796"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.961Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 174,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 10,
+            capital_pagado: 111055,
+            interes_pagado: 16145,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2026-01-05T13:34:37.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 592517"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.976Z error: PrismaClientValidationError: 
+Invalid `tx.historial_pagos_detallado.create()` invocation in
+/home/node/app/src/domain/class/historial-pagos-mapper.ts:282:46
+
+  279     `Error creating detallado DTO for legacy pago ${pagoLegacy.id}: ${errorDetallado}`
+  280   );
+  281 } else {
+→ 282   await tx.historial_pagos_detallado.create({
+          data: {
+            id_pago: 175,
+            prestamo_id: 196,
+            id_cliente: 11365,
+            documento: "4548239",
+            numero_cuota: 11,
+            capital_pagado: 113120,
+            interes_pagado: 14080,
+            aval_pagado: 0,
+            iva_pagado: 0,
+            pablok: 0,
+            sancion_pagada: 0,
+            descuento_capital: 0,
+            descuento_interes: 0,
+            descuento_aval: 0,
+            descuento_iva: 0,
+            descuento_sancion: 0,
+            total_pagado: 127200,
+            total_descuento: 0,
+            tipo_pago: "Cuota",
+                       ~~~~~~~
+            id_bolsa_asignada: null,
+            usuario_aplicacion: "MIGRACION_AUTOMATICA",
+            fecha_aplicacion: new Date("2026-01-05T13:34:37.000Z"),
+            observaciones: "Pago migrado desde FACILITO - Legacy ID: 592518"
+          }
+        })
+
+Invalid value for argument `tipo_pago`. Expected historial_pagos_detallado_tipo_pago.
+    at Nn (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:33:1363)
+    at ei.handleRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6911)
+    at ei.handleAndLogRequestError (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6593)
+    at ei.request (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:125:6300)
+    at a (/home/node/app/node_modules/@prisma/client-main/runtime/library.js:134:9551)
+2026-02-18T02:18:31.984Z info: Payment migration complete for credito 25089:
+2026-02-18T02:18:31.985Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 0
+2026-02-18T02:18:31.992Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:18:32.017Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:18:32.028Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
+2026-02-18T02:25:20.263Z info: 📊 PRECREDITOS FILTRADOS para cliente 4548239:
+  ✅ Aprobados con interés (tasa > 0): 1
+  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), Sin interés (tasa=0), Sin cuotas válidas
+2026-02-18T02:25:20.267Z info: [PHASE 0] Creating bodega mapping...
+2026-02-18T02:25:20.274Z info: Found 116 active puntos in legacy database
+2026-02-18T02:25:20.562Z info: Bodega mapping completed: 116 entries
+2026-02-18T02:25:20.562Z info: [PHASE 0] Bodega mapping created: 116 entries
+2026-02-18T02:25:20.563Z info: [PHASE 9] Fetching active credit data from legacy...
+2026-02-18T02:25:20.573Z info: Loaded active credit data for 1 precreditos
+2026-02-18T02:25:20.573Z info: [PHASE 9] Loaded 1 active credits
+2026-02-18T02:25:20.574Z info: 📊 CLASIFICACIÓN DE CRÉDITOS para cliente 4548239:
+  💰 Desembolsados (con amortización completa): 1
+  ⏳ Aprobados pendientes desembolso (sin amortización): 0
+  📝 Total a migrar: 1
+2026-02-18T02:25:20.636Z info: [MIGRATION] Processing 1 DISBURSED credits...
+2026-02-18T02:25:20.668Z info: [CREDIT] Created detalle_credito 197 for precredito 34390
+2026-02-18T02:25:20.669Z info: [PHASE 11] Generating amortization for prestamo 197...
+2026-02-18T02:25:20.669Z info: [CARTERA] Using amortization params: seguro/aval=0.0%, iva=19.0%
+2026-02-18T02:25:20.671Z info: [PRESTAMO 197] Generando 24 cuotas, Tasa período: 1.8600%, Aval: 0.0%, IVA: 19.0%
+2026-02-18T02:25:20.731Z info: [FASE 2] ✅ Using valor_cuota_fija from legacy: $127,190
+2026-02-18T02:25:20.731Z info: [FASE 1] Cargos exactos por cuota: Aval=$0.00, IVA=$0.00, Pablok=$0, Seguro=$0
+2026-02-18T02:25:20.732Z info: [PRIMERA CUOTA] Componentes exactos: Capital=$94082.00, Interés=$33108.00, Total sin redondear=$127190.00, Total redondeado=$127200
+2026-02-18T02:25:20.735Z info: ✅ [GENERACIÓN COMPLETADA] Prestamo 197: 24 cuotas, Capital: $1,780,000, Interés: $1,272,800, Total: $3,052,800
+2026-02-18T02:25:20.842Z info: [PHASE 11] Generated 24 amortization entries
+2026-02-18T02:25:20.843Z info: [PHASE 12] Creating pedido with products...
+2026-02-18T02:25:20.850Z warn: No ref_productos found for precredito 34390
+2026-02-18T02:25:20.850Z info: [PHASE 13] Creating saldo_inicial...
+2026-02-18T02:25:20.858Z info: [PHASE 13] Created saldo_inicial for prestamo 197
+2026-02-18T02:25:20.859Z info: [PHASE 14] Migrating complete payment history...
+2026-02-18T02:25:20.876Z info: Processing 36 payments for credito 25089 → prestamo 197
+2026-02-18T02:25:21.394Z info: Payment migration complete for credito 25089:
+2026-02-18T02:25:21.395Z info: [PHASE 14] Payment migration complete - Applied: 35, Pending: 1, Historial: 31, Detallados: 31
+2026-02-18T02:25:21.403Z info: [PHASE 10] Creating estudios_realizados with real data...
+2026-02-18T02:25:21.518Z info: [PHASE 10] Created estudios_realizados successfully
+2026-02-18T02:25:21.530Z info: 
+✅ MIGRACIÓN COMPLETADA EXITOSAMENTE para cliente 4548239:
+  👤 User Cliente: Jose Gañan 
+  💳 Créditos totales: 1
+     ├─ 💰 Desembolsados (con amortización): 1
+     └─ ⏳ Pendientes desembolso (sin amortización): 0
+  📊 Cuotas de amortización: 24
+  📦 Pedidos migrados: 0
+  💵 Saldos iniciales: 1
