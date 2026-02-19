@@ -402,41 +402,18 @@ class MainDataService {
       parser
     );
     if (infoReferenciasError) throw new Error(`Error en mapeo InfoReferencias: ${infoReferenciasError}`);
-
-    // 4.6 Obtener precreditos del cliente legacy para migrar a detalle_credito
-    // FILTRO CRÍTICO: Solo créditos APROBADOS con INTERÉS y desembolsados
+//TODO: hay que  colocar el sistema que  me cree el usuario independientemente si tiene credito o no
+    // 4.6 Obtener TODOS los precreditos del cliente legacy (sin filtros)
     let precreditosData: any[] = [];
     if (clienteLegacy.id) {
       precreditosData = await prismaLegacyService.precreditos.findMany({
         where: {
           cliente_id: clienteLegacy.id,
-          aprobado: 'Si',                    // ✅ Solo créditos aprobados
-          vlr_fin: { gt: 0 },                // ✅ Monto mayor a 0
-          cuotas: { gt: 0 },                 // ✅ Tiene cuotas
-          vlr_cuota: { gt: 0 },              // ✅ Cuota válida
-          carteras: {
-            estado: 'Activo',                // ✅ Cartera activa
-            tasa: { gt: 0 }                  // ✅ SOLO con interés (excluye tasa=0)
-          }
         },
         include: {
           carteras: true,
-          creditos: {
-            where: {
-              valor_credito: { gt: 0 },
-              estado: {
-                in: [
-                  'Al_dia',
-                  'Mora',
-                  'Prejuridico',
-                  'Juridico',
-                  'Cancelado',
-                  'Cancelado_por_refinanciacion'
-                ]
-              }
-            }
-          },
-          users_precreditos_funcionario_idTousers: {  // ✅ Para creador
+          creditos: true,  // Obtener todos los créditos sin filtros
+          users_precreditos_funcionario_idTousers: {
             select: { 
               id: true,
               name: true 
@@ -447,7 +424,7 @@ class MainDataService {
     }
 
     this.logger.info(
-      `📊 PRECREDITOS FILTRADOS para cliente ${documento}:` +
+      `📊 PRECREDITOS para cliente ${documento}:` +
       `\n  ✅ Aprobados con interés (tasa > 0): ${precreditosData.length}` +
       `\n  ℹ️  EXCLUIDOS: Simulaciones (aprobado='En_estudio'), Rechazados (aprobado='No'), ` +
       `Sin interés (tasa=0), Sin cuotas válidas`
@@ -711,7 +688,7 @@ class MainDataService {
                   castigo = 'SI';
                 }
               }
-
+            //TODO: debemos capturar el id del prestamo de legacy y colocarlo en el credito migrado para que concuerde en el detalle credito
               // Crear el registro de crédito
               const detalleCredito = await tx.detalle_credito.create({
                 data: {

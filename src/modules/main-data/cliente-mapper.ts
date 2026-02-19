@@ -310,19 +310,28 @@ class ClienteMapperService {
   /**
    * Construye el nombre completo desde primer y segundo nombre
    */
+  /**
+   * Construye nombres completo: primer_nombre + segundo_nombre
+   * Normalizado a MAYÚSCULAS
+   */
   private buildNombres(cliente: any): string {
-    const primer = cliente.primer_nombre || '';
-    const segundo = cliente.segundo_nombre || '';
-    return (primer + ' ' + segundo).trim();
+    const primer = (cliente.primer_nombre || '').trim().toUpperCase();
+    const segundo = (cliente.segundo_nombre || '').trim().toUpperCase();
+    const combined = (primer + ' ' + segundo).trim();
+    // Normalizar espacios múltiples
+    return combined.replace(/\s+/g, ' ');
   }
 
   /**
-   * Construye el apellido completo desde primer y segundo apellido
+   * Construye apellido completo: primer_apellido + segundo_apellido
+   * Normalizado a MAYÚSCULAS
    */
   private buildApellidos(cliente: any): string {
-    const primer = cliente.primer_apellido || '';
-    const segundo = cliente.segundo_apellido || '';
-    return (primer + ' ' + segundo).trim();
+    const primer = (cliente.primer_apellido || '').trim().toUpperCase();
+    const segundo = (cliente.segundo_apellido || '').trim().toUpperCase();
+    const combined = (primer + ' ' + segundo).trim();
+    // Normalizar espacios múltiples
+    return combined.replace(/\s+/g, ' ');
   }
 
   /**
