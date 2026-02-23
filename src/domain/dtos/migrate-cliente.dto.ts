@@ -24,7 +24,7 @@ export class UserClienteCreateDto {
     if (!nombre) return ['Nombre is required', undefined];
     if (!apellido) return ['Apellido is required', undefined];
     if (!tipo) return ['Tipo is required', undefined];
-    if (!email) return ['Email is required', undefined];
+    const emailFinal = email || 'clientesinEmail@Migradofacilito';
     if (!telefono) return ['Teléfono is required', undefined];
     if (!nombre_completo) return ['Nombre completo is required', undefined];
 
@@ -35,7 +35,7 @@ export class UserClienteCreateDto {
         nombre,
         apellido,
         tipo,
-        email,
+        emailFinal,
         telefono,
         nombre_completo,
         password || 'changeme',
@@ -130,7 +130,7 @@ export class InfoContactoCreateDto {
 
     if (!documento) return ['Documento is required', undefined];
     if (!celular) return ['Celular is required', undefined];
-    if (!email) return ['Email is required', undefined];
+    const emailFinal = email || 'clientesinEmail@Migradofacilito';
     if (!direccion) return ['Dirección is required', undefined];
     if (!ciudad) return ['Ciudad is required', undefined];
 

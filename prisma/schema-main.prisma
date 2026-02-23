@@ -1359,7 +1359,7 @@ model zonas {
 model cartera {
   id              Int               @id @default(autoincrement())
   nombre          String            @dbMain.VarChar(255)
-  franja_dias     Int
+  franja_dias     String            @dbMain.VarChar(250)
   fecha_creacion  DateTime?         @default(now()) @dbMain.Timestamp(0)
   detalle_credito detalle_credito[]
 }
@@ -1369,6 +1369,52 @@ model estrategia_credito {
   nombre          String            @dbMain.VarChar(255)
   fecha_creacion  DateTime?         @default(now()) @dbMain.Timestamp(0)
   detalle_credito detalle_credito[]
+}
+
+model documento_precredito {
+  id                   Int               @id @default(autoincrement())
+  documento_cliente    String            @dbMain.VarChar(50)
+  estado               String            @dbMain.VarChar(50)
+}
+
+/// Cola FIFO para procesar migraciones por fases
+/// - Almacena documentos/referencias que necesitan ser procesados
+/// - Estado: PENDIENTE, PROCESANDO, COMPLETADO, ERROR
+/// - FIFO garantizado por: orderBy createdAt ASC
+model migration_queue {
+  id        Int     @id @default(autoincrement())
+  documento String  @dbMain.VarChar(50)
+  // Fase de migración: CLIENTES, CREDITOS, PAGOS, AMORTIZACIONES, BODEGA
+  fase      String  @dbMain.VarChar(50)
+  // Estado del procesamiento
+  estado    String  @dbMain.VarChar(50)     // PENDIENTE, PROCESANDO, COMPLETADO, ERROR
+  // Control de reintentos
+  intentos  Int     @default(0)         // Cuántos intentos ha tenido (máximo 3)
+  // Información de error (si aplica)
+  error     String? @dbMain.LongText        // Mensaje de error completo
+  // Timestamps
+  createdAt DateTime @default(now())    // Cuándo se enqueó
+  updatedAt DateTime @updatedAt
+  processedAt DateTime?                 // Cuándo se completó
+  // Índices para queries rápidas
+  @@index([documento])                  // Buscar por cliente
+  @@index([fase])                       // Buscar por fase
+  @@index([estado])                     // Buscar por estado (PENDIENTE, etc)
+  @@index([createdAt])                  // FIFO: obtener más antiguos primero
+}
+
+/// Dead Letter Queue - para items que no se pudieron procesar
+/// - Items que agotaron reintentos (3 intentos fallidos)
+/// - Requiere intervención manual
+model migration_queue_dlq {
+  id        Int     @id @default(autoincrement())
+  documento String  @dbMain.VarChar(50)
+  fase      String  @dbMain.VarChar(50)
+  // Error completo que causó que llegara aquí
+  error     String  @dbMain.LongText
+  createdAt DateTime @default(now())
+  @@index([documento])
+  @@index([createdAt])
 }
 
 enum historial_reservas_estado_anterior {
