@@ -92,6 +92,25 @@ router.post('/calcular', (req: Request, res: Response) =>
 );
 
 /**
+ * POST /api/amortizacion/refinanciamiento/calcular-con-pagos
+ * 
+ * Calcula refinanciamiento mediante consulta automática a BD
+ * Obtiene directamente la información del crédito y procesa pagos realizados Y sanciones pendientes
+ * 
+ * Body JSON requerido:
+ * {
+ *   "creditoId": 26122 -ejemplo 1 (sin sanciones o sanciones pagadas)
+ *    "creditoId" : 8770 - ejemplo 2 (caso de muchas sanciones y pagos sin num cuota)
+ *   "creditoId" : 25391 - ejemplo 3 (caso con sanciones pagadas y sin pagar - 115+ sanciones pendientes)
+ * }
+ * 
+ * Respuesta: amortización actualizada sin las cuotas pagadas, con sanciones distribuidas por fecha/cuota
+ */
+router.post('/refinanciamiento/calcular-con-pagos', (req: Request, res: Response) =>
+  controller.calcularRefinanciamientoConPagos(req, res)
+);
+
+/**
  * POST /api/amortizacion/refinanciamiento/calcular
  * 
  * Calcula refinanciamiento con sistema equitativo (capital distribuido equitativamente)

@@ -187,6 +187,105 @@ class AmortizacionController {
   }
 
   /**
+   * POST /api/amortizacion/refinanciamiento/calcular-con-pagos
+   * 
+   * ═══════════════════════════════════════════════════════════════════════════
+   * FLUJO COMPLETO DE REFINANCIAMIENTO CON VALIDACIÓN DE PAGOS
+   * ═══════════════════════════════════════════════════════════════════════════
+   * 
+   * 1️⃣  OBTIENE INFORMACIÓN DEL CRÉDITO
+   *     - Documento, valor préstamo, valor cuota, periocidad, cantidad meses
+   *     - Fecha de creación, cuotas faltantes
+   *
+   * 2️⃣  CALCULA AMORTIZACIÓN DE REFINANCIAMIENTO
+   *     - Capital distribuido equitativamente
+   *     - Aval e IVA fijos por cuota (30% interés, 50% aval, 20% IVA)
+   *
+   * 3️⃣  OBTIENE PAGOS REGISTRADOS DEL CRÉDITO
+   *     - Busca pagos en la tabla 'pagos' filtrando por credito_id
+   *     - Obtiene estado de pago, monto abonado, monto debido, num_cuota
+   *
+   * 4️⃣  VALIDA Y PROCESA PAGOS
+   *     - Identifica cuota máxima pagada (estado = 'Ok')
+   *     - ELIMINA esas cuotas de la amortización actualizada
+   *     - Si existe cuota parcial (estado = 'Debe' + abono > 0):
+   *       → Calcula proporción de pago vs cuota total
+   *       → Ajusta capital, interés, aval e IVA proporcionalmente
+   *       → El resultado es lo que aún debe pagar
+   *
+   * 5️⃣  RETORNA AMORTIZACIÓN ACTUALIZADA
+   *     - Solo las cuotas que faltan por pagar
+   *     - Cuota parcial ajustada al monto que aún debe
+   *
+   * Body JSON:
+   * {
+   *   "creditoId": 26122
+   * }
+   * 
+   * Respuesta exitosa (200):
+   * {
+   *   "exitoso": true,
+   *   "mensaje": "Refinanciamiento calculado exitosamente. Cuotas pendientes: 5",
+   *   "infoCredito": { documento, valor_prestamo, periodicidad, ... },
+   *   "infoPagos": { cuotaMaximaPagada, tieneCuotaParcial, montoDebe, ... },
+   *   "amortizacionOriginal": [ 18 cuotas calculadas ],
+   *   "amortizacionActualizada": [ 5 cuotas pendientes ],
+   *   "estadisticas": { totalCuotas, cuotaTotal, totalCapital, ... }
+   * }
+   */
+  async calcularRefinanciamientoConPagos(req: Request, res: Response): Promise<void> {
+    try {
+      const { creditoId } = req.body;
+
+      // Validar parametro
+      if (!creditoId || creditoId <= 0) {
+        res.status(400).json({
+          success: false,
+          message: 'Parametros invalidos',
+          errores: ['creditoId es requerido y debe ser un numero positivo'],
+        });
+        return;
+      }
+
+      // Llamar al servicio - usa prismaMainService internamente
+      const resultado = await this.refinanciamientoService.calcularRefinanciamientoConPagos(creditoId);
+
+      // Retornar resultado
+      if (resultado.exitoso) {
+        res.status(200).json({
+          success: true,
+          ...resultado,
+        });
+
+        this.logger.info(
+          `[REFINANCIAMIENTO-CTRL] OK POST /calcular-con-pagos - Credito: ${creditoId}, Cuotas pendientes: ${resultado.amortizacionActualizada?.length || 0}`
+        );
+      } else {
+        res.status(400).json({
+          success: false,
+          ...resultado,
+        });
+
+        this.logger.warn(
+          `[REFINANCIAMIENTO-CTRL] WARN POST /calcular-con-pagos - Credito: ${creditoId} - ${resultado.mensaje}`
+        );
+      }
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error desconocido';
+      
+      res.status(500).json({
+        success: false,
+        message: 'Error al calcular refinanciamiento con pagos',
+        error: mensaje,
+      });
+
+      this.logger.error(
+        `[REFINANCIAMIENTO-CTRL] ERROR en /calcular-con-pagos: ${mensaje}`
+      );
+    }
+  }
+
+  /**
    * POST /api/amortizacion/refinanciamiento/calcular
    * 
    * Calcula refinanciamiento (sistema equitativo)

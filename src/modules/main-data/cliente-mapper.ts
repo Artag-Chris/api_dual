@@ -35,8 +35,8 @@ class ClienteMapperService {
 
     const props = {
       documento: clienteLegacy.num_doc || '',
-      nombre: clienteLegacy.primer_nombre || nombres.split(' ')[0] || '',
-      apellido: clienteLegacy.primer_apellido || apellidos.split(' ')[0] || '',
+      nombre: nombres || '',
+      apellido: apellidos || '',
       tipo: clienteLegacy.tipo_doc ? this.mapTipoDoc(clienteLegacy.tipo_doc) : 'CC',
       email: clienteLegacy.email || '',
       telefono: clienteLegacy.movil || '',
@@ -58,8 +58,8 @@ class ClienteMapperService {
     
     const props = {
       documento: clienteLegacy.num_doc || '',
-      nombre: clienteLegacy.primer_nombre || '',
-      apellido: clienteLegacy.primer_apellido || '',
+      nombre: this.buildNombres(clienteLegacy),
+      apellido: this.buildApellidos(clienteLegacy),
       tipoDocumento: clienteLegacy.tipo_doc ? this.mapTipoDoc(clienteLegacy.tipo_doc) : 'CC',
       conyuge: conyugeValue,
       fecha_nacimiento: clienteLegacy.fecha_nacimiento || null,

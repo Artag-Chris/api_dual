@@ -59599,3 +59599,51 @@ Invalid `prismaMainService.migration_queue.findUnique()` invocation in
   147   try {
 → 148     const item = await prismaMainService.migration_queue.findUnique(
 Server has closed the connection.
+2026-02-23T19:29:49.351Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-23T19:29:49.414Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-23T19:29:49.475Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-23T19:29:49.478Z error: [QUEUE] Max retries reached: 1030559997
+2026-02-23T20:16:28.115Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Información de pagos inválida - Errores: Pago 5: debe debe ser número >= 0
+2026-02-23T20:16:28.116Z error: [PHASE 3B] ❌ RefinanciamientoService falló: Información de pagos inválida
+2026-02-23T20:16:28.116Z error: [AmortizacionesConsumer] ❌ Error procesando: Información de pagos inválida, Pago 5: debe debe ser número >= 0
+2026-02-23T20:49:54.336Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Información de pagos inválida - Errores: El array de pagos está vacío
+2026-02-23T20:49:54.336Z error: [PHASE 3B] ❌ RefinanciamientoService falló: Información de pagos inválida
+2026-02-23T20:49:54.337Z error: [AmortizacionesConsumer] ❌ Error procesando: Información de pagos inválida, El array de pagos está vacío
+2026-02-24T17:09:08.125Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-02-24T17:09:08.238Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-02-24T17:09:08.332Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-02-24T17:09:08.337Z error: [QUEUE] Max retries reached: 1088312312
+2026-02-24T18:09:39.651Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-24T18:09:39.782Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-24T18:09:39.900Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_residencial' at row 2`
+2026-02-24T18:09:39.903Z error: [QUEUE] Max retries reached: 1030559997
+2026-02-24T18:27:30.052Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Información de pagos inválida - Errores: El array de pagos está vacío
+2026-02-24T18:27:30.053Z error: [Fase Amortizacion] ❌ RefinanciamientoService falló: Información de pagos inválida
+2026-02-24T18:27:30.054Z error: [AmortizacionesConsumer] ❌ Error procesando: Información de pagos inválida, El array de pagos está vacío
+2026-02-24T18:34:20.827Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Información de pagos inválida - Errores: El array de pagos está vacío
+2026-02-24T18:34:20.827Z error: [Fase Amortizacion] ❌ RefinanciamientoService falló: Información de pagos inválida
+2026-02-24T18:34:20.828Z error: [AmortizacionesConsumer] ❌ Error procesando: Información de pagos inválida, El array de pagos está vacío

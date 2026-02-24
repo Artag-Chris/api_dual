@@ -173,6 +173,10 @@ class MigrationService {
     this.procesarAmortizacionesConsumer().catch(err => 
       this.logger.error(`[MIGRATION] Consumidor AMORTIZACIONES error: ${err.message}`)
     );
+    
+    this.procesarHistorialPagosConsumer().catch(err => 
+      this.logger.error(`[MIGRATION] Consumidor HISTORIAL_PAGOS error: ${err.message}`)
+    );
 
     this.logger.info('[MIGRATION] ✓ Todos los consumidores iniciados en paralelo');
   }
@@ -191,8 +195,6 @@ class MigrationService {
           await this.sleep(5000);
           continue;
         }
-
-        this.logger.info(`[${consumerName}] Procesando cliente: ${item.documento}`);
 
         try {
           await this.mainDataService.migrateClienteFromLegacy(item.documento);
@@ -235,16 +237,15 @@ class MigrationService {
           continue;
         }
 
-        this.logger.info(`[${consumerName}] Procesando: ${item.documento}`);
 
         try {
           // Llamar PHASE 2: migrateCreditsPhase
           const resultado = await this.mainDataService.migrateCreditsPhase(item.documento);
           
-          this.logger.info(`[${consumerName}] Resultado PHASE 2: ${resultado.status}`);
+          // this.logger.info(`[${consumerName}] Resultado PHASE 2: ${resultado.status}`);
           
           if (resultado.status === 'SIN_CREDITOS') {
-            this.logger.info(`[${consumerName}] Cliente registrado en documento_precredito (sin créditos)`);
+            // this.logger.info(`[${consumerName}] Cliente registrado en documento_precredito (sin créditos)`);
           } else if (resultado.status === 'CREDITOS_MIGRADOS') {
             this.logger.info(`[${consumerName}] ${resultado.creditosMigrados} créditos migrados, ${resultado.enqueuedAmortizaciones} enqueuados a AMORTIZACIONES`);
           } else if (resultado.status === 'TODOS_FALLIDOS') {
@@ -252,7 +253,7 @@ class MigrationService {
           }
           
           await this.queueService.markCompleted(item.id);
-          this.logger.info(`[${consumerName}] ✅ CREDITOS completado: ${item.documento}`);
+          // this.logger.info(`[${consumerName}] ✅ CREDITOS completado: ${item.documento}`);
 
         } catch (processError) {
           this.logger.error(`[${consumerName}] Error procesando: ${(processError as any).message}`);
@@ -268,52 +269,67 @@ class MigrationService {
 
   /**
    * CONSUMIDOR 3: Procesa amortizaciones - PHASE 3
-   * Prepara datos de crédito migrado para cálculo de amortización
+   * Calcula e inserta amortizaciones para créditos migrados
    * 
    * Flow:
-   * 1. Dequeue item con metadata (documento + prestamo_ID)
-   * 2. Llamar prepareAmortizacionesPhase(documento, prestamo_ID)
-   * 3. Log resultado: datos preparados, credito no encontrado, o error
-   * 4. Marcar como completado
+   * 1. Dequeue item con prestamo_ID (en item.documento como string)
+   * 2. Parsear prestamo_ID y validar
+   * 3. Llamar migrateAmortizacionesPhase(prestamo_ID)
+   * 4. Log resultado: amortizaciones creadas, credito no encontrado, o error
+   * 5. Marcar como completado
    */
   private async procesarAmortizacionesConsumer(): Promise<void> {
     const consumerName = 'AmortizacionesConsumer';
+    let heartbeatCounter = 0;
 
     while (this.consumersRunning) {
       try {
+        // Heartbeat logging cada 10 iteraciones (aprox cada 50s)
+        heartbeatCounter++;
+        if (heartbeatCounter % 10 === 0) {
+          this.logger.debug(`[${consumerName}] ♥️ Consumer activo, esperando items en AMORTIZACIONES...`);
+        }
+
         const item = await this.queueService.dequeue('AMORTIZACIONES');
 
         if (!item) {
-          await this.sleep(5000);
+          await this.sleep(1000);
           continue;
         }
 
-        this.logger.info(`[${consumerName}] Procesando: ${item.documento}`);
+        this.logger.info(`[${consumerName}] 📦 Item recibido de cola: item.id=${item.id}, item.documento=${item.documento} (tipo: ${typeof item.documento})`);
 
         try {
-          // Consultar el último crédito del cliente (el más recientemente creado)
-          const ultimoCredito = await prismaMainService.detalle_credito.findFirst({
-            where: { documento: item.documento },
-            orderBy: { fecha_registro: 'desc' }
-          });
-
-          if (!ultimoCredito) {
-            this.logger.warn(`[${consumerName}] ⚠️ No hay créditos para ${item.documento}`);
-            await this.queueService.markCompleted(item.id);
+          // Validar que item.documento es número válido
+          if (!item.documento || item.documento.trim() === '') {
+            throw new Error(`item.documento vacío o inválido`);
+          }
+          
+          // Parsear prestamo_ID del item.documento
+          const prestamo_ID = parseInt(item.documento);
+          
+          if (isNaN(prestamo_ID) || prestamo_ID <= 0) {
+            throw new Error(`prestamo_ID inválido después de parsear: ${item.documento} → ${prestamo_ID}`);
+          }
+          
+          // this.logger.info(`[${consumerName}] 🔍 prestamo_ID parseado: ${prestamo_ID} (válido)`);
+          
+          if (isNaN(prestamo_ID)) {
+            this.logger.error(`[${consumerName}] ❌ prestamo_ID inválido: ${item.documento}`);
+            await this.queueService.markError(item.id, `prestamo_ID inválido: ${item.documento}`);
             continue;
           }
 
-          const prestamo_ID = ultimoCredito.prestamo_ID;
-          this.logger.info(`[${consumerName}] Último crédito encontrado: prestamo_ID=${prestamo_ID}`);
+          this.logger.info(`[${consumerName}] Iniciando migrateAmortizacionesPhase para prestamo_ID=${prestamo_ID}`);
 
-          // Llamar Phase 3: prepareAmortizacionesPhase
-          const resultado = await this.mainDataService.prepareAmortizacionesPhase(item.documento, prestamo_ID);
+          // Llamar Phase 3: migrateAmortizacionesPhase (incluye amortizaciones + sanciones)
+          const resultado = await this.mainDataService.migrateAmortizacionesPhase(prestamo_ID);
           
-          if (resultado.status === 'DATOS_PREPARADOS') {
+          if (resultado.status === 'AMORTIZACIONES_Y_SANCIONES_CREADAS') {
             this.logger.info(
-              `[${consumerName}] ✅ Datos preparados para prestamo_ID=${resultado.prestamo_ID}: ` +
-              `plazo=${resultado.calculoParams?.plazo}, tasa=${resultado.calculoParams?.tasa}%, ` +
-              `periocidad=${resultado.calculoParams?.periocidad}`
+              `[${consumerName}] ✅ Amortizaciones creadas: ${resultado.amortizacionesCreadas}, ` +
+              `Sanciones agregadas: ${resultado.sancionesAgregadas}, ` +
+              `Monto total sanciones: $${resultado.totalSanciones}`
             );
           } else if (resultado.status === 'CREDITO_NO_ENCONTRADO') {
             this.logger.warn(
@@ -326,7 +342,7 @@ class MigrationService {
           }
           
           await this.queueService.markCompleted(item.id);
-          this.logger.info(`[${consumerName}] ✅ Item completado: ${item.documento}`);
+          this.logger.info(`[${consumerName}] ✅ Item completado: prestamo_ID=${prestamo_ID}`);
 
         } catch (processError) {
           this.logger.error(
@@ -536,6 +552,77 @@ class MigrationService {
    */
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * CONSUMIDOR 4: Procesa historial de pagos - PHASE 4
+   * Migra facturas legacy a historial_pagos main
+   * 
+   * Flow:
+   * 1. Dequeue item con prestamo_ID
+   * 2. Llamar migratePaymentHistoryPhase(prestamo_ID)
+   * 3. Log resultado: pagos migrados o sin pagos
+   * 4. Marcar como completado
+   */
+  private async procesarHistorialPagosConsumer(): Promise<void> {
+    const consumerName = 'HistorialPagosConsumer';
+
+    while (this.consumersRunning) {
+      try {
+        const item = await this.queueService.dequeue('PAGOS');
+
+        if (!item) {
+          await this.sleep(5000);
+          continue;
+        }
+
+        this.logger.info(`[${consumerName}] Procesando: prestamo_ID=${item.documento}`);
+
+        try {
+          const prestamo_ID = parseInt(item.documento);
+          
+          if (isNaN(prestamo_ID)) {
+            this.logger.error(`[${consumerName}] ❌ prestamo_ID inválido: ${item.documento}`);
+            await this.queueService.markError(item.id, `prestamo_ID inválido: ${item.documento}`);
+            continue;
+          }
+
+          this.logger.info(`[${consumerName}] Iniciando migratePaymentHistoryPhase para prestamo_ID=${prestamo_ID}`);
+
+          const resultado = await this.mainDataService.migratePaymentHistoryPhase(prestamo_ID);
+          
+          if (resultado.status === 'PAGOS_MIGRADOS') {
+            this.logger.info(
+              `[${consumerName}] ✅ Pagos migrados: ${resultado.pagosMigrados} para prestamo_ID=${prestamo_ID}`
+            );
+          } else if (resultado.status === 'SIN_PAGOS') {
+            this.logger.info(
+              `[${consumerName}] ℹ️ Sin pagos encontrados para prestamo_ID=${prestamo_ID}`
+            );
+          } else if (resultado.status === 'CREDITO_NO_ENCONTRADO') {
+            this.logger.warn(
+              `[${consumerName}] ⚠️ Crédito no encontrado: prestamo_ID=${prestamo_ID}. Errores: ${resultado.errores?.join(', ')}`
+            );
+          } else {
+            this.logger.error(
+              `[${consumerName}] ❌ Error procesando: ${resultado.errores?.join(', ')}`
+            );
+          }
+          
+          await this.queueService.markCompleted(item.id);
+          this.logger.info(`[${consumerName}] ✅ Item completado: prestamo_ID=${prestamo_ID}`);
+
+        } catch (processError) {
+          this.logger.error(
+            `[${consumerName}] Error procesando: ${(processError as any).message}`
+          );
+          await this.queueService.markError(item.id, (processError as any).message);
+        }
+      } catch (error) {
+        this.logger.error(`[${consumerName}] Error fatal: ${error}`);
+        await this.sleep(10000);
+      }
+    }
   }
 }
 

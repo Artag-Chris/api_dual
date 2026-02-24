@@ -2,8 +2,9 @@
  * Servicio de Amortización Refinanciamiento
  */
 
-import { AmortizacionRefinanciamiento, RefinanciamientoItem, RefinanciamientoParams } from './amortizacion-refinanciamiento.class';
+import { AmortizacionRefinanciamiento, RefinanciamientoItem, RefinanciamientoParams, InfoCreditoData, PagoRegistro, SancionRegistro, ResultadoRefinanciamientoConPagos } from './amortizacion-refinanciamiento.class';
 import WinstonAdapter from '../config/adapters/winstonAdapter';
+import { prismaLegacyService } from '../database/legacy/prisma-legacy.service';
 
 class RefinanciamientoService {
   private static instance: RefinanciamientoService;
@@ -16,6 +17,245 @@ class RefinanciamientoService {
       RefinanciamientoService.instance = new RefinanciamientoService();
     }
     return RefinanciamientoService.instance;
+  }
+
+  /**
+   * Obtiene la información del crédito desde la BD
+   * Ejecuta la consulta para obtener datos del cliente y crédito
+   */
+  async obtenerInfoCredito(creditoId: number): Promise<InfoCreditoData | null> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo información del crédito ${creditoId}`);
+
+      const resultado = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          clientes.num_doc AS documento,
+          precreditos.vlr_fin AS valor_prestamo,
+          precreditos.vlr_cuota AS valor_cuota,
+          precreditos.periodo AS periodicidad,
+          precreditos.meses AS cantidad_meses,
+          precreditos.created_at AS fecha_creacion,
+          precreditos.p_fecha AS fecha_pago1,
+          precreditos.s_fecha AS fecha_pago2,
+          creditos.cuotas_faltantes,
+          creditos.id AS credito_id
+        FROM clientes
+        LEFT JOIN codeudores 
+          ON clientes.codeudor_id = codeudores.id
+        INNER JOIN precreditos
+          ON clientes.id = precreditos.cliente_id 
+        LEFT JOIN estudios
+          ON clientes.id = estudios.cliente_id 
+        INNER JOIN creditos
+          ON precreditos.id = creditos.precredito_id 
+        LEFT JOIN amortizaciones
+          ON precreditos.id = amortizaciones.precredito_id
+        INNER JOIN users AS creator
+          ON precreditos.user_create_id = creator.id
+        INNER JOIN users AS updator
+          ON creditos.user_update_id = updator.id
+        LEFT JOIN fecha_cobros fc 
+          ON creditos.id = fc.credito_id
+        INNER JOIN carteras 
+          ON precreditos.cartera_id = carteras.id
+        LEFT JOIN est_datacreditos
+          ON estudios.estDatacredito_id = est_datacreditos.id
+        WHERE creditos.id = ${creditoId}
+        ORDER BY precreditos.id DESC
+        LIMIT 1
+      `) as any[];
+
+      if (!resultado || resultado.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No se encontró información para crédito ${creditoId}`);
+        return null;
+      }
+
+      return resultado[0] as InfoCreditoData;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener info crédito: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene los pagos registrados para un crédito
+   */
+  async obtenerPagos(creditoId: number): Promise<PagoRegistro[]> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo pagos del crédito ${creditoId}`);
+
+      const pagos = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          p.id,
+          p.credito_id,
+          p.concepto,
+          p.abono,
+          p.debe,
+          p.estado,
+          p.num_cuota,
+          p.created_at,
+          p.descripcion
+        FROM pagos p
+        INNER JOIN creditos c ON p.credito_id = c.id
+        WHERE p.credito_id = ${creditoId}
+        ORDER BY p.created_at ASC
+      `) as PagoRegistro[];
+
+      this.logger.info(`[REFINANCIAMIENTO-SVC] OK Se encontraron ${pagos.length} pagos`);
+      return pagos;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener pagos: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene las sanciones pendientes (estado = 'Debe') para un crédito
+   * 
+   * @param creditoId ID del crédito
+   * @returns Array de sanciones pendientes ordenado por fecha de creación
+   */
+  async obtenerSancionesPendientes(creditoId: number): Promise<SancionRegistro[]> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo sanciones pendientes del crédito ${creditoId}`);
+
+      const sanciones = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          s.id,
+          s.credito_id,
+          s.valor,
+          s.estado,
+          s.pago_id,
+          s.created_at
+        FROM sanciones s
+        WHERE s.credito_id = ${creditoId}
+        AND s.estado = 'Debe'
+        ORDER BY s.created_at ASC
+      `) as SancionRegistro[];
+
+      this.logger.info(`[REFINANCIAMIENTO-SVC] OK Se encontraron ${sanciones.length} sanciones pendientes`);
+      return sanciones;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener sanciones: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Calcula refinanciamiento con información de pagos desde BD
+   * 
+   * FLUJO COMPLETO:
+   * 1. Obtiene información del crédito (documento, valor préstamo, periodicidad, etc)
+   *    usando creditoId de la consulta principal
+   * 
+   * 2. Calcula la amortización inicial con el método de refinanciamiento
+   *    (capital distribuido equitativamente + aval fijo)
+   * 
+   * 3. Obtiene los pagos registrados para ese crédito
+   * 
+   * 4. Valida y procesa los pagos:
+   *    - Encuentra el número máximo de cuota con estado 'Ok' (completamente pagadas)
+   *    - Elimina esas cuotas de la amortización
+   *    - Si existe una cuota en estado 'Debe' (parcialmente pagada):
+   *      * Calcula lo que falta por pagar
+   *      * Ajusta proporcionalmente capital, interés, aval e IVA
+   * 
+   * 5. Retorna amortización actualizada sin cuotas pagadas
+   */
+  async calcularRefinanciamientoConPagos(
+    creditoId: number
+  ): Promise<ResultadoRefinanciamientoConPagos> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Iniciando cálculo de refinanciamiento para crédito ${creditoId}`);
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 1: OBTENER INFORMACIÓN DEL CRÉDITO
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 1: Obteniendo información del crédito ${creditoId}`);
+      
+      const infoCredito = await this.obtenerInfoCredito(creditoId);
+      if (!infoCredito) {
+        this.logger.error(`[REFINANCIAMIENTO-SVC] Crédito ${creditoId} no encontrado`);
+        return {
+          exitoso: false,
+          mensaje: `No se encontró información para el crédito ${creditoId}`,
+          errores: ['Crédito no encontrado'],
+        };
+      }
+
+      this.logger.info(
+        `[REFINANCIAMIENTO-SVC] ✅ Información obtenida: ${infoCredito.documento}, ${infoCredito.valor_prestamo}, ${infoCredito.periodicidad}`
+      );
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 2: OBTENER PAGOS DEL CRÉDITO
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 2: Obteniendo pagos del crédito ${creditoId}`);
+      
+      const pagos = await this.obtenerPagos(creditoId);
+
+      if (pagos.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No hay pagos registrados para crédito ${creditoId}`);
+      } else {
+        this.logger.info(`[REFINANCIAMIENTO-SVC] ✅ Se encontraron ${pagos.length} pagos`);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 3: OBTENER SANCIONES PENDIENTES DEL CRÉDITO
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 3: Obteniendo sanciones pendientes del crédito ${creditoId}`);
+      
+      const sanciones = await this.obtenerSancionesPendientes(creditoId);
+
+      if (sanciones.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No hay sanciones pendientes para crédito ${creditoId}`);
+      } else {
+        this.logger.info(`[REFINANCIAMIENTO-SVC] ✅ Se encontraron ${sanciones.length} sanciones pendientes`);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 4: CALCULAR REFINANCIAMIENTO Y PROCESAR PAGOS Y SANCIONES
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 4: Calculando refinanciamiento, procesando pagos y sanciones`);
+      
+      const resultado = AmortizacionRefinanciamiento.calcularRefinanciamientoConPagos(infoCredito, pagos, sanciones);
+
+      if (resultado.exitoso) {
+        this.logger.info(
+          `[REFINANCIAMIENTO-SVC] ✅ ${resultado.mensaje} - Cuotas pendientes: ${resultado.amortizacionActualizada?.length || 0}`
+        );
+        
+        // Log adicional para debug
+        if (resultado.infoPagos) {
+          this.logger.info(
+            `[REFINANCIAMIENTO-SVC] Cuota máxima pagada: ${resultado.infoPagos.cuotaMaximaPagada}, ` +
+            `Cuota parcial: ${resultado.infoPagos.tieneCuotaParciall ? 'Sí' : 'No'}, ` +
+            `Monto aún debe: ${resultado.infoPagos.montoDebe}`
+          );
+        }
+      } else {
+        this.logger.error(
+          `[REFINANCIAMIENTO-SVC] ❌ Error: ${resultado.mensaje} - Errores: ${resultado.errores.join(', ')}`
+        );
+      }
+
+      return resultado;
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'Error desconocido';
+      this.logger.error(`[REFINANCIAMIENTO-SVC] Error fatal: ${mensaje}`);
+
+      return {
+        exitoso: false,
+        mensaje: 'Error al procesar refinanciamiento',
+        errores: [mensaje],
+      };
+    }
   }
 
   async calcularRefinanciamiento(params: RefinanciamientoParams): Promise<RefinanciamientoItem[]> {
