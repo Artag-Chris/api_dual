@@ -74,6 +74,8 @@ export interface InfoPagosProcessados {
   tieneCuotaParciall: boolean;
   montoPagadoCuotaParcial: number;
   montoDebe: number;
+  sanciones_condonadas: number;
+  dias_sanciones_condonadas: number;
   desglosePagos: {
     [key: number]: {
       capital: number;
@@ -410,10 +412,27 @@ export class AmortizacionRefinanciamiento {
   }
 
   /**
+   * Procesa sanciones exoneradas para extraer información de condonaciones
+   * 
+   * @param sancionesExoneradas Array de sanciones con estado 'Exonerado'
+   * @returns Objeto con sanciones_condonadas (suma) y dias_sanciones_condonadas (cantidad)
+   */
+  private static procesarSancionesExoneradas(sancionesExoneradas: SancionRegistro[]): { sanciones_condonadas: number; dias_sanciones_condonadas: number } {
+    if (!sancionesExoneradas || sancionesExoneradas.length === 0) {
+      return { sanciones_condonadas: 0, dias_sanciones_condonadas: 0 };
+    }
+
+    const sanciones_condonadas = sancionesExoneradas.reduce((sum, sancion) => sum + sancion.valor, 0);
+    const dias_sanciones_condonadas = sancionesExoneradas.length;
+
+    return { sanciones_condonadas, dias_sanciones_condonadas };
+  }
+
+  /**
    * Procesa y valida los pagos, extrayendo información relevante
    * Agrupa por número de cuota e identifica cuotas pagadas vs parciales
    */
-  public static procesarPagos(pagos: PagoRegistro[], valorCuota: number): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
+  public static procesarPagos(pagos: PagoRegistro[], valorCuota: number, sancionesExoneradas?: SancionRegistro[]): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
     // Validar estructura
     const validacion = this.validarEstructuraPagos(pagos);
     if (!validacion.valido) {
@@ -452,6 +471,9 @@ export class AmortizacionRefinanciamiento {
       }
     }
 
+    // Procesar sanciones exoneradas
+    const { sanciones_condonadas, dias_sanciones_condonadas } = this.procesarSancionesExoneradas(sancionesExoneradas || []);
+
     // Convertir desglose a formato esperado por InfoPagosProcessados
     const desglosePagos: { [key: number]: { capital: number; interes: number; aval: number; iva: number; totalAbonado: number } } = {};
     Object.entries(desglosePagosCompleto).forEach(([numCuotaStr, desglose]) => {
@@ -470,6 +492,8 @@ export class AmortizacionRefinanciamiento {
       tieneCuotaParciall: tieneCuotaParcial,
       montoPagadoCuotaParcial,
       montoDebe,
+      sanciones_condonadas,
+      dias_sanciones_condonadas,
       desglosePagos,
     };
 
@@ -810,7 +834,8 @@ export class AmortizacionRefinanciamiento {
   public static calcularRefinanciamientoConPagos(
     infoCredito: InfoCreditoData,
     pagos: PagoRegistro[],
-    sanciones?: SancionRegistro[]
+    sanciones?: SancionRegistro[],
+    sancionesExoneradas?: SancionRegistro[]
   ): ResultadoRefinanciamientoConPagos {
     const resultado: ResultadoRefinanciamientoConPagos = {
       exitoso: false,
@@ -831,8 +856,8 @@ export class AmortizacionRefinanciamiento {
       const creditoNormalizado = this.normalizarInfoCredito(infoCredito);
       resultado.infoCredito = creditoNormalizado;
 
-      // Paso 3: Validar y procesar pagos (pasar valor_cuota para agruppear correctamente)
-      const procesoPagos = this.procesarPagos(pagos, creditoNormalizado.valor_cuota);
+      // Paso 3: Validar y procesar pagos (pasar valor_cuota y sancionesExoneradas)
+      const procesoPagos = this.procesarPagos(pagos, creditoNormalizado.valor_cuota, sancionesExoneradas);
       if (!procesoPagos.valido) {
         resultado.errores = procesoPagos.errores;
         resultado.mensaje = 'Información de pagos inválida';

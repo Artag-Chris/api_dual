@@ -141,11 +141,47 @@ class RefinanciamientoService {
       return sanciones;
     } catch (error) {
       this.logger.error(
-        `[REFINANCIAMIENTO-SVC] Error al obtener sanciones: ${error instanceof Error ? error.message : 'Error desconocido'}`
+        `[REFINANCIAMIENTO-SVC] Error al obtener sanciones pendientes: ${error instanceof Error ? error.message : 'Error desconocido'}`
       );
       throw error;
     }
   }
+
+  /**
+   * Obtiene las sanciones exoneradas (estado = 'Exonerada') para un crédito
+   * 
+   * @param creditoId ID del crédito
+   * @returns Array de sanciones exoneradas ordenado por fecha de creación
+   */
+  async obtenerSancionesExoneradas(creditoId: number): Promise<SancionRegistro[]> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo sanciones exoneradas del crédito ${creditoId}`);
+
+      const sanciones = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          s.id,
+          s.credito_id,
+          s.valor,
+          s.estado,
+          s.pago_id,
+          s.created_at
+        FROM sanciones s
+        WHERE s.credito_id = ${creditoId}
+        AND s.estado = 'Exonerada'
+        ORDER BY s.created_at ASC
+      `) as SancionRegistro[];
+
+      this.logger.info(`[REFINANCIAMIENTO-SVC] OK Se encontraron ${sanciones.length} sanciones exoneradas`);
+      return sanciones;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener sanciones exoneradas: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
+
+  /**
 
   /**
    * Calcula refinanciamiento con información de pagos desde BD
@@ -220,11 +256,24 @@ class RefinanciamientoService {
       }
 
       // ═══════════════════════════════════════════════════════════════════════════
-      // PASO 4: CALCULAR REFINANCIAMIENTO Y PROCESAR PAGOS Y SANCIONES
+      // PASO 4: OBTENER SANCIONES EXONERADAS DEL CRÉDITO
       // ═══════════════════════════════════════════════════════════════════════════
-      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 4: Calculando refinanciamiento, procesando pagos y sanciones`);
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 4: Obteniendo sanciones exoneradas del crédito ${creditoId}`);
       
-      const resultado = AmortizacionRefinanciamiento.calcularRefinanciamientoConPagos(infoCredito, pagos, sanciones);
+      const sancionesExoneradas = await this.obtenerSancionesExoneradas(creditoId);
+
+      if (sancionesExoneradas.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No hay sanciones exoneradas para crédito ${creditoId}`);
+      } else {
+        this.logger.info(`[REFINANCIAMIENTO-SVC] ✅ Se encontraron ${sancionesExoneradas.length} sanciones exoneradas`);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 5: CALCULAR REFINANCIAMIENTO Y PROCESAR PAGOS Y SANCIONES
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 5: Calculando refinanciamiento, procesando pagos y sanciones`);
+      
+      const resultado = AmortizacionRefinanciamiento.calcularRefinanciamientoConPagos(infoCredito, pagos, sanciones, sancionesExoneradas);
 
       if (resultado.exitoso) {
         this.logger.info(
