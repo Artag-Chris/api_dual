@@ -28,6 +28,9 @@ export interface RefinanciamientoParams {
   prestamoId: number | string;
   iva_aval?: number;
   fechaPrimerPago?: Date;
+  cta_aval?: number;
+  cta_iva_aval?: number;
+  diasPago?: number[];
 }
 
 export interface PagoRegistro {
@@ -67,6 +70,9 @@ export interface InfoCreditoData {
   credito_id: number;
   fecha_pago1?: number;
   fecha_pago2?: number;
+  cta_aval?: number;
+  cta_iva_aval?: number;
+  proxima_fecha_pago?: string | Date;
 }
 
 export interface InfoPagosProcessados {
@@ -169,9 +175,8 @@ export class AmortizacionRefinanciamiento {
       // Verificar si está dentro del rango
       if (fechaPrimeraOpcion >= rangoInicio && fechaPrimeraOpcion <= rangoFin) {
         // Usar el segundo día de pago en el próximo mes
-        const proximoMes = new Date(fechaBase);
-        proximoMes.setMonth(proximoMes.getMonth() + 1);
-        proximoMes.setDate(segundoDiaPago);
+        // IMPORTANTE: Usar constructor directo para evitar bug de setMonth()
+        const proximoMes = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, segundoDiaPago);
         return proximoMes;
       } else {
         // Si no está en el rango, usar el segundo día de pago en el mes actual
@@ -204,9 +209,8 @@ export class AmortizacionRefinanciamiento {
       // Verificar si está dentro del rango
       if (fechaPrimeraOpcion >= rangoInicio && fechaPrimeraOpcion <= rangoFin) {
         // Usar el mismo día de pago en el mes siguiente después del rango fin
-        const proximoMes = new Date(rangoFin);
-        proximoMes.setMonth(proximoMes.getMonth() + 1);
-        proximoMes.setDate(diaPago);
+        // IMPORTANTE: Usar constructor directo para evitar bug de setMonth() con enero 30/31
+        const proximoMes = new Date(rangoFin.getFullYear(), rangoFin.getMonth() + 1, diaPago);
         return proximoMes;
       } else {
         // Si no está en el rango, usar esa fecha
@@ -218,26 +222,64 @@ export class AmortizacionRefinanciamiento {
   /**
    * Calcula la siguiente fecha de pago
    */
+  /**
+   * Calcula la siguiente fecha de pago alternando entre diasPago[0] y diasPago[1]
+   * 
+   * Para la cuota 0: retorna fechaBase tal cual
+   * Para cuotas posteriores: alterna entre los días de pago
+   * 
+   * Excepción especial: Si la fecha cae en febrero con día 29 o 30, pasa al 1 de marzo
+   */
   private static calcularSiguienteFechaPago(
     fechaBase: Date,
     periocidad: 'mensual' | 'quincenal',
-    cuotaIndex: number
+    cuotaIndex: number,
+    diasPago: number[] = []
   ): Date {
-    const fecha = new Date(fechaBase);
-
-    if (periocidad === 'quincenal') {
-      const diasAPasar = cuotaIndex * 15;
-      fecha.setDate(fecha.getDate() + diasAPasar);
-    } else {
-      const diasAPasar = cuotaIndex * 30;
-      fecha.setDate(fecha.getDate() + diasAPasar);
+    // Primera cuota: retornar la fecha base tal cual
+    if (cuotaIndex === 0) {
+      return new Date(fechaBase);
     }
 
+    // Para quincenal: alternar entre diasPago[0] y diasPago[1]
+    if (periocidad === 'quincenal') {
+      // Obtener el día de la cuota anterior
+      const diaAnterior = fechaBase.getDate();
+      // Alternar al otro día
+      const diaSeleccionado = diaAnterior === diasPago[0] ? diasPago[1] : diasPago[0];
+      
+      // Crear fecha en el próximo mes con el día seleccionado
+      const proximaFecha = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, diaSeleccionado);
+      
+      return this.ajustarFechaFebrero(proximaFecha);
+    } else {
+      // Para mensual: usar siempre diasPago[0]
+      const diaSeleccionado = diasPago[0] || 1;
+      
+      // Crear fecha en el próximo mes con el día seleccionado
+      const proximaFecha = new Date(fechaBase.getFullYear(), fechaBase.getMonth() + 1, diaSeleccionado);
+      
+      return this.ajustarFechaFebrero(proximaFecha);
+    }
+  }
+
+  /**
+   * Ajusta la fecha si cae en febrero con día 29 o 30
+   * Cambia a 1 de marzo en esos casos
+   */
+  private static ajustarFechaFebrero(fecha: Date): Date {
+    if (fecha.getMonth() === 1) { // Febrero (mes 1)
+      if (fecha.getDate() >= 29) {
+        // Cambiar a 1 de marzo
+        return new Date(fecha.getFullYear(), 2, 1);
+      }
+    }
     return fecha;
   }
 
   /**
    * Valida que los registros de pagos tengan la estructura correcta
+   * Nota: Arrays vacíos son válidos (créditos sin pagos registrados aún)
    */
   private static validarEstructuraPagos(pagos: PagoRegistro[]): { valido: boolean; errores: string[] } {
     const errores: string[] = [];
@@ -247,9 +289,9 @@ export class AmortizacionRefinanciamiento {
       return { valido: false, errores };
     }
 
+    // Arrays vacíos son válidos → crédito sin pagos (recién creado)
     if (pagos.length === 0) {
-      errores.push('El array de pagos está vacío');
-      return { valido: false, errores };
+      return { valido: true, errores: [] };
     }
 
     // Validar cada registro
@@ -431,12 +473,30 @@ export class AmortizacionRefinanciamiento {
   /**
    * Procesa y valida los pagos, extrayendo información relevante
    * Agrupa por número de cuota e identifica cuotas pagadas vs parciales
+   * 
+   * Caso especial: Si no hay pagos (array vacío), retorna infoPagos con valores por defecto
+   * indicando que no hay cuotas pagadas y se generará amortización completa
    */
   public static procesarPagos(pagos: PagoRegistro[], valorCuota: number, sancionesExoneradas?: SancionRegistro[]): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
     // Validar estructura
     const validacion = this.validarEstructuraPagos(pagos);
     if (!validacion.valido) {
       return { valido: false, errores: validacion.errores };
+    }
+
+    // CASO ESPECIAL: Sin pagos registrados (crédito nuevo)
+    // Retornar infoPagos con valores por defecto: no hay cuotas pagadas
+    if (pagos.length === 0) {
+      const infoPagos: InfoPagosProcessados = {
+        cuotaMaximaPagada: 0,
+        tieneCuotaParciall: false,
+        montoPagadoCuotaParcial: 0,
+        montoDebe: 0,
+        sanciones_condonadas: 0,
+        dias_sanciones_condonadas: 0,
+        desglosePagos: {},
+      };
+      return { valido: true, errores: [], infoPagos };
     }
 
     // Asignar cuota numbers a pagos con num_cuota = NULL (agrupa múltiples pagos por cuota)
@@ -576,11 +636,17 @@ export class AmortizacionRefinanciamiento {
    * 
    * Cuota parcial: Resta el monto pagado de forma secuencial en orden: IVA → Aval → Interés → Capital
    * Los valores que no se tocan se mantienen igual a las cuotas restantes
+   * 
+   * Con proxima_fecha_pago: Asigna essa fecha a la primera cuota con saldo pendiente,
+   * luego genera fechas subsecuentes alternando entre fecha_pago1 y fecha_pago2
    */
   public static actualizarAmortizacionPorPagos(
     amortizacion: RefinanciamientoItem[],
     infoPagos: InfoPagosProcessados,
-    sancionPorCuota?: Map<number, number>
+    sancionPorCuota?: Map<number, number>,
+    proxima_fecha_pago?: string | Date,
+    diasPago?: number[],
+    periocidad?: 'mensual' | 'quincenal'
   ): RefinanciamientoItem[] {
     if (!amortizacion || amortizacion.length === 0) {
       return [];
@@ -681,6 +747,42 @@ export class AmortizacionRefinanciamiento {
     }
 
     // Paso 4: Recalcular saldos basados en capital pendiente
+    // Paso 5: Aplicar proxima_fecha_pago a la primera cuota con saldo pendiente y recalcular fechas subsecuentes
+    if (proxima_fecha_pago && diasPago && diasPago.length > 0 && periocidad) {
+      let primeraConSaldoEncontrada = false;
+      let fechaAnterior: Date | null = null;
+
+      for (let i = 0; i < amortizacionActualizada.length; i++) {
+        const cuota = amortizacionActualizada[i];
+
+        // Identificar primera cuota con capital pendiente (saldo)
+        if (!primeraConSaldoEncontrada && cuota.capital > 0) {
+          // Esta es la primera cuota con saldo → asignar proxima_fecha_pago
+          const fechaProxima = new Date(proxima_fecha_pago);
+          amortizacionActualizada[i] = {
+            ...cuota,
+            fechaPago: fechaProxima.toISOString().split('T')[0],
+          };
+          fechaAnterior = fechaProxima;
+          primeraConSaldoEncontrada = true;
+        } else if (primeraConSaldoEncontrada && cuota.capital > 0 && fechaAnterior) {
+          // Cuotas subsecuentes: generar fechas alternando entre diasPago[0] y diasPago[1]
+          const proximaFecha = this.calcularSiguienteFechaPago(
+            fechaAnterior,
+            periocidad,
+            i, // Índice usado para determinar cuál día usar (alternancia)
+            diasPago
+          );
+          amortizacionActualizada[i] = {
+            ...cuota,
+            fechaPago: proximaFecha.toISOString().split('T')[0],
+          };
+          fechaAnterior = proximaFecha;
+        }
+      }
+    }
+
+    // Paso 6: Recalcular saldos basados en capital pendiente
     let saldoAcumulado = 0;
     for (let i = 0; i < amortizacionActualizada.length; i++) {
       const cuota = amortizacionActualizada[i];
@@ -792,6 +894,9 @@ export class AmortizacionRefinanciamiento {
       prestamoId: infoCredito.credito_id,
       iva_aval: 19,
       fechaPrimerPago,
+      cta_aval: infoCredito.cta_aval || 0,
+      cta_iva_aval: infoCredito.cta_iva_aval || 0,
+      diasPago,
     };
   }
 
@@ -880,10 +985,14 @@ export class AmortizacionRefinanciamiento {
       }
 
       // Paso 7: Actualizar amortización con pagos realizados (y sanciones si existen)
+      // Pasar proxima_fecha_pago, diasPago y periocidad para aplicar fecha correcta a primera cuota pendiente
       const amortizacionActualizada = this.actualizarAmortizacionPorPagos(
         amortizacionOriginal,
         procesoPagos.infoPagos!,
-        sancionPorCuota
+        sancionPorCuota,
+        creditoNormalizado.proxima_fecha_pago,
+        params.diasPago,
+        creditoNormalizado.periodicidad === 'Mensual' || creditoNormalizado.periodicidad === 'mensual' ? 'mensual' : 'quincenal'
       );
       resultado.amortizacionActualizada = amortizacionActualizada;
 
@@ -916,6 +1025,9 @@ export class AmortizacionRefinanciamiento {
       prestamoId,
       iva_aval = 19,
       fechaPrimerPago = this.getFechaColombia(),
+      cta_aval = 0,
+      cta_iva_aval = 0,
+      diasPago = periocidad === 'quincenal' ? [5, 20] : [1],
     } = params;
 
     // Validaciones
@@ -939,46 +1051,38 @@ export class AmortizacionRefinanciamiento {
     const capitalPorCuota = Math.floor(capitalEnMora / numeroCuotas);
     const capitalUltimaCuota = capitalEnMora - capitalPorCuota * (numeroCuotas - 1);
 
-    // Calcular restante (excedente sobre el capital)
-    const restanteTotal = valorCuotaAcordada * numeroCuotas - capitalEnMora;
+    // Calcular excedente por cuota: excedente = valorCuota - capital/cuota
+    const excedentePorCuota = valorCuotaAcordada - capitalPorCuota;
 
-    // Distribuir el restante: 30% interés, 50% aval, 20% iva_aval
-    const interesPorcentaje = 0.30;
-    const avalPorcentaje = 0.50;
-    const ivaPorcentaje = 0.20;
-
-    const interesTotal = Math.floor(restanteTotal * interesPorcentaje);
-    const avalTotalBase = Math.floor(restanteTotal * avalPorcentaje);
-    const ivaTotal = Math.floor(restanteTotal * ivaPorcentaje);
-
-    // Distribuir equitativamente por cuota
-    const interesPorCuota = Math.floor(interesTotal / numeroCuotas);
-    const interesUltimaCuota = interesTotal - interesPorCuota * (numeroCuotas - 1);
-
-    const avalPorCuota = Math.floor(avalTotalBase / numeroCuotas);
-    const avalUltimaCuota = avalTotalBase - avalPorCuota * (numeroCuotas - 1);
-
-    const ivaPorCuota = Math.floor(ivaTotal / numeroCuotas);
-    const ivaUltimaCuota = ivaTotal - ivaPorCuota * (numeroCuotas - 1);
+    // Distribuir el excedente: restar cta_aval y cta_iva_aval, el resto es interés
+    const avalPorCuota = Math.floor(cta_aval);
+    const ivaPorCuota = Math.floor(cta_iva_aval);
+    const interesPorCuota = excedentePorCuota - avalPorCuota - ivaPorCuota;
 
     const amortizacion: RefinanciamientoItem[] = [];
     let saldoPendiente = capitalEnMora;
+    let fechaAnterior = fechaPrimerPago;
 
     for (let i = 0; i < numeroCuotas; i++) {
       const esUltimaCuota = i === numeroCuotas - 1;
 
-      // Capital, Interés, Aval e IVA para esta cuota
+      // Capital para esta cuota
       const capitalCuota = esUltimaCuota ? capitalUltimaCuota : capitalPorCuota;
-      const interesCuota = esUltimaCuota ? interesUltimaCuota : interesPorCuota;
-      const avalCuota = esUltimaCuota ? avalUltimaCuota : avalPorCuota;
-      const ivaCuota = esUltimaCuota ? ivaUltimaCuota : ivaPorCuota;
+      
+      // Aval e IVA son fijos (cta_aval y cta_iva_aval) para cada cuota
+      const avalCuota = avalPorCuota;
+      const ivaCuota = ivaPorCuota;
+      
+      // Interés es el excedente después de restar aval e iva (por cuota)
+      const interesCuota = interesPorCuota;
 
       // Actualizar saldo
       saldoPendiente -= capitalCuota;
       saldoPendiente = Math.max(0, saldoPendiente);
 
-      // Calcular fecha de pago
-      const fechaCuota = this.calcularSiguienteFechaPago(fechaPrimerPago, periocidad, i);
+      // Calcular fecha de pago (alterna entre fechas o mantiene la misma para mensual)
+      const fechaCuota = i === 0 ? fechaPrimerPago : this.calcularSiguienteFechaPago(fechaAnterior, periocidad, i, diasPago);
+      fechaAnterior = fechaCuota;
 
       amortizacion.push({
         prestamoId,

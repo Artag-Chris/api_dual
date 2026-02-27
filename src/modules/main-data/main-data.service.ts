@@ -5,6 +5,12 @@ import { ReferenceParser } from './reference-parser';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
+import { getTasabyPeriocidad } from '../../utils/functions/getTasabyPeriocidad';
+import { getIdbyFuzzy } from '../../utils/functions/getIdbyFuzzy';
+import { getDiaPago } from '../../utils/functions/getDiaPago';
+import { getDatacreditScore } from '../../utils/functions/getDatacreditScore';
+import { raw } from '@prisma/client/runtime/library';
+import { getEstadoValidoFromList } from '../../utils/functions/getDataCreditState';
 
 /**************************************************************************************************
  * Servicio para datos Main
@@ -26,6 +32,64 @@ class MainDataService {
       MainDataService.instance = new MainDataService();
     }
     return MainDataService.instance;
+  }
+
+  /**
+   * Calcula similitud entre dos strings para fuzzy matching
+   */
+  private calcularSimilitud(a: string, b: string): number {
+    const max = Math.max(a.length, b.length);
+    if (max === 0) return 1;
+    let diferencias = 0;
+    for (let i = 0; i < max; i++) {
+      if (a[i] !== b[i]) diferencias++;
+    }
+    return 1 - (diferencias / max);
+  }
+
+  /**
+   * Obtiene el estado válido más parecido con fuzzy matching (70%+)
+   */
+  private async getEstadoValidoFromList(estadoLegacy: string): Promise<string> {
+    try {
+      const estadosValidos = await prismaMainService.lista_estado_credito.findMany({
+        select: { tipo: true }
+      });
+
+      if (!estadosValidos || estadosValidos.length === 0) {
+        return 'EN ESTUDIO';
+      }
+
+      const estadoNormalizado = String(estadoLegacy || '').trim().toUpperCase();
+
+      // Match exacto
+      const matchExacto = estadosValidos.find(e => e.tipo.toUpperCase() === estadoNormalizado);
+      if (matchExacto) {
+        return matchExacto.tipo;
+      }
+
+      // Fuzzy match
+      let mejorMatch = estadosValidos[0].tipo;
+      let mejorSimilitud = 0;
+
+      for (const estado of estadosValidos) {
+        const similitud = this.calcularSimilitud(estadoNormalizado, estado.tipo.toUpperCase());
+        if (similitud > mejorSimilitud) {
+          mejorSimilitud = similitud;
+          mejorMatch = estado.tipo;
+        }
+      }
+
+      if (mejorSimilitud >= 0.7) {
+        this.logger.info(`[ESTADO] Fuzzy: "${estadoLegacy}" → "${mejorMatch}" (${(mejorSimilitud * 100).toFixed(0)}%)`);
+        return mejorMatch;
+      }
+
+      return 'EN ESTUDIO';
+    } catch (error) {
+      this.logger.warn(`[ESTADO] Error: ${error}. Using fallback.`);
+      return 'EN ESTUDIO';
+    }
   }
 
   /**
@@ -636,11 +700,8 @@ class MainDataService {
                 telefono: conyugeDto.telefono,
               },
             });
-            this.logger.info(`[MIGRATE] ✅ Cónyuge creado/actualizado para ${documento}`);
+       
           } catch (conyugeError) {
-            const errorMsg = conyugeError instanceof Error ? conyugeError.message : String(conyugeError);
-            this.logger.warn(`[MIGRATE] ⚠️ Error con cónyuge para ${documento}: ${errorMsg}. Continuando sin cónyuge.`);
-            // Continuar sin cónyuge - la transacción NO falla
             conyuge = null;
           }
         }
@@ -800,86 +861,15 @@ class MainDataService {
 
   // ==================== MIGRACIÓN DE CRÉDITOS - PHASE 2 ====================
 
-  /**
-   * QUERY 2 FALLBACK: Busca precreditos aprobados sin relación a creditos
-   * Se ejecuta cuando Query 1 (con INNER JOIN creditos) retorna 0 filas
-   * 
-   * Filtros:
-   * - aprobado = 'Si'
-   * - id NOT IN (SELECT creditos.precredito_id FROM creditos)
-   * 
-   * Retorna datos similares a Query 1 pero desde tabla precreditos
-   */
-  private async executeQuery2(documento: string): Promise<any[]> {
-    try {
-      this.logger.info(`[PHASE 2-Q2] Ejecutando Query 2 (precreditos fallback) para ${documento}`);
 
-      const precreditosData = await prismaLegacyService.$queryRaw<any[]>`
-        SELECT 
-          NULL AS credito_id_legacy,
-          clientes.num_doc AS documento,
-          precreditos.vlr_fin AS valor_prestamo,
-          precreditos.aprobado AS estado_aprobacion,
-          precreditos.cuota_inicial,
-          precreditos.s_inicial AS segunda_inicial,
-          precreditos.cuotas AS numero_cuotas_mensuales,
-          precreditos.periodo AS periodicidad,
-          precreditos.vlr_cuota,
-          amortizaciones.porc_interes AS tasa,
-          amortizaciones.porc_tea AS tasa_efectiva_anual,
-          precreditos.p_fecha AS fecha_pago_1,
-          precreditos.s_fecha AS fecha_pago_2,
-          'APROBADO' AS estado,
-          creator.name AS creador,
-          precreditos.created_at AS fecha_creacion,
-          amortizaciones.porc_aval AS seguro,
-          amortizaciones.porc_iva_aval AS iva_aval,
-          'NO' AS es_castigada,
-          NULL AS proxima_fecha_pago,
-          creator.name as actualizador,
-          precreditos.updated_at AS ultima_fecha_actualizacion,
-          carteras.id AS cartera_id,
-          carteras.nombre AS linea_credito,
-          codeudores.num_doc AS documento_codeudor,
-          codeudores.id AS id_codeudor,
-          estudios.cal_asesor,
-          estudios.cal_estudio,
-          est_datacreditos.puntaje AS puntaje_datacredito_fc
-        FROM clientes
-        LEFT JOIN codeudores ON clientes.codeudor_id = codeudores.id
-        INNER JOIN precreditos ON clientes.id = precreditos.cliente_id 
-        LEFT JOIN estudios ON clientes.id = estudios.cliente_id 
-        LEFT JOIN amortizaciones ON precreditos.id = amortizaciones.precredito_id
-        INNER JOIN users AS creator ON precreditos.user_create_id = creator.id
-        INNER JOIN carteras ON precreditos.cartera_id = carteras.id
-        LEFT JOIN est_datacreditos ON estudios.estDatacredito_id = est_datacreditos.id
-        LEFT JOIN creditos ON precreditos.id = creditos.precredito_id
-        WHERE clientes.num_doc = ${documento}
-        AND precreditos.aprobado = 'Si'
-        AND creditos.id IS NULL
-        ORDER BY precreditos.id DESC
-      `;
-
-      this.logger.info(`[PHASE 2-Q2] Query 2 retornó ${precreditosData.length} precreditos aprobados`);
-      return precreditosData;
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.warn(`[PHASE 2-Q2] Error ejecutando Query 2: ${errorMsg}`);
-      return [];
-    }
-  }
 
   /**
    * MIGRATION PHASE 2: Migra créditos de un cliente desde Legacy a Main
    * 
-   * Bifurcación DUO-QUERY:
-   * - Query 1 (INNER JOIN creditos): Créditos relacionados existentes
-   *   - Si 0 filas → Path B2 (Query 2 Fallback)
-   *   - Si N filas → Path B1 (Migrar desde creditos)
-   * - Query 2 (precreditos aprobados sin creditos): Precreditos alternativos
-   *   - Si 0 filas → Path A (Registrar documento_precredito)
-   *   - Si N filas → Path B2 (Migrar desde precreditos)
-   * - Path A (ambas queries = 0): Sin créditos → registrar en documento_precredito
+   * Bifurcación SINGLE-QUERY:
+   * - Query 1 (INNER JOIN creditos): Busca créditos relacionados existentes
+   *   - Si 0 filas → PATH A: Registrar en documento_precredito (sin créditos)
+   *   - Si N filas → PATH B: Procesar y migrar cada crédito
    * 
    * Resilencia: error en 1 crédito NO falla el documento completo
    */
@@ -889,60 +879,76 @@ class MainDataService {
     enqueuedAmortizaciones?: number,
     documentoRegistrado?: boolean,
     errores?: string[],
-    queryUsed?: "Q1" | "Q2"
+    queryUsed?: "Q1"
   }> {
     try {
-      this.logger.info(`[PHASE 2] Iniciando migrateCreditsPhase para documento ${documento}`);
-
       // ========================= QUERY 1: CREDITOS RELACIONADOS =========================
       // QUERY EXACTA: Obtener créditos del cliente desde Legacy (con INNER JOIN creditos)
       const creditosData = await prismaLegacyService.$queryRaw<any[]>`
-        SELECT 
-          creditos.id AS credito_id_legacy,
-          clientes.num_doc AS documento,
-          precreditos.vlr_fin AS valor_prestamo,
-          precreditos.aprobado AS estado_aprobacion,
-          precreditos.cuota_inicial,
-          precreditos.s_inicial AS segunda_inicial,
-          precreditos.cuotas AS numero_cuotas_mensuales,
-          precreditos.periodo AS periodicidad,
-          precreditos.vlr_cuota,
-          amortizaciones.porc_interes AS tasa,
-          amortizaciones.porc_tea AS tasa_efectiva_anual,
-          precreditos.p_fecha AS fecha_pago_1,
-          precreditos.s_fecha AS fecha_pago_2,
-          creditos.estado,
-          creator.name AS creador,
-          precreditos.created_at AS fecha_creacion,
-          amortizaciones.porc_aval AS seguro,
-          amortizaciones.porc_iva_aval AS iva_aval,
-          creditos.castigada AS es_castigada,
-          fc.fecha_pago AS proxima_fecha_pago,
-          updator.name as actualizador,
-          creditos.updated_at AS ultima_fecha_actualizacion,
-          carteras.id AS cartera_id,
-          carteras.nombre AS linea_credito,
-          codeudores.num_doc AS documento_codeudor,
-          codeudores.id AS id_codeudor,
-          estudios.cal_asesor,
-          estudios.cal_estudio,
-          est_datacreditos.puntaje AS puntaje_datacredito_fc
-        FROM clientes
-        LEFT JOIN codeudores ON clientes.codeudor_id = codeudores.id
-        INNER JOIN precreditos ON clientes.id = precreditos.cliente_id 
-        LEFT JOIN estudios ON clientes.id = estudios.cliente_id 
-        INNER JOIN creditos ON precreditos.id = creditos.precredito_id 
-        LEFT JOIN amortizaciones ON precreditos.id = amortizaciones.precredito_id
-        INNER JOIN users AS creator ON precreditos.user_create_id = creator.id
-        INNER JOIN users AS updator ON precreditos.user_create_id = updator.id
-        LEFT JOIN fecha_cobros fc ON creditos.id = fc.credito_id
-        INNER JOIN carteras ON precreditos.cartera_id = carteras.id
-        LEFT JOIN est_datacreditos ON estudios.estDatacredito_id = est_datacreditos.id
-        WHERE clientes.num_doc = ${documento}
-        ORDER BY precreditos.id DESC
+SELECT 
+    clientes.num_doc AS documento,
+    precreditos.vlr_fin AS valor_prestamo,
+    precreditos.aprobado AS estado_aprobacion,
+    precreditos.cuota_inicial,
+    precreditos.s_inicial AS segunda_inicial,
+    precreditos.meses AS plazo,
+    precreditos.cuotas AS numero_cuotas,
+    precreditos.periodo AS periodicidad,
+    precreditos.vlr_cuota,
+    amortizaciones.porc_interes AS tasa,
+    amortizaciones.porc_tea AS tasa_efectiva_anual,
+    precreditos.p_fecha AS fecha_pago_1,
+    precreditos.s_fecha AS fecha_pago_2,
+    fc.fecha_pago AS proxima_fecha_pago,
+    creditos.id AS credito_id_legacy,
+    creditos.estado,
+    creditos.cuotas_faltantes,
+    creator.name AS creador,
+    precreditos.created_at AS fecha_creacion,
+    precreditos.id AS precredito_id,
+    amortizaciones.porc_aval AS seguro,
+    amortizaciones.porc_iva_aval AS iva_aval,
+    amortizaciones.cta_capital,
+    amortizaciones.cta_aval,
+    amortizaciones.cta_iva_aval,
+    amortizaciones.total_cta_aval,
+    creditos.castigada AS es_castigada,
+    updator.name AS actualizador,
+    creditos.updated_at AS ultima_fecha_actualizacion,
+    carteras.id AS cartera_id,
+    carteras.nombre AS nombre_cartera,
+    carteras.nombre AS linea_credito,
+    codeudores.num_doc AS documento_codeudor,
+    codeudores.id AS id_codeudor,
+    estudios.cal_asesor,
+    estudios.cal_estudio,
+    estudios.created_at AS creacion_de_estudio,
+    estudios.estDatacredito_id,
+    est_datacreditos.puntaje AS puntaje_datacredito_fc
+FROM clientes
+LEFT JOIN codeudores 
+    ON clientes.codeudor_id = codeudores.id
+INNER JOIN precreditos
+    ON clientes.id = precreditos.cliente_id 
+LEFT JOIN estudios
+    ON clientes.id = estudios.cliente_id 
+INNER JOIN creditos
+    ON precreditos.id = creditos.precredito_id 
+LEFT JOIN amortizaciones
+    ON precreditos.id = amortizaciones.precredito_id
+INNER JOIN users AS creator
+    ON precreditos.user_create_id = creator.id
+INNER JOIN users AS updator
+    ON precreditos.user_create_id = updator.id
+LEFT JOIN fecha_cobros fc 
+    ON creditos.id = fc.credito_id
+INNER JOIN carteras 
+    ON precreditos.cartera_id = carteras.id
+LEFT JOIN est_datacreditos
+    ON estudios.estDatacredito_id = est_datacreditos.id
+WHERE clientes.num_doc = ${documento}
+ORDER BY precreditos.id DESC
       `;
-
-      this.logger.info(`[PHASE 2-Q1] Query 1 retornó ${creditosData.length} créditos`);
 
       // ========================= DUAL-QUERY LOGIC =========================
       let queryUsed: "Q1" | "Q2" = "Q1";
@@ -950,60 +956,39 @@ class MainDataService {
 
       // Si Query 1 retorna 0, intentar Query 2 (precreditos fallback)
       if (!creditosData || creditosData.length === 0) {
-        this.logger.info(`[PHASE 2] Query 1 = 0 filas, intentando Query 2 fallback...`);
-
-        const precreditosData = await this.executeQuery2(documento);
-
-        if (precreditosData && precreditosData.length > 0) {
-          this.logger.info(`[PHASE 2-Q2] ✅ Query 2 encontró ${precreditosData.length} precreditos aprobados`);
-          queryUsed = "Q2";
-          dataToProcess = precreditosData;
-        } else {
-          // ========================= PATH A: Sin créditos ni precreditos =========================
-          this.logger.info(`[PHASE 2] Path A: Ambas queries vacías → registrando en documento_precredito`);
-
-          try {
-            await prismaMainService.documento_precredito.create({
-              data: {
-                documento_cliente: documento,
-                estado: 'SIN_CREDITOS_RELACIONADOS'
-              }
-            });
-
-            this.logger.info(`[PHASE 2] Documento registrado sin créditos: ${documento}`);
-          } catch (error) {
-            this.logger.warn(`[PHASE 2] Error registrando en documento_precredito: ${error}`);
-          }
-
-          return {
-            status: "SIN_CREDITOS",
-            documentoRegistrado: true,
-            queryUsed: "Q1"
-          };
+        try {
+          this.logger.info(`[PHASE 2] Documento registrado sin créditos: ${documento}`);
+        } catch (error) {
+          await prismaMainService.documento_precredito.create({
+            data: {
+              documento_cliente: documento,
+              estado: 'SIN_CREDITOS_RELACIONADOS'
+            }
+          });
         }
+
+        return {
+          status: "SIN_CREDITOS",
+          documentoRegistrado: true,
+          queryUsed: "Q1"
+        };
       }
+
 
       // ========================= PATH B: Con créditos (Q1 o Q2) =========================
       const errores: string[] = [];
       let creditosMigrados = 0;
       let enqueuedAmortizaciones = 0;
 
-      this.logger.info(`[PHASE 2] 🔄 Iniciando procesamiento de ${dataToProcess.length} créditos (Query: ${queryUsed})`);
+      this.logger.info(`[Face credito] 🔄 Iniciando procesamiento de ${dataToProcess.length} créditos (Query: ${queryUsed})`);
 
       for (const row of dataToProcess) {
         try {
           // i. Mapear fila a detalle_credito DTO
           const creditoIndex = dataToProcess.indexOf(row) + 1;
-          this.logger.info(`[PHASE 2] 📌 Crédito ${creditoIndex}/${dataToProcess.length} para documento ${documento}`);
+          this.logger.info(`[Fase credito] 📌 Crédito ${creditoIndex}/${dataToProcess.length} para documento ${documento}`);
 
-          // Log para diagnosticar fechas
-          this.logger.info(
-            `[PHASE 2] 📅 Fechas recibidas: ` +
-            `fecha_pago_1=${typeof row.fecha_pago_1 === 'string' ? row.fecha_pago_1.substring(0, 30) : row.fecha_pago_1}, ` +
-            `fecha_creacion=${typeof row.fecha_creacion === 'string' ? row.fecha_creacion.substring(0, 30) : row.fecha_creacion}`
-          );
 
-          // ✅ AUXILIAR: Función de similitud reutilizable (fuzzy matching)
           const calcularSimilitud = (a: string, b: string): number => {
             const max = Math.max(a.length, b.length);
             let diferencias = 0;
@@ -1013,7 +998,6 @@ class MainDataService {
             return 1 - (diferencias / max);
           };
 
-          // ✅ MEJORADO: Mapeo robusto con fuzzy matching para estados de crédito
           const mapEstadoCredito = (estadoLegacy: string): string => {
             // 1. Normalizar entrada: trim + mayúsculas para comparación
             const estadoNormalizado = String(estadoLegacy || '').trim().toUpperCase();
@@ -1031,7 +1015,6 @@ class MainDataService {
             // 3. Intentar match exacto primero
             if (mapaExacto[estadoNormalizado]) {
               const estadoMapeado = mapaExacto[estadoNormalizado];
-              this.logger.info(`[PHASE 2] 📊 Estado mapeado: "${estadoLegacy}" → "${estadoMapeado}" (EXACTO)`);
               return estadoMapeado;
             }
 
@@ -1058,7 +1041,7 @@ class MainDataService {
             return 'EN ESTUDIO';
           };
 
-          // ✅ MEJORADO: Mapeo de periodicidad con normalización
+
           const mapPeriodicidad = (periodoLegacy: string): string => {
             const periodoNormalizado = String(periodoLegacy || '').trim().toUpperCase();
             const mapaPeriodicidad: { [key: string]: string } = {
@@ -1121,12 +1104,12 @@ class MainDataService {
             documento: row.documento,
             valor_prestamo: String(row.valor_prestamo),
             estado: mapEstadoCredito(row.estado || 'Activo'),
-            tasa: String(row.tasa || 0),
-            numero_cuotas: String(row.numero_cuotas_mensuales || row.cuotas || 12),
-            plazo: mapPeriodicidad(row.periodicidad),
+            tasa: getTasabyPeriocidad(String(row.tasa || 0), row.periodicidad),
+            numero_cuotas: String(row.numero_cuotas),
+            plazo: String(row.plazo), //meses
             valor_cuota: String(row.vlr_cuota),
-            tipoCredito: 'CREDITO EXPRESS',
-            origen: 'LEGACY_MIGRADO',  // ✅ VALORES VÁLIDOS: 'NUEVO' o 'REFINANCIADO' (FK constraint a lista_origen_credito)
+            tipoCredito: 'CREDITO MIGRADO',
+            origen: 'LEGACY_MIGRADO',
             creador: row.creador || 'SISTEMA_LEGACY',
             fecha_registro: row.fecha_creacion,
             fecha_actualizacion: row.ultima_fecha_actualizacion,
@@ -1135,13 +1118,14 @@ class MainDataService {
             pablok: 0,
             seguro_add: String(row.seguro_add || 0),
             castigo: row.es_castigada === 'Si' ? 'SI' : 'NO',
-            dia_pago: diaPago,
+            dia_pago: getDiaPago(row.fecha_pago_1, row.fecha_pago_2),
             fecha_Pago: this.parseFecha(row.fecha_pago_1),
             inicial: parseInt(row.cuota_inicial || 0),
-            periocidad: mapPeriodicidad(row.periodicidad)
+            periocidad: mapPeriodicidad(row.periodicidad),
+            id_estrategia: getIdbyFuzzy(row.nombre_cartera).estrategiaId,
+            id_cartera: getIdbyFuzzy(row.nombre_cartera).carteraId,
           };
 
-          // ii. Insertar en main.detalle_credito usando transacción
           // Usar credito_id_legacy como prestamo_ID para correlacionar con facturas en Phase 4
           const prestamoCreado = await prismaMainService.$transaction(async (tx) => {
             const creditoCreateData: any = {
@@ -1153,7 +1137,7 @@ class MainDataService {
               numero_cuotas: detalleCreditoData.numero_cuotas,
               valor_cuota: detalleCreditoData.valor_cuota,
               periocidad: detalleCreditoData.periocidad,
-              tasa: detalleCreditoData.tasa,
+              tasa: String(detalleCreditoData.tasa),
               dia_pago: detalleCreditoData.dia_pago,
               fecha_Pago: detalleCreditoData.fecha_Pago,
               estado: detalleCreditoData.estado,
@@ -1164,13 +1148,15 @@ class MainDataService {
               iva_aval: detalleCreditoData.iva_aval ? parseFloat(String(detalleCreditoData.iva_aval)) : 0,
               pablok: detalleCreditoData.pablok,
               seguro_add: detalleCreditoData.seguro_add ? parseFloat(String(detalleCreditoData.seguro_add)) : 0,
-              fecha_actualizacion: new Date()
+              fecha_actualizacion: new Date(),
+              id_estrategia: detalleCreditoData.id_estrategia,
+              id_cartera: detalleCreditoData.id_cartera
             };
 
             // Si tenemos credito_id_legacy de Query 1, usarlo como prestamo_ID para correlacionar con facturas
             if (row.credito_id_legacy && row.credito_id_legacy > 0) {
               creditoCreateData.prestamo_ID = Number(row.credito_id_legacy);
-              this.logger.info(`[PHASE 2] 🔗 Correlacionando con credito_id_legacy=${Number(row.credito_id_legacy)} para Phase 4`);
+              this.logger.info(`[Fase 2] 🔗 Correlacionando con credito_id_legacy=${Number(row.credito_id_legacy)} para Phase 4`);
             }
 
             // Parsear fecha_registro de forma segura - SIEMPRE debe ser Date válida
@@ -1184,7 +1170,7 @@ class MainDataService {
                 creditoCreateData.fecha_registro = new Date();
               }
             } catch (dateError) {
-              this.logger.warn(`[PHASE 2] ⚠️ Error parsing fecha_creacion, using current date`);
+              this.logger.warn(`[Fase 2] ⚠️ Error parsing fecha_creacion, using current date`);
               creditoCreateData.fecha_registro = new Date();
             }
 
@@ -1193,7 +1179,6 @@ class MainDataService {
               creditoCreateData.fecha_registro = new Date();
             }
 
-            // ✅ VALIDACIÓN FK: Verificar que el cliente existe en user_cliente
             const clienteExiste = await tx.user_cliente.findUnique({
               where: { documento: creditoCreateData.documento }
             });
@@ -1205,11 +1190,80 @@ class MainDataService {
               );
             }
 
-            this.logger.debug(`[PHASE 2] ✅ Cliente validado en BD: documento=${creditoCreateData.documento}`);
+            this.logger.debug(`[Fase 2] ✅ Cliente validado en BD: documento=${creditoCreateData.documento}`);
 
             const credito = await tx.detalle_credito.create({
               data: creditoCreateData
             });
+
+
+            if (creditosMigrados === 0) {
+              try {
+                const scoreValor = getDatacreditScore(row.puntaje_datacredito_fc || '0');
+                const estadoValor = await getEstadoValidoFromList(row.estado);
+
+                await tx.estudio_de_credito.upsert({
+                  where: { documento },
+                  update: {
+                    score: scoreValor,
+                    estado: estadoValor,
+                    observacion: `Actualizado. Asesor: ${row.cal_asesor || 'N/A'}`
+                  },
+                  create: {
+                    documento: documento,
+                    sect_financiero: '0',
+                    sect_real: '0',
+                    sect_coop: '0',
+                    sect_telco: '0',
+                    score: scoreValor,
+                    edad: '0',
+                    observacion: `Migrado. Asesor: ${row.cal_asesor || 'N/A'}, Cal: ${row.cal_estudio || 'N/A'}`,
+                    estado: estadoValor,
+                    creador: 1,
+                    fecha_registro: new Date(),
+                    fecha_actualizacion: new Date()
+                  }
+                });
+                try {
+                  let comentarioTexto = '';
+                  let tipoComentario = 'MIGRACION';
+
+                  // Condición 1: Si scoreValor es '0' → Sin experiencia crediticia
+                  if (scoreValor === '0') {
+                    comentarioTexto = `[MIGRACIÓN] Cliente sin experiencia crediticia. Score: ${scoreValor}. Requiere análisis especial.`;
+                    tipoComentario = 'SISTEMA';
+                  }
+                  // Condición 2: Si scoreValor es 'Reportado' → Cliente reportado
+                  else if (scoreValor === '1') {
+                    comentarioTexto = `[MIGRACIÓN] Cliente reportado en DataCrédito. Score: ${scoreValor}. Revisar historial antes de desembolso.`;
+                    tipoComentario = 'ALERTA';
+                  }
+
+                  // Crear comentario solo si hay texto
+                  if (comentarioTexto) {
+                    try {
+                      await tx.comentarios.create({
+                        data: {
+                          documento: documento,
+                          comentario: comentarioTexto,
+                          tipo: "ESTUDIO",
+                          fecha_registro: new Date()
+                        }
+                      });
+                    } catch (comentarioError) {
+                      const comentarioMsg = comentarioError instanceof Error ? comentarioError.message : String(comentarioError);
+                    }
+                  }
+                } catch (comentarioWrapError) {
+                  const wrapMsg = comentarioWrapError instanceof Error ? comentarioWrapError.message : String(comentarioWrapError);
+                  this.logger.warn(`[COMENTARIO] ⚠️ Error: ${wrapMsg}`);
+                }
+                this.logger.info(`[ESTUDIO] ✅ Creado para doc=${documento}, score=${scoreValor}, estado=${estadoValor}`);
+              } catch (estudioError) {
+                const msg = estudioError instanceof Error ? estudioError.message : String(estudioError);
+                this.logger.warn(`[ESTUDIO] ⚠️ Error: ${msg}. Continuando...`);
+              }
+            }
 
             return credito;
           });
@@ -1220,21 +1274,17 @@ class MainDataService {
           const queueService = QueueService.getInstance();
 
           // Log ANTES de enqueuear
-          this.logger.info(`[PHASE 2] 🔄 Enqueuando prestamo_ID=${prestamoCreado.prestamo_ID} a AMORTIZACIONES...`);
+          this.logger.info(`[Fase 2] 🔄 Enqueuando prestamo_ID=${prestamoCreado.prestamo_ID} a AMORTIZACIONES...`);
           await queueService.enqueue(String(prestamoCreado.prestamo_ID), 'AMORTIZACIONES');
-          this.logger.info(`[PHASE 2] ✅ Enqueuado a AMORTIZACIONES: prestamo_ID=${prestamoCreado.prestamo_ID}`);
-
-          this.logger.info(`[PHASE 2] 🔄 Enqueuando prestamo_ID=${prestamoCreado.prestamo_ID} a PAGOS...`);
           await queueService.enqueue(String(prestamoCreado.prestamo_ID), 'PAGOS');
-          this.logger.info(`[PHASE 2] ✅ Enqueuado a PAGOS: prestamo_ID=${prestamoCreado.prestamo_ID}`);
           enqueuedAmortizaciones++;
 
           const creditoIdInfo = row.credito_id_legacy ? `[credito_legacy=${row.credito_id_legacy}]` : '[auto-increment]';
-          this.logger.info(`[PHASE 2] ✅ Crédito migrado: prestamo_ID=${prestamoCreado.prestamo_ID} ${creditoIdInfo}, enqueuado a AMORTIZACIONES y PAGOS`);
+          this.logger.info(`[Fase 2] ✅ Crédito migrado: prestamo_ID=${prestamoCreado.prestamo_ID} ${creditoIdInfo}, enqueuado a AMORTIZACIONES y PAGOS`);
 
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`[PHASE 2] ❌ Error crédito: ${errorMsg}`);
+          this.logger.warn(`[Fase 2] ❌ Error crédito: ${errorMsg}`);
           errores.push(errorMsg);
           // Continuar con próximo crédito (NO fallar documento)
         }
@@ -1243,7 +1293,7 @@ class MainDataService {
       // Determinar resultado final
       if (creditosMigrados === 0) {
 
-        this.logger.info(`[PHASE 2] Todos los créditos fallaron, registrando documento_precredito`);
+        this.logger.info(`[Fase 2] Todos los créditos fallaron, registrando documento_precredito`);
 
         try {
           await prismaMainService.documento_precredito.create({
@@ -1253,7 +1303,7 @@ class MainDataService {
             }
           });
         } catch (error) {
-          this.logger.warn(`[PHASE 2] Error registrando documento en estado ERROR: ${error}`);
+          this.logger.warn(`[Fase 2] Error registrando documento en estado ERROR: ${error}`);
         }
 
         return {
@@ -1275,7 +1325,7 @@ class MainDataService {
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`[PHASE 2] Error fatal en migrateCreditsPhase: ${errorMsg}`);
+      this.logger.error(`[Fase 2] Error fatal en migrateCreditsPhase: ${errorMsg}`);
       throw error;
     }
   }

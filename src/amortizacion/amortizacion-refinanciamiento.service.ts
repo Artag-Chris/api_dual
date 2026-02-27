@@ -18,7 +18,6 @@ class RefinanciamientoService {
     }
     return RefinanciamientoService.instance;
   }
-
   /**
    * Obtiene la información del crédito desde la BD
    * Ejecuta la consulta para obtener datos del cliente y crédito
@@ -37,7 +36,10 @@ class RefinanciamientoService {
           precreditos.created_at AS fecha_creacion,
           precreditos.p_fecha AS fecha_pago1,
           precreditos.s_fecha AS fecha_pago2,
-          creditos.cuotas_faltantes,
+          fc.fecha_pago AS proxima_fecha_pago,
+			    amortizaciones.cta_aval,
+		      amortizaciones.cta_iva_aval,
+    	    creditos.cuotas_faltantes,
           creditos.id AS credito_id
         FROM clientes
         LEFT JOIN codeudores 

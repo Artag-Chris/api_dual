@@ -23,7 +23,7 @@ model amortizacion {
   total_cuota     Int?            @default(0)
   saldo           String?         @default("0") @dbMain.VarChar(50)
   fecha_pago      String          @dbMain.VarChar(50)
-  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onUpdate: Restrict, map: "amortizacion_ibfk_1")
+  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "amortizacion_ibfk_1")
 
   @@index([prestamoID], map: "amortizacion_ibfk_1")
 }
@@ -149,11 +149,11 @@ model comentarios {
   documento        String           @dbMain.VarChar(50)
   comentario       String           @dbMain.Text
   tipo             String           @dbMain.VarChar(50)
-  creador          String           @dbMain.VarChar(120)
+  creador          String?          @dbMain.VarChar(120)
   fecha_registro   DateTime         @default(now()) @dbMain.Timestamp(0)
   user_cliente     user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, map: "comentarios_ibfk_1")
   lista_comentario lista_comentario @relation(fields: [tipo], references: [tipo], onUpdate: Restrict, map: "fk_tipo_comentario")
-  user_admin       user_admin       @relation(fields: [creador], references: [nombre_completo], map: "id_nombre_creador")
+  user_admin       user_admin?      @relation(fields: [creador], references: [nombre_completo], onDelete: Restrict, map: "id_nombre_creador")
 
   @@index([documento], map: "comentarios_ibfk_1")
   @@index([tipo], map: "id_lista_coentarios")
@@ -194,6 +194,7 @@ model conyuge {
   documento         String           @unique(map: "documento") @dbMain.VarChar(50)
   telefono          String           @dbMain.VarChar(20)
   fecha_registro    DateTime         @default(now()) @dbMain.DateTime(0)
+  user_cliente      user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_cliente")
   lista_documentos  lista_documentos @relation(fields: [tipo_documento], references: [tipo], map: "id_lista_documento")
 
   @@index([documento], map: "documento_2")
@@ -470,7 +471,7 @@ model gestion_cartera {
   dias            String          @dbMain.VarChar(50)
   valor           String          @dbMain.VarChar(50)
   valor_mora      String          @dbMain.VarChar(50)
-  detalle_credito detalle_credito @relation(fields: [prestamo_ID], references: [prestamo_ID], onUpdate: Restrict, map: "prestamoID_bfk")
+  detalle_credito detalle_credito @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "prestamoID_bfk")
 }
 
 model historial_pagos {
@@ -496,7 +497,7 @@ model historial_pagos {
   creador         String?         @default("") @dbMain.VarChar(50)
   fecha_registro  DateTime        @default(now()) @dbMain.Timestamp(0)
   bolsas          bolsas?         @relation(fields: [bolsa], references: [nombre], onDelete: Restrict, onUpdate: Restrict, map: "bolsa_fk")
-  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_bfk")
+  detalle_credito detalle_credito @relation(fields: [prestamoID], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "prestamo_bfk")
 
   @@index([prestamoID], map: "historial_pagos_ibfk_1")
   @@index([agente_creador], map: "historial_pagos_ibfk_2")
@@ -1223,11 +1224,11 @@ model sanciones_condonadas {
   prestamo_id      Int
   dia_condonado    Int
   monto_condonado  Int
-  usuario_autoriza Int
+  usuario_autoriza Int?
   actualizado      DateTime        @default(now()) @dbMain.Timestamp(0)
   fecha_registro   DateTime        @default(now()) @dbMain.Timestamp(0)
-  detalle_credito  detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onUpdate: Restrict, map: "prestamo_ibfk_")
-  user_admin       user_admin      @relation(fields: [usuario_autoriza], references: [id], onUpdate: Restrict, map: "user_Admin_ibfk")
+  detalle_credito  detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "prestamo_ibfk_")
+  user_admin       user_admin?     @relation(fields: [usuario_autoriza], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "user_Admin_ibfk")
 
   @@index([prestamo_id], map: "prestamo_ibfk_")
   @@index([usuario_autoriza], map: "user_Admin_ibfk")
@@ -1330,6 +1331,7 @@ model user_cliente {
   nombre_completo           String                        @dbMain.VarChar(100)
   estado_registro           user_cliente_estado_registro? @default(incompleto)
   comentarios               comentarios[]
+  conyuge                   conyuge?
   detalle_credito           detalle_credito[]
   documentos_estudio        documentos_estudio[]
   documentos_registro       documentos_registro[]
@@ -1372,9 +1374,9 @@ model estrategia_credito {
 }
 
 model documento_precredito {
-  id                   Int               @id @default(autoincrement())
-  documento_cliente    String            @dbMain.VarChar(50)
-  estado               String            @dbMain.VarChar(50)
+  id                Int    @id @default(autoincrement())
+  documento_cliente String @dbMain.VarChar(50)
+  estado            String @dbMain.VarChar(50)
 }
 
 /// Cola FIFO para procesar migraciones por fases
@@ -1382,37 +1384,32 @@ model documento_precredito {
 /// - Estado: PENDIENTE, PROCESANDO, COMPLETADO, ERROR
 /// - FIFO garantizado por: orderBy createdAt ASC
 model migration_queue {
-  id        Int     @id @default(autoincrement())
-  documento String  @dbMain.VarChar(50)
-  // Fase de migración: CLIENTES, CREDITOS, PAGOS, AMORTIZACIONES, BODEGA
-  fase      String  @dbMain.VarChar(50)
-  // Estado del procesamiento
-  estado    String  @dbMain.VarChar(50)     // PENDIENTE, PROCESANDO, COMPLETADO, ERROR
-  // Control de reintentos
-  intentos  Int     @default(0)         // Cuántos intentos ha tenido (máximo 3)
-  // Información de error (si aplica)
-  error     String? @dbMain.LongText        // Mensaje de error completo
-  // Timestamps
-  createdAt DateTime @default(now())    // Cuándo se enqueó
-  updatedAt DateTime @updatedAt
-  processedAt DateTime?                 // Cuándo se completó
-  // Índices para queries rápidas
-  @@index([documento])                  // Buscar por cliente
-  @@index([fase])                       // Buscar por fase
-  @@index([estado])                     // Buscar por estado (PENDIENTE, etc)
-  @@index([createdAt])                  // FIFO: obtener más antiguos primero
+  id          Int       @id @default(autoincrement())
+  documento   String    @dbMain.VarChar(50)
+  fase        String    @dbMain.VarChar(50)
+  estado      String    @dbMain.VarChar(50)
+  intentos    Int       @default(0)
+  error       String?   @dbMain.LongText
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  processedAt DateTime?
+
+  @@index([documento])
+  @@index([fase])
+  @@index([estado])
+  @@index([createdAt])
 }
 
 /// Dead Letter Queue - para items que no se pudieron procesar
 /// - Items que agotaron reintentos (3 intentos fallidos)
 /// - Requiere intervención manual
 model migration_queue_dlq {
-  id        Int     @id @default(autoincrement())
-  documento String  @dbMain.VarChar(50)
-  fase      String  @dbMain.VarChar(50)
-  // Error completo que causó que llegara aquí
-  error     String  @dbMain.LongText
+  id        Int      @id @default(autoincrement())
+  documento String   @dbMain.VarChar(50)
+  fase      String   @dbMain.VarChar(50)
+  error     String   @dbMain.LongText
   createdAt DateTime @default(now())
+
   @@index([documento])
   @@index([createdAt])
 }

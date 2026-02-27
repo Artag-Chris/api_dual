@@ -13,6 +13,7 @@ import { envs } from '../../config/envs';
 
 class PrismaLegacyService extends PrismaClientLegacy {
   private static instance: PrismaLegacyService;
+    static $queryRaw: any;
 
   constructor() {
     super({
