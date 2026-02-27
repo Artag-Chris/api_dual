@@ -739,125 +739,7 @@ class MainDataService {
     }
   }
 
-  // ==================== AMORTIZACIONES CON ESTADO ====================
 
-  /**
-   * Get amortizaciones with estado derived from historial_pagos
-   * Matches cuotas by number + date proximity (±7 days) to determine if PAGADA or PENDIENTE
-   */
-  async getAmortizacionesConEstado(prestamoID: number) {
-    try {
-      // 1. Get all amortizaciones
-      const amortizaciones = await prismaMainService.amortizacion.findMany({
-        where: { prestamoID },
-        orderBy: { Numero_cuota: 'asc' }
-      });
-
-      // 2. Get all payment history records
-      const pagasHistoricas = await prismaMainService.historial_pagos.findMany({
-        where: { prestamoID },
-        select: {
-          Numero_cuota: true,
-          total_pagado: true,
-          fecha_registro: true,
-          recibo: true
-        }
-      });
-
-      // 3. Enrich each cuota with estado derived from payment history
-      const cuotasEnriquecidas = amortizaciones.map(cuota => {
-        const cuotaFecha = new Date(cuota.fecha_pago);
-        const fechaMin = new Date(cuotaFecha);
-        fechaMin.setDate(fechaMin.getDate() - 7);  // 7 days before
-        const fechaMax = new Date(cuotaFecha);
-        fechaMax.setDate(fechaMax.getDate() + 7);  // 7 days after
-
-        // Search for payment with matching cuota number AND within date range
-        const pagoEncontrado = pagasHistoricas.find(pago => {
-          const pagoFecha = new Date(pago.fecha_registro);
-          const esNumeroCuotaIgual = pago.Numero_cuota === parseInt(cuota.Numero_cuota);
-          const estaDentroRango = pagoFecha >= fechaMin && pagoFecha <= fechaMax;
-          return esNumeroCuotaIgual && estaDentroRango;
-        });
-
-        return {
-          ...cuota,
-          estado_pago: pagoEncontrado ? 'PAGADA' : 'PENDIENTE',
-          pago_info: pagoEncontrado ? {
-            total_pagado: pagoEncontrado.total_pagado,
-            fecha_pago: pagoEncontrado.fecha_registro,
-            recibo: pagoEncontrado.recibo
-          } : null
-        };
-      });
-
-      return cuotasEnriquecidas;
-    } catch (error) {
-      this.logger.warn(`Error getting amortizaciones with estado: ${error}`);
-      throw error;
-    }
-  }
-
-  /**
-   * BULK MIGRATION: Process multiple documents from Excel file
-   * Secuentially migrates each documento by calling migrateClienteFromLegacy()
-   * Returns report with successful and failed migrations
-   */
-  async procesarBulkMigracionExcel(
-    documentos: string[]
-  ): Promise<{ exitosos: number; errores: number; totalProcesados: number; detalles: any[] }> {
-    const detalles: any[] = [];
-    let exitosos = 0;
-    let errores = 0;
-
-    this.logger.info(`[BULK] Iniciando migración masiva de ${documentos.length} documentos`);
-
-    for (let i = 0; i < documentos.length; i++) {
-      const documento = documentos[i];
-
-      try {
-        this.logger.info(`[BULK] Procesando documento ${i + 1}/${documentos.length}: ${documento}`);
-
-        // Call existing migration method for each document
-        const resultado = await this.migrateClienteFromLegacy(documento);
-
-        exitosos++;
-        detalles.push({
-          documento,
-          prestamo_ID: resultado.prestamo_ID || '-',
-          usuario: resultado.usuario || '-',
-          cuotas: resultado.cuotas_totales || '-',
-          estado: 'EXITOSO',
-          timestamp: new Date().toISOString()
-        });
-
-        this.logger.info(`[BULK] ✅ Migración exitosa para documento ${documento}`);
-      } catch (error) {
-        errores++;
-        detalles.push({
-          documento,
-          estado: 'ERROR',
-          error: error instanceof Error ? error.message : String(error),
-          timestamp: new Date().toISOString()
-        });
-
-        this.logger.error(`[BULK] ❌ Error migrando documento ${documento}: ${error}`);
-      }
-    }
-
-    const resumen = {
-      exitosos,
-      errores,
-      totalProcesados: documentos.length,
-      detalles
-    };
-
-    this.logger.info(
-      `[BULK] Migración masiva completada: ${exitosos} exitosos, ${errores} errores de ${documentos.length} documentos`
-    );
-
-    return resumen;
-  }
 
   // ==================== MIGRACIÓN DE CRÉDITOS - PHASE 2 ====================
 
@@ -1190,8 +1072,6 @@ ORDER BY precreditos.id DESC
               );
             }
 
-            this.logger.debug(`[Fase 2] ✅ Cliente validado en BD: documento=${creditoCreateData.documento}`);
-
             const credito = await tx.detalle_credito.create({
               data: creditoCreateData
             });
@@ -1216,7 +1096,6 @@ ORDER BY precreditos.id DESC
                     sect_coop: '0',
                     sect_telco: '0',
                     score: scoreValor,
-                    edad: '0',
                     observacion: `Migrado. Asesor: ${row.cal_asesor || 'N/A'}, Cal: ${row.cal_estudio || 'N/A'}`,
                     estado: estadoValor,
                     creador: 1,
@@ -1270,23 +1149,30 @@ ORDER BY precreditos.id DESC
 
           creditosMigrados++;
 
-          // iii. Enqueuear automático a AMORTIZACIONES (pasando prestamo_ID)
-          const queueService = QueueService.getInstance();
-
-          // Log ANTES de enqueuear
-          this.logger.info(`[Fase 2] 🔄 Enqueuando prestamo_ID=${prestamoCreado.prestamo_ID} a AMORTIZACIONES...`);
-          await queueService.enqueue(String(prestamoCreado.prestamo_ID), 'AMORTIZACIONES');
-          await queueService.enqueue(String(prestamoCreado.prestamo_ID), 'PAGOS');
-          enqueuedAmortizaciones++;
-
           const creditoIdInfo = row.credito_id_legacy ? `[credito_legacy=${row.credito_id_legacy}]` : '[auto-increment]';
-          this.logger.info(`[Fase 2] ✅ Crédito migrado: prestamo_ID=${prestamoCreado.prestamo_ID} ${creditoIdInfo}, enqueuado a AMORTIZACIONES y PAGOS`);
+          this.logger.info(`[Fase 2] ✅ Crédito migrado: prestamo_ID=${prestamoCreado.prestamo_ID} ${creditoIdInfo}`);
 
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : String(error);
           this.logger.warn(`[Fase 2] ❌ Error crédito: ${errorMsg}`);
           errores.push(errorMsg);
           // Continuar con próximo crédito (NO fallar documento)
+        }
+      }
+
+      // iii. DESPUÉS del loop: Enqueuear UNA VEZ el documento a AMORTIZACIONES y PAGOS
+      if (creditosMigrados > 0) {
+        try {
+          const queueService = QueueService.getInstance();
+          this.logger.info(`[Fase 2] 🔄 Enqueuando documento=${documento} a AMORTIZACIONES_TODO y PAGOS_TODO (${creditosMigrados} crédito(s) procesado(s))...`);
+          await queueService.enqueue(documento, 'AMORTIZACIONES_TODO');
+          await queueService.enqueue(documento, 'PAGOS_TODO');
+          enqueuedAmortizaciones = 1; // Marcamos como enqueuado una vez
+          this.logger.info(`[Fase 2] ✅ Documento enqueuado a Phase 3B y Phase 4`);
+        } catch (queueError) {
+          const qErrorMsg = queueError instanceof Error ? queueError.message : String(queueError);
+          this.logger.warn(`[Fase 2] ⚠️ Error al enqueuear documento=${documento}: ${qErrorMsg}`);
+          errores.push(`Enqueueing error: ${qErrorMsg}`);
         }
       }
 
@@ -1314,12 +1200,12 @@ ORDER BY precreditos.id DESC
         };
       }
 
-      this.logger.info(`[PHASE 2] Completado: ${creditosMigrados} créditos migrados, ${enqueuedAmortizaciones} enqueuados (Query: ${queryUsed})`);
+      this.logger.info(`[PHASE 2] ✅ Completado: ${creditosMigrados} créditos migrados, documento=${documento} enqueuado a Phase 3B y Phase 4 (Query: ${queryUsed})`);
 
       return {
         status: "CREDITOS_MIGRADOS",
         creditosMigrados,
-        enqueuedAmortizaciones,
+        enqueuedAmortizaciones: 1,
         queryUsed
       };
 
@@ -1459,188 +1345,135 @@ ORDER BY precreditos.id DESC
   // ═══════════════════════════════════════════════════════════════════════════
 
   /**
-   * PHASE 3B: Calcula y crea amortizaciones + sanciones en main
+   * PHASE 3B: Calcula y crea amortizaciones para TODOS los créditos de un cliente
    * 
    * Flujo:
-   * 1. Buscar crédito by prestamo_ID en main.detalle_credito
-   * 2. Llamar a RefinanciamientoService.calcularRefinanciamientoConPagos(prestamo_ID)
-   * 3. Mapear amortizacionActualizada[] a schema de main.amortizacion
-   * 4. Insertar amortizaciones en bulk en transacción
-   * 5. FASE SANCIONES: Buscar sanciones del crédito en legacy
-   * 6. Sumar sanciones con estado 'Debe'
-   * 7. Actualizar main.amortizacion.sancion con el monto total distribuido
-   * 8. Retornar status + cantidades
+   * 1. Buscar ALL créditos del cliente (by documento) en main.detalle_credito
+   * 2. Para cada crédito:
+   *    - Llamar a RefinanciamientoService.calcularRefinanciamientoConPagos(prestamo_ID)
+   *    - Mapear amortizacionActualizada[] a schema de main.amortizacion
+   *    - Insertar amortizaciones en bulk en transacción
+   * 3. Retornar status + cantidades agregadas
    * 
-   * @param prestamo_ID - ID del crédito en main.detalle_credito
+   * @param documento - Documento del cliente (busca todos sus créditos)
    * @returns Promise<AmortizacionesMigrationResult>
    */
-  async migrateAmortizacionesPhase(prestamo_ID: number): Promise<{
-    status: "AMORTIZACIONES_Y_SANCIONES_CREADAS" | "CREDITO_NO_ENCONTRADO" | "ERROR";
+  async migrateAmortizacionesPhase(documento: string): Promise<{
+    status: "AMORTIZACIONES_Y_SANCIONES_CREADAS" | "SIN_CREDITOS" | "TODOS_FALLIDOS" | "ERROR";
+    creditosProcesados?: number;
     amortizacionesCreadas?: number;
-    sancionesAgregadas?: number;
-    totalSanciones?: number;
+    totalAmortizaciones?: number;
     errores?: string[];
   }> {
     try {
-      this.logger.info(`[Fase Amortizacion] Iniciando migrateAmortizacionesPhase para prestamo_ID=${prestamo_ID}`);
+      this.logger.info(`[PHASE 3B] Iniciando migrateAmortizacionesPhase para documento=${documento}`);
 
-      // 1. Validar que el crédito existe en main
-      const credito = await prismaMainService.detalle_credito.findUnique({
-        where: { prestamo_ID }
+      // 1. Buscar TODOS los créditos del cliente en main
+      const creditosMain = await prismaMainService.detalle_credito.findMany({
+        where: { documento }
       });
 
-      if (!credito) {
-        this.logger.warn(`[Fase Amortizacion] ❌ Crédito no encontrado: prestamo_ID=${prestamo_ID}`);
+      if (!creditosMain || creditosMain.length === 0) {
+        this.logger.info(`[PHASE 3B] ℹ️ Sin créditos encontrados para documento=${documento}`);
         return {
-          status: "CREDITO_NO_ENCONTRADO",
-          errores: [`Crédito con prestamo_ID=${prestamo_ID} no existe en main.detalle_credito`]
-        };
-      }
-
-      // 2. Llamar a RefinanciamientoService para obtener amortizaciones
-      const refinanciamientoService = RefinanciamientoService.getInstance();
-      const resultado = await refinanciamientoService.calcularRefinanciamientoConPagos(prestamo_ID);
-
-      if (!resultado.exitoso) {
-        this.logger.error(`[Fase Amortizacion] ❌ RefinanciamientoService falló: ${resultado.mensaje}`);
-        return {
-          status: "ERROR",
-          errores: [resultado.mensaje, ...(resultado.errores || [])]
-        };
-      }
-
-      if (!resultado.amortizacionActualizada || resultado.amortizacionActualizada.length === 0) {
-        this.logger.warn(`[Fase Amortizacion] ⚠️ Sin amortizaciones calculadas para prestamo_ID=${prestamo_ID}`);
-        return {
-          status: "AMORTIZACIONES_Y_SANCIONES_CREADAS",
+          status: "SIN_CREDITOS",
+          creditosProcesados: 0,
           amortizacionesCreadas: 0,
-          sancionesAgregadas: 0,
-          totalSanciones: 0
+          totalAmortizaciones: 0
         };
       }
 
-      // 3. Mapear amortizacionActualizada[] a schema main.amortizacion
-      // ✅ RefinanciamientoService es responsable de incluir TODAS las cuotas (pagadas + futuras)
-      const amortizacionesToCreate = resultado.amortizacionActualizada.map(cuota => ({
-        prestamoID: prestamo_ID,
-        documento: credito.documento,
-        Numero_cuota: String(cuota.numeroCuota),
-        capital: parseInt(String(cuota.capital)) || 0,
-        interes: parseInt(String(cuota.interes)) || 0,
-        aval: parseInt(String(cuota.aval)) || 0,
-        IVA: parseInt(String(cuota.iva)) || 0,
-        pablok: 0,
-        seguro: parseInt(String(credito.seguro)) || 0,
-        sancion: 0,
-        total_cuota: parseInt(String(cuota.cuotaTotal)) || 0,
-        saldo: String(cuota.saldo || '0'),
-        fecha_pago: cuota.fechaPago || new Date().toISOString().split('T')[0]
-      }));
+      this.logger.info(`[PHASE 3B] 📋 ${creditosMain.length} crédito(s) encontrado(s) para documento=${documento}`);
 
-      const numPagadas = amortizacionesToCreate.filter(a => a.capital === 0 && a.saldo === '0').length;
-      const numFuturas = amortizacionesToCreate.length - numPagadas;
+      const errores: string[] = [];
+      let creditosProcesados = 0;
+      let totalAmortizacionesCreadas = 0;
 
-      const createdAmortizaciones = await prismaMainService.$transaction(async (tx) => {
-        return await tx.amortizacion.createMany({
-          data: amortizacionesToCreate,
-          skipDuplicates: false
-        });
-      });
+      // 2. Procesar cada crédito
+      for (const credito of creditosMain) {
+        try {
+          this.logger.info(`[PHASE 3B] 🔄 Procesando crédito ${creditosProcesados + 1}/${creditosMain.length}: prestamo_ID=${credito.prestamo_ID}`);
 
-      this.logger.info(`[Face Amortizacion] ✅ ${createdAmortizaciones.count} amortizaciones creadas para prestamo_ID=${prestamo_ID} (${numPagadas} pagadas + ${numFuturas} futuras)`);
+          // 2a. Llamar a RefinanciamientoService para obtener amortizaciones
+          const refinanciamientoService = RefinanciamientoService.getInstance();
+          const resultado = await refinanciamientoService.calcularRefinanciamientoConPagos(credito.prestamo_ID);
 
-      // ═══════════════════════════════════════════════════════════════════════════
-      //TODO: FASE SANCIONES: Buscar y migrar sanciones de legacy
-      // ═══════════════════════════════════════════════════════════════════════════
+          if (!resultado.exitoso) {
+            const msg = `RefinanciamientoService falló para prestamo_ID=${credito.prestamo_ID}: ${resultado.mensaje}`;
+            this.logger.warn(`[PHASE 3B] ⚠️ ${msg}`);
+            errores.push(msg);
+            continue; // Pasar al siguiente crédito
+          }
 
-      // let totalSanciones = 0;
-      // let sancionesAgregadas = 0;
+          if (!resultado.amortizacionActualizada || resultado.amortizacionActualizada.length === 0) {
+            this.logger.warn(`[PHASE 3B] ⚠️ Sin amortizaciones calculadas para prestamo_ID=${credito.prestamo_ID}`);
+            continue; // Pasar al siguiente crédito
+          }
 
-      // try {
-      //   this.logger.info(`[PHASE 3B - SANCIONES] Buscando sanciones para documento=${credito.documento}`);
+          // 2b. Mapear amortizaciones
+          const amortizacionesToCreate = resultado.amortizacionActualizada.map(cuota => ({
+            prestamoID: credito.prestamo_ID,
+            documento: documento,
+            Numero_cuota: String(cuota.numeroCuota),
+            capital: parseInt(String(cuota.capital)) || 0,
+            interes: parseInt(String(cuota.interes)) || 0,
+            aval: parseInt(String(cuota.aval)) || 0,
+            IVA: parseInt(String(cuota.iva)) || 0,
+            pablok: 0,
+            seguro: 0,
+            sancion: 0,
+            total_cuota: parseInt(String(cuota.cuotaTotal)) || 0,
+            saldo: String(cuota.saldo || '0'),
+            fecha_pago: cuota.fechaPago || new Date().toISOString().split('T')[0]
+          }));
 
-      //   // 5a. Buscar cliente en legacy por documento
-      //   const clienteLegacy = await prismaLegacyService.clientes.findFirst({
-      //     where: { num_doc: credito.documento }
-      //   });
+          // 2c. Insertar amortizaciones en transacción
+          const createdAmortizaciones = await prismaMainService.$transaction(async (tx) => {
+            return await tx.amortizacion.createMany({
+              data: amortizacionesToCreate,
+              skipDuplicates: false
+            });
+          });
 
-      //   if (!clienteLegacy) {
-      //     this.logger.warn(`[PHASE 3B - SANCIONES] ⚠️ Cliente no encontrado en legacy: documento=${credito.documento}`);
-      //   } else {
-      //     this.logger.info(`[PHASE 3B - SANCIONES] Cliente encontrado en legacy: cliente_id=${clienteLegacy.id}`);
+          this.logger.info(`[PHASE 3B] ✅ ${createdAmortizaciones.count} amortizaciones creadas para prestamo_ID=${credito.prestamo_ID}`);
+          totalAmortizacionesCreadas += createdAmortizaciones.count;
+          creditosProcesados++;
 
-      //     // 5b. Buscar créditos del cliente en legacy usando raw SQL para ignorar enums vacíos
-      //     const creditosLegacy = await prismaLegacyService.$queryRaw<any[]>`
-      //       SELECT id FROM creditos 
-      //       WHERE precredito_id IN (
-      //         SELECT id FROM precreditos WHERE cliente_id = ${clienteLegacy.id}
-      //       )
-      //     `;
+        } catch (creditoError) {
+          const errorMsg = creditoError instanceof Error ? creditoError.message : String(creditoError);
+          this.logger.warn(`[PHASE 3B] ❌ Error procesando crédito prestamo_ID=${credito.prestamo_ID}: ${errorMsg}`);
+          errores.push(errorMsg);
+          // Continuar con próximo crédito (NO fallar documento completo)
+        }
+      }
 
-      //     if (!creditosLegacy || creditosLegacy.length === 0) {
-      //       this.logger.warn(`[PHASE 3B - SANCIONES] ⚠️ No se encontraron créditos legacy para cliente_id=${clienteLegacy.id}`);
-      //     } else {
-      //       this.logger.info(`[PHASE 3B - SANCIONES] ${creditosLegacy.length} crédito(s) encontrado(s) en legacy`);
+      // 3. Determinar resultado final
+      if (creditosProcesados === 0) {
+        this.logger.warn(`[PHASE 3B] ❌ Todos los créditos fallaron para documento=${documento}`);
+        return {
+          status: "TODOS_FALLIDOS",
+          creditosProcesados: 0,
+          amortizacionesCreadas: 0,
+          totalAmortizaciones: 0,
+          errores
+        };
+      }
 
-      //       // 5c. Extraer IDs de créditos - convertir BigInt a number
-      //       const creditoIds = creditosLegacy.map(c => Number(c.id));
+      this.logger.info(`[PHASE 3B] ✅ Completado: ${creditosProcesados} crédito(s) procesado(s), ${totalAmortizacionesCreadas} amortizaciones creadas para documento=${documento}`);
 
-      //       // 5d. Buscar sanciones con estado 'Debe'
-      //       const sanciones = await prismaLegacyService.sanciones.findMany({
-      //         where: {
-      //           credito_id: { in: creditoIds },
-      //           estado: 'Debe'
-      //         }
-      //       });
-
-      //       if (sanciones.length === 0) {
-      //         this.logger.info(`[PHASE 3B - SANCIONES] ℹ️ Sin sanciones con estado 'Debe' para este crédito`);
-      //       } else {
-      //         // 5e. Sumar sanciones vigentes
-      //         totalSanciones = sanciones.reduce((sum, s) => sum + (s.valor || 0), 0);
-      //         this.logger.info(
-      //           `[PHASE 3B - SANCIONES] 📊 ${sanciones.length} sanciones encontradas, total: $${totalSanciones}`
-      //         );
-
-      //         // 5f. Actualizar amortizaciones distribuyendo las sanciones
-      //         const sancionPorCuota = Math.round(totalSanciones / amortizacionesToCreate.length);
-      //         const updatedAmortizaciones = await prismaMainService.$transaction(async (tx) => {
-      //           return await tx.amortizacion.updateMany({
-      //             where: { prestamoID: prestamo_ID },
-      //             data: { sancion: sancionPorCuota }
-      //           });
-      //         });
-
-      //         sancionesAgregadas = updatedAmortizaciones.count;
-      //         this.logger.info(
-      //           `[PHASE 3B - SANCIONES] ✅ Sanciones agregadas a ${sancionesAgregadas} amortizaciones ` +
-      //           `($${sancionPorCuota} por cuota)`
-      //         );
-      //       }
-      //     }
-      //   }
-
-      // } catch (sanctionError) {
-      //   const sanctionErrorMsg = sanctionError instanceof Error ? sanctionError.message : String(sanctionError);
-      //   this.logger.warn(
-      //     `[PHASE 3B - SANCIONES] ⚠️ Error procesando sanciones (continuando): ${sanctionErrorMsg}`
-      //   );
-      //   // No retornamos error aquí - las amortizaciones ya fueron creadas, las sanciones son opcionales
-      // }
-
-      // 6. Retornar resultado completo
       return {
         status: "AMORTIZACIONES_Y_SANCIONES_CREADAS",
-        amortizacionesCreadas: createdAmortizaciones.count,
-        //ancionesAgregadas: sancionesAgregadas,
-        //otalSanciones: totalSanciones
+        creditosProcesados,
+        amortizacionesCreadas: totalAmortizacionesCreadas,
+        totalAmortizaciones: totalAmortizacionesCreadas
       };
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`[PHASE 3B] ❌ Error en migrateAmortizacionesPhase: ${errorMsg}`);
+      this.logger.error(`[PHASE 3B] ❌ Error fatal en migrateAmortizacionesPhase: ${errorMsg}`);
       return {
         status: "ERROR",
+        totalAmortizaciones: 0,
         errores: [errorMsg]
       };
     }
@@ -1651,103 +1484,153 @@ ORDER BY precreditos.id DESC
   // ═══════════════════════════════════════════════════════════════════════════
 
   /**
-   * PHASE 4: Migra historial de pagos (facturas legacy → historial_pagos main)
+   * PHASE 4: Migra historial de pagos para TODOS los créditos de un cliente
    * 
    * Flujo:
-   * 1. Buscar all facturas en legacy con credito_id = prestamo_ID
-   * 2. Mapear cada factura a schema main.historial_pagos
-   * 3. Insertar en bulk
-   * 4. Retornar status + cantidad
+   * 1. Buscar ALL créditos del cliente (by documento) en main.detalle_credito
+   * 2. Para cada crédito:
+   *    - Buscar facturas en legacy con credito_id = prestamo_ID
+   *    - Mapear cada factura a schema main.historial_pagos
+   *    - Insertar en bulk
+   * 3. Retornar status + cantidades agregadas
    * 
-   * @param prestamo_ID - ID del crédito (correlacionado con legacy.creditos.id)
+   * @param documento - Documento del cliente (busca todos sus créditos)
    * @returns Promise<PaymentHistoryMigrationResult>
    */
-  async migratePaymentHistoryPhase(prestamo_ID: number): Promise<{
-    status: "PAGOS_MIGRADOS" | "SIN_PAGOS" | "CREDITO_NO_ENCONTRADO" | "ERROR";
+  async migratePaymentHistoryPhase(documento: string): Promise<{
+    status: "PAGOS_MIGRADOS" | "SIN_CREDITOS" | "SIN_PAGOS" | "TODOS_FALLIDOS" | "ERROR";
+    creditosProcesados?: number;
     pagosMigrados?: number;
+    totalPagos?: number;
     errores?: string[];
   }> {
     try {
-      this.logger.info(`[PHASE 4] Iniciando migratePaymentHistoryPhase para prestamo_ID=${prestamo_ID}`);
+      this.logger.info(`[PHASE 4] Iniciando migratePaymentHistoryPhase para documento=${documento}`);
 
-      // 1. Validar crédito en main
-      const credito = await prismaMainService.detalle_credito.findUnique({
-        where: { prestamo_ID }
+      // 1. Buscar TODOS los créditos del cliente en main
+      const creditosMain = await prismaMainService.detalle_credito.findMany({
+        where: { documento }
       });
 
-      if (!credito) {
-        this.logger.warn(`[PHASE 4] ❌ Crédito no encontrado: prestamo_ID=${prestamo_ID}`);
+      if (!creditosMain || creditosMain.length === 0) {
+        this.logger.info(`[PHASE 4] ℹ️ Sin créditos encontrados para documento=${documento}`);
         return {
-          status: "CREDITO_NO_ENCONTRADO",
-          errores: [`Crédito con prestamo_ID=${prestamo_ID} no existe en main.detalle_credito`]
+          status: "SIN_CREDITOS",
+          creditosProcesados: 0,
+          pagosMigrados: 0,
+          totalPagos: 0
         };
       }
 
-      // 2. Buscar facturas en legacy por credito_id = prestamo_ID
-      const facturas = await prismaLegacyService.facturas.findMany({
-        where: { credito_id: prestamo_ID }
-      });
+      this.logger.info(`[PHASE 4] 📋 ${creditosMain.length} crédito(s) encontrado(s) para documento=${documento}`);
 
-      if (!facturas || facturas.length === 0) {
-        this.logger.info(`[PHASE 4] ℹ️ Sin facturas encontradas para prestamo_ID=${prestamo_ID}`);
+      const errores: string[] = [];
+      let creditosProcesados = 0;
+      let totalPagosMigrados = 0;
+
+      // 2. Procesar cada crédito
+      for (const credito of creditosMain) {
+        try {
+          this.logger.info(`[PHASE 4] 🔄 Procesando crédito ${creditosProcesados + 1}/${creditosMain.length}: prestamo_ID=${credito.prestamo_ID}`);
+
+          // 2a. Buscar facturas en legacy por credito_id = prestamo_ID
+          const facturas = await prismaLegacyService.facturas.findMany({
+            where: { credito_id: credito.prestamo_ID }
+          });
+
+          if (!facturas || facturas.length === 0) {
+            this.logger.info(`[PHASE 4] ℹ️ Sin facturas encontradas para prestamo_ID=${credito.prestamo_ID}`);
+            creditosProcesados++;
+            continue; // Pasar al siguiente crédito
+          }
+
+          this.logger.info(`[PHASE 4] 📋 ${facturas.length} factura(s) encontrada(s) para prestamo_ID=${credito.prestamo_ID}`);
+
+          // 2b. Mapear facturas a historial_pagos
+          const pagosToCreate = facturas.map((factura, idx) => {
+            const fecha = factura.fecha ? new Date(factura.fecha) : factura.created_at || new Date();
+
+            return {
+              documento: documento,
+              prestamoID: credito.prestamo_ID,
+              Numero_cuota: idx + 1,
+              capital: 0,
+              interes: 0,
+              aval: 0,
+              IVA: 0,
+              pablok: 0,
+              sanciones: 0,
+              prejuridico: 0,
+              juridico: 0,
+              seguro: 0,
+              total_pagado: Math.round(factura.total || 0),
+              recibo: factura.num_fact || `FAC-${factura.id}`,
+              agente_creador: "MIGRACION",
+              bolsa: null,
+              canal: factura.tipo || "DESCONOCIDO",
+              tipo_pago: factura.banco ? `BANCO: ${factura.banco}` : "NO_ESPECIFICADO",
+              creador: "SISTEMA_MIGRACION",
+              fecha_registro: fecha
+            };
+          });
+
+          // 2c. Insertar pagos en transacción
+          const createdPagos = await prismaMainService.$transaction(async (tx) => {
+            return await tx.historial_pagos.createMany({
+              data: pagosToCreate,
+              skipDuplicates: false
+            });
+          });
+
+          this.logger.info(`[PHASE 4] ✅ ${createdPagos.count} pagos migrados para prestamo_ID=${credito.prestamo_ID}`);
+          totalPagosMigrados += createdPagos.count;
+          creditosProcesados++;
+
+        } catch (creditoError) {
+          const errorMsg = creditoError instanceof Error ? creditoError.message : String(creditoError);
+          this.logger.warn(`[PHASE 4] ❌ Error procesando crédito prestamo_ID=${credito.prestamo_ID}: ${errorMsg}`);
+          errores.push(errorMsg);
+          // Continuar con próximo crédito (NO fallar documento completo)
+        }
+      }
+
+      // 3. Determinar resultado final
+      if (creditosProcesados === 0) {
+        this.logger.warn(`[PHASE 4] ❌ Todos los créditos fallaron para documento=${documento}`);
+        return {
+          status: "TODOS_FALLIDOS",
+          creditosProcesados: 0,
+          pagosMigrados: 0,
+          totalPagos: 0,
+          errores
+        };
+      }
+
+      if (totalPagosMigrados === 0) {
+        this.logger.info(`[PHASE 4] ℹ️ ${creditosProcesados} crédito(s) procesado(s) pero sin pagos encontrados para documento=${documento}`);
         return {
           status: "SIN_PAGOS",
-          pagosMigrados: 0
+          creditosProcesados,
+          pagosMigrados: 0,
+          totalPagos: 0
         };
       }
 
-      this.logger.info(`[PHASE 4] 📋 ${facturas.length} factura(s) encontrada(s)`);
-
-      // 3. Mapear facturas a historial_pagos
-      const pagosToCreate = facturas.map((factura, idx) => {
-        const fecha = factura.fecha ? new Date(factura.fecha) : factura.created_at || new Date();
-
-        return {
-          documento: credito.documento,
-          prestamoID: prestamo_ID,
-          Numero_cuota: idx + 1,
-          capital: 0,
-          interes: 0,
-          aval: 0,
-          IVA: 0,
-          pablok: 0,
-          sanciones: 0,
-          prejuridico: 0,
-          juridico: 0,
-          seguro: 0,
-          total_pagado: Math.round(factura.total || 0),
-          recibo: factura.num_fact || `FAC-${factura.id}`,
-          agente_creador: "MIGRACION",
-          bolsa: null,
-          canal: factura.tipo || "DESCONOCIDO",
-          tipo_pago: factura.banco ? `BANCO: ${factura.banco}` : "NO_ESPECIFICADO",
-          creador: "SISTEMA_MIGRACION",
-          fecha_registro: fecha
-        };
-      });
-
-      // 4. Insertar en transacción
-      const createdPagos = await prismaMainService.$transaction(async (tx) => {
-        return await tx.historial_pagos.createMany({
-          data: pagosToCreate,
-          skipDuplicates: false
-        });
-      });
-
-      this.logger.info(
-        `[PHASE 4] ✅ ${createdPagos.count} pagos migrados para prestamo_ID=${prestamo_ID}`
-      );
+      this.logger.info(`[PHASE 4] ✅ Completado: ${creditosProcesados} crédito(s) procesado(s), ${totalPagosMigrados} pagos migrados para documento=${documento}`);
 
       return {
         status: "PAGOS_MIGRADOS",
-        pagosMigrados: createdPagos.count
+        creditosProcesados,
+        pagosMigrados: totalPagosMigrados,
+        totalPagos: totalPagosMigrados
       };
 
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`[PHASE 4] ❌ Error en migratePaymentHistoryPhase: ${errorMsg}`);
+      this.logger.error(`[PHASE 4] ❌ Error fatal en migratePaymentHistoryPhase: ${errorMsg}`);
       return {
         status: "ERROR",
+        totalPagos: 0,
         errores: [errorMsg]
       };
     }

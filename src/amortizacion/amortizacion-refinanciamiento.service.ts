@@ -18,6 +18,64 @@ class RefinanciamientoService {
     }
     return RefinanciamientoService.instance;
   }
+
+  /**
+   * Normaliza infoCredito convirtiendo todos los BigInt a Number
+   * Necesario para serialización JSON
+   */
+  private normalizarInfoCredito(infoCredito: InfoCreditoData): InfoCreditoData {
+    // Normaliza periodicidad a uno de los valores esperados
+    const periodoPeriodo = String(infoCredito.periodicidad).trim().toLowerCase();
+    const periodicidadNormalizada: 'Mensual' | 'Quincenal' | 'mensual' | 'quincenal' = 
+      (periodoPeriodo === 'mensual') ? 'mensual' :
+      (periodoPeriodo === 'quincenal') ? 'quincenal' :
+      (infoCredito.periodicidad as 'Mensual' | 'Quincenal' | 'mensual' | 'quincenal');
+
+    return {
+      ...infoCredito,
+      cantidad_meses: Number(infoCredito.cantidad_meses),
+      credito_id: Number(infoCredito.credito_id),
+      valor_prestamo: Number(infoCredito.valor_prestamo),
+      valor_cuota: Number(infoCredito.valor_cuota),
+      cuotas_faltantes: Number(infoCredito.cuotas_faltantes),
+      documento: String(infoCredito.documento),
+      periodicidad: periodicidadNormalizada,
+      fecha_pago1: infoCredito.fecha_pago1 ? Number(infoCredito.fecha_pago1) : undefined,
+      fecha_pago2: infoCredito.fecha_pago2 ? Number(infoCredito.fecha_pago2) : undefined,
+      cta_aval: infoCredito.cta_aval ? Number(infoCredito.cta_aval) : undefined,
+      cta_iva_aval: infoCredito.cta_iva_aval ? Number(infoCredito.cta_iva_aval) : undefined,
+    };
+  }
+
+  /**
+   * Genera una amortización vacía (cuotas en 0) para créditos cancelados
+   * @param infoCredito Información del crédito cancelado
+   * @returns Array de items de amortización con todos los valores en 0
+   */
+  private generarAmortizacionCancelada(infoCredito: InfoCreditoData): RefinanciamientoItem[] {
+    const numeroCuotas = Number(infoCredito.cantidad_meses);
+    const prestamoId = Number(infoCredito.credito_id);
+    const amortizacion: RefinanciamientoItem[] = [];
+
+    for (let i = 0; i < numeroCuotas; i++) {
+      amortizacion.push({
+        prestamoId,
+        documento: String(infoCredito.documento),
+        numeroCuota: i + 1,
+        capitalEnMora: 0,
+        capital: 0,
+        interes: 0,
+        aval: 0,
+        iva: 0,
+        cuotaTotal: 0,
+        saldo: 0,
+        fechaPago: new Date().toISOString().split('T')[0],
+      });
+    }
+
+    return amortizacion;
+  }
+
   /**
    * Obtiene la información del crédito desde la BD
    * Ejecuta la consulta para obtener datos del cliente y crédito
@@ -36,6 +94,7 @@ class RefinanciamientoService {
           precreditos.created_at AS fecha_creacion,
           precreditos.p_fecha AS fecha_pago1,
           precreditos.s_fecha AS fecha_pago2,
+          creditos.estado,
           fc.fecha_pago AS proxima_fecha_pago,
 			    amortizaciones.cta_aval,
 		      amortizaciones.cta_iva_aval,
@@ -230,6 +289,43 @@ class RefinanciamientoService {
       this.logger.info(
         `[REFINANCIAMIENTO-SVC] ✅ Información obtenida: ${infoCredito.documento}, ${infoCredito.valor_prestamo}, ${infoCredito.periodicidad}`
       );
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // VALIDACIÓN: VERIFICAR SI EL CRÉDITO ESTÁ CANCELADO
+      // ═══════════════════════════════════════════════════════════════════════════
+      const estadoNormalizado = String(infoCredito.estado).toUpperCase().trim();
+      if (estadoNormalizado === 'CANCELADO') {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] ⚠️ Crédito ${creditoId} está CANCELADO`);
+        
+        const infoCreditoNormalizado = this.normalizarInfoCredito(infoCredito);
+        const amortizacionCancelada = this.generarAmortizacionCancelada(infoCreditoNormalizado);
+        
+        return {
+          exitoso: true,
+          mensaje: `Crédito ${creditoId} está completamente cancelado. Todas las cuotas han sido pagadas.`,
+          errores: [],
+          infoCredito: infoCreditoNormalizado,
+          infoPagos: {
+            cuotaMaximaPagada: infoCreditoNormalizado.cantidad_meses,
+            tieneCuotaParciall: false,
+            montoPagadoCuotaParcial: 0,
+            montoDebe: 0,
+            sanciones_condonadas: 0,
+            dias_sanciones_condonadas: 0,
+            desglosePagos: {},
+          },
+          amortizacionOriginal: amortizacionCancelada,
+          amortizacionActualizada: amortizacionCancelada,
+          estadisticas: {
+            totalCuotas: infoCreditoNormalizado.cantidad_meses,
+            cuotaTotal: 0,
+            totalCapital: 0,
+            totalInteres: 0,
+            totalAval: 0,
+            totalIVA: 0,
+          },
+        };
+      }
 
       // ═══════════════════════════════════════════════════════════════════════════
       // PASO 2: OBTENER PAGOS DEL CRÉDITO

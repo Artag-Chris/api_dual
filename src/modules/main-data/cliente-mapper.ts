@@ -63,9 +63,8 @@ class ClienteMapperService {
       tipoDocumento: clienteLegacy.tipo_doc ? this.mapTipoDoc(clienteLegacy.tipo_doc) : 'CC',
       conyuge: conyugeValue,
       fecha_nacimiento: clienteLegacy.fecha_nacimiento || null,
-      fecha_expedicion: clienteLegacy.fecha_exp ? this.formatDate(clienteLegacy.fecha_exp) : null,
-      lugar_expedicion: clienteLegacy.lugar_exp || null,
-      // Usar 'N/A' como valores por defecto si no existen en legacy (evita constraint violations)
+      fecha_expedicion: this.formatDate(clienteLegacy.fecha_exp),
+      lugar_expedicion: clienteLegacy.lugar_exp,
       estudios: clienteLegacy.nivel_estudios || 'N/A',
       estrato: clienteLegacy.estrato || 'N/A',
     };
@@ -418,19 +417,34 @@ class ClienteMapperService {
   /**
    * Formatea fecha a formato YYYY-MM-DD
    */
-  private formatDate(date: any): string | null {
-    if (!date) return null;
+private formatDate(date: any): string | null {
+  if (!date) return null;
+
+  try {
+    let fechaObj: Date;
 
     if (typeof date === 'string') {
-      return date;
+      fechaObj = new Date(date);
+    } else if (date instanceof Date) {
+      fechaObj = date;
+    } else {
+      return null;
     }
 
-    if (date instanceof Date) {
-      return date.toISOString().split('T')[0];
+    if (isNaN(fechaObj.getTime())) {
+      return null;
     }
 
+    // Retorna en formato YYYY-MM-DD garantizado
+    const year = fechaObj.getFullYear();
+    const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
+    const day = String(fechaObj.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  } catch (error) {
     return null;
   }
+}
 
   /**
    * Determina el estado del registro basado en datos disponibles

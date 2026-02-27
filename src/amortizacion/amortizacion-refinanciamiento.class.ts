@@ -73,6 +73,7 @@ export interface InfoCreditoData {
   cta_aval?: number;
   cta_iva_aval?: number;
   proxima_fecha_pago?: string | Date;
+  estado?: string;
 }
 
 export interface InfoPagosProcessados {
@@ -344,12 +345,12 @@ export class AmortizacionRefinanciamiento {
       p => p.num_cuota === null && ['Cuota', 'Cuota Parcial', 'Aval'].includes(p.concepto)
     );
 
-    console.log(`[DEBUG] Pagos con num_cuota = null encontrados: ${pagosNullNumCuota.length}`);
-    console.log(`[DEBUG] valorCuota: ${valorCuota}`);
+  //  console.log(`[DEBUG] Pagos con num_cuota = null encontrados: ${pagosNullNumCuota.length}`);
+  //  console.log(`[DEBUG] valorCuota: ${valorCuota}`);
 
     // Si no hay pagos null, retornar sin modificar
     if (pagosNullNumCuota.length === 0) {
-      console.log(`[DEBUG] No hay pagos con num_cuota = null para asignar`);
+    //  console.log(`[DEBUG] No hay pagos con num_cuota = null para asignar`);
       return pagosModificados;
     }
 
@@ -371,12 +372,12 @@ export class AmortizacionRefinanciamiento {
       const indexEnModificados = pagosModificados.findIndex(p => p.id === pago.id);
       if (indexEnModificados !== -1) {
         pagosModificados[indexEnModificados].num_cuota = numeroCuotaActual;
-        console.log(`[DEBUG] Pago ${pago.id} asignado a cuota ${numeroCuotaActual} (abono: ${pago.abono}, acumulado: ${abonoAcumulado})`);
+      //  console.log(`[DEBUG] Pago ${pago.id} asignado a cuota ${numeroCuotaActual} (abono: ${pago.abono}, acumulado: ${abonoAcumulado})`);
       }
 
       // Si el acumulado alcanzó o pasó el valor de la cuota, pasar a la siguiente cuota
       if (abonoAcumulado >= valorCuota) {
-        console.log(`[DEBUG] Acumulado ${abonoAcumulado} >= ${valorCuota}, pasando a cuota ${numeroCuotaActual + 1}`);
+     //   console.log(`[DEBUG] Acumulado ${abonoAcumulado} >= ${valorCuota}, pasando a cuota ${numeroCuotaActual + 1}`);
         numeroCuotaActual++;
         abonoAcumulado = 0;
       }
@@ -422,7 +423,7 @@ export class AmortizacionRefinanciamiento {
     pagos.forEach(pago => {
       // IMPORTANTE: Solo procesar pagos que ya tienen num_cuota asignado
       if (pago.num_cuota === null) {
-        console.warn(`[ADVERTENCIA] Pago ${pago.id} aún tiene num_cuota = null en calcularDesglosePagos`);
+      
         return;
       }
 

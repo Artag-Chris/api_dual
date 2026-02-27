@@ -1,3 +1,4 @@
+import { appendFile } from 'fs';
 import { envs } from './config/envs';
 import { AppRoutes } from './presentation/routes';
 import { Server } from './presentation/server';
@@ -16,7 +17,6 @@ function main() {
 
   //ws conection
  // WSService.getInstance(httpServer as any, '/wsImproved');
-
 
   server.setRoutes(AppRoutes.routes);
 

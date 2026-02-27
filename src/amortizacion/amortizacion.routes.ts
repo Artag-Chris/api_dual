@@ -5,6 +5,8 @@
 
 import { Router, Request, Response } from 'express';
 import AmortizacionController from './amortizacion.controller';
+import { ReporteCarteraCiudadController } from '../amortizacion/reporte/reporte-cartera-ciudad.controller';
+
 
 const router = Router();
 const controller = new AmortizacionController();
@@ -135,5 +137,32 @@ router.post('/refinanciamiento/calcular-con-pagos', (req: Request, res: Response
 router.post('/refinanciamiento/calcular', (req: Request, res: Response) =>
   controller.calcularRefinanciamiento(req, res)
 );
+
+
+
+/*
+
+* RUTAS PARA LOS REPORTES DE CARTERA POR CIUDAD
+*/
+
+router.get('/', ReporteCarteraCiudadController.obtenerReporte);
+
+/**
+ * GET /api/reportes/cartera-ciudad/pivot
+ * Obtiene el reporte en formato pivot (datos pivoteados)
+ */
+router.get('/pivot', ReporteCarteraCiudadController.obtenerReportePivot);
+
+/**
+ * GET /api/reportes/cartera-ciudad/tabla
+ * Obtiene el reporte en formato tabla (listo para Excel/tabla HTML)
+ */
+router.get('/tabla', ReporteCarteraCiudadController.obtenerReporteTabla);
+
+/**
+ * GET /api/reportes/cartera-ciudad/visual
+ * Obtiene el reporte con formato visual/presentación
+ */
+router.get('/visual', ReporteCarteraCiudadController.obtenerReporteVisual);
 
 export default router;
