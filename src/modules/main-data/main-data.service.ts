@@ -5,10 +5,10 @@ import { ReferenceParser } from './reference-parser';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
-import { getTasabyPeriocidad, getDiaPago, parseFecha, getIdbyFuzzy, getDatacreditScore, getEstadoValidoFromList } from '../../utils/functions';
-
+import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy } from '../../utils/functions';
+import { getClientLegacyByDoc, getCreditLegacyDataByDoc } from '../../utils/querys';
 import { raw } from '@prisma/client/runtime/library';
-import { getClientLegacyByDoc } from '../../utils/querys/getClientLegacyByDoc';
+
 
 
 
@@ -34,18 +34,7 @@ class MainDataService {
     return MainDataService.instance;
   }
 
-  /**
-   * Calcula similitud entre dos strings para fuzzy matching
-   */
-  private calcularSimilitud(a: string, b: string): number {
-    const max = Math.max(a.length, b.length);
-    if (max === 0) return 1;
-    let diferencias = 0;
-    for (let i = 0; i < max; i++) {
-      if (a[i] !== b[i]) diferencias++;
-    }
-    return 1 - (diferencias / max);
-  }
+
 
   /**
    * Parsea fecha de forma segura
@@ -242,92 +231,15 @@ class MainDataService {
 
   // ==================== MIGRACIÓN DE CLIENTE ====================
 
-  /**
-   * SIMPLIFIED: Migra SOLO usuario + información personal desde Legacy al Main
-   * 
-   * Pasos:
-   * 1. Consulta cliente en LEGACY por documento
-   * 2. Valida que existe en LEGACY
-   * 3. Valida que NO existe en MAIN
-   * 4. Mapea datos a DTOs (user + info only)
-   * 5. Inicia transacción en MAIN
-   * 6. Crea user_cliente
-   * 7. Crea info_personal
-   * 8. Crea info_contacto
-   * 9. Crea info_laboral
-   * 10. Crea info_referencias
-   * 11. Crea cónyuge si existe
-   * 12. Confirma transacción
-   * 13. Retorna usuario completado
-   * 
-   * NOTA: Este método SOLO crea usuario + información.
-   * Los créditos, amortizaciones, pedidos y saldos se migran en fases separadas.
-   */
   async migrateClienteFromLegacy(documento: string): Promise<any> {
-    // 1. Consultar cliente en LEGACY usando SQL directo para manejar enums vacíos
+    // 1. Consultar cliente en LEGACY 
     const clientesData = await getClientLegacyByDoc(prismaLegacyService,documento)
     
-    // await prismaLegacyService.$queryRaw<any[]>`
-    //   SELECT 
-    //     CAST(id AS UNSIGNED) as id,
-    //     nombre,
-    //     primer_nombre,
-    //     segundo_nombre,
-    //     primer_apellido,
-    //     segundo_apellido,
-    //     tipo_doc,
-    //     num_doc,
-    //     fecha_nacimiento,
-    //     direccion,
-    //     barrio,
-    //     CAST(municipio_id AS UNSIGNED) as municipio_id,
-    //     movil,
-    //     fijo,
-    //     email,
-    //     placa,
-    //     ocupacion,
-    //     empresa,
-    //     NULLIF(tipo_actividad, '') as tipo_actividad,
-    //     CAST(codeudor_id AS UNSIGNED) as codeudor_id,
-    //     numero_de_creditos,
-    //     CAST(user_create_id AS UNSIGNED) as user_create_id,
-    //     CAST(user_update_id AS UNSIGNED) as user_update_id,
-    //     calificacion,
-    //     created_at,
-    //     updated_at,
-    //     dir_empresa,
-    //     tel_empresa,
-    //     CAST(conyuge_id AS UNSIGNED) as conyuge_id,
-    //     genero,
-    //     NULLIF(estado_civil, '') as estado_civil,
-    //     fecha_exp,
-    //     lugar_exp,
-    //     lugar_nacimiento,
-    //     NULLIF(nivel_estudios, '') as nivel_estudios,
-    //     antiguedad_movil,
-    //     anos_residencia,
-    //     NULLIF(envio_correspondencia, '') as envio_correspondencia,
-    //     NULLIF(estrato, '') as estrato,
-    //     meses_residencia,
-    //     NULLIF(tipo_vivienda, '') as tipo_vivienda,
-    //     nombre_arrendador,
-    //     telefono_arrendador,
-    //     cargo,
-    //     descripcion_actividad,
-    //     doc_empresa,
-    //     fecha_vinculacion,
-    //     NULLIF(tipo_contrato, '') as tipo_contrato,
-    //     reportado
-    //   FROM clientes
-    //   WHERE num_doc = ${documento}
-    //   LIMIT 1
-    // `;
 
     if (!clientesData || clientesData.length === 0) {
       throw new Error(`Cliente no encontrado en base de datos LEGACY: ${documento}`);
     }
 
-    // Convertir BigInt a number PRIMERO para todas las operaciones con Prisma
     const clienteLegacy = {
       ...clientesData[0],
       id: Number(clientesData[0].id),
@@ -420,7 +332,6 @@ class MainDataService {
       conyugeDto = conyugeMapped;
     }
 
-    // SIMPLIFIED TRANSACTION: Create ONLY user + info (no credits/amortization)
     try {
       const result = await prismaMainService.$transaction(async (tx) => {
         // 6. Crear user_cliente
@@ -617,7 +528,6 @@ class MainDataService {
           }
         }
 
-        // 12. Return simplified result
         return {
           userCliente,
           infoPersonal,
@@ -628,12 +538,6 @@ class MainDataService {
         };
       });
 
-      // Log migration summary
-      // this.logger.info(
-      //   `✅ USUARIO MIGRADO: ${documento} - ${result.userCliente.nombre_completo}`
-      // );
-
-      // 13. Return user with nested relationships (user + info only)
       return {
         user_cliente: {
           ...result.userCliente,
@@ -677,71 +581,7 @@ class MainDataService {
     try {
       // ========================= QUERY 1: CREDITOS RELACIONADOS =========================
       // QUERY EXACTA: Obtener créditos del cliente desde Legacy (con INNER JOIN creditos)
-      const creditosData = await prismaLegacyService.$queryRaw<any[]>`
-SELECT 
-    clientes.num_doc AS documento,
-    precreditos.vlr_fin AS valor_prestamo,
-    precreditos.aprobado AS estado_aprobacion,
-    precreditos.cuota_inicial,
-    precreditos.s_inicial AS segunda_inicial,
-    precreditos.meses AS plazo,
-    precreditos.cuotas AS numero_cuotas,
-    precreditos.periodo AS periodicidad,
-    precreditos.vlr_cuota,
-    amortizaciones.porc_interes AS tasa,
-    amortizaciones.porc_tea AS tasa_efectiva_anual,
-    precreditos.p_fecha AS fecha_pago_1,
-    precreditos.s_fecha AS fecha_pago_2,
-    fc.fecha_pago AS proxima_fecha_pago,
-    creditos.id AS credito_id_legacy,
-    creditos.estado,
-    creditos.cuotas_faltantes,
-    creator.name AS creador,
-    precreditos.created_at AS fecha_creacion,
-    precreditos.id AS precredito_id,
-    amortizaciones.porc_aval AS seguro,
-    amortizaciones.porc_iva_aval AS iva_aval,
-    amortizaciones.cta_capital,
-    amortizaciones.cta_aval,
-    amortizaciones.cta_iva_aval,
-    amortizaciones.total_cta_aval,
-    creditos.castigada AS es_castigada,
-    updator.name AS actualizador,
-    creditos.updated_at AS ultima_fecha_actualizacion,
-    carteras.id AS cartera_id,
-    carteras.nombre AS nombre_cartera,
-    carteras.nombre AS linea_credito,
-    codeudores.num_doc AS documento_codeudor,
-    codeudores.id AS id_codeudor,
-    estudios.cal_asesor,
-    estudios.cal_estudio,
-    estudios.created_at AS creacion_de_estudio,
-    estudios.estDatacredito_id,
-    est_datacreditos.puntaje AS puntaje_datacredito_fc
-FROM clientes
-LEFT JOIN codeudores 
-    ON clientes.codeudor_id = codeudores.id
-INNER JOIN precreditos
-    ON clientes.id = precreditos.cliente_id 
-LEFT JOIN estudios
-    ON clientes.id = estudios.cliente_id 
-INNER JOIN creditos
-    ON precreditos.id = creditos.precredito_id 
-LEFT JOIN amortizaciones
-    ON precreditos.id = amortizaciones.precredito_id
-INNER JOIN users AS creator
-    ON precreditos.user_create_id = creator.id
-INNER JOIN users AS updator
-    ON precreditos.user_create_id = updator.id
-LEFT JOIN fecha_cobros fc 
-    ON creditos.id = fc.credito_id
-INNER JOIN carteras 
-    ON precreditos.cartera_id = carteras.id
-LEFT JOIN est_datacreditos
-    ON estudios.estDatacredito_id = est_datacreditos.id
-WHERE clientes.num_doc = ${documento}
-ORDER BY precreditos.id DESC
-      `;
+      const creditosData = await getCreditLegacyDataByDoc(prismaLegacyService,documento)
 
       // ========================= DUAL-QUERY LOGIC =========================
       let queryUsed: "Q1" | "Q2" = "Q1";
@@ -910,13 +750,13 @@ ORDER BY precreditos.id DESC
             iva_aval: String(row.iva_aval || 0),
             pablok: 0,
             seguro_add: String(row.seguro_add || 0),
-            castigo: row.es_castigada === 'Si' ? 'SI' : 'NO',
+            castigo: row.es_castigada.toUpperCase(),
             dia_pago: getDiaPago(row.fecha_pago_1, row.fecha_pago_2),
             fecha_Pago: parseFecha(row.fecha_pago_1),
             inicial: parseInt(row.cuota_inicial || 0),
             periocidad: mapPeriodicidad(row.periodicidad),
-            id_estrategia: getIdbyFuzzy(row.nombre_cartera).estrategiaId,
-            id_cartera: getIdbyFuzzy(row.nombre_cartera).carteraId,
+            id_estrategia: getCarteraIdbyFuzzy(row.nombre_cartera, row.estado).estrategiaId,
+            id_cartera: getCarteraIdbyFuzzy(row.nombre_cartera, row.estado).carteraId,
           };
 
           // Usar credito_id_legacy como prestamo_ID para correlacionar con facturas en Phase 4

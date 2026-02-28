@@ -141,28 +141,64 @@ router.post('/refinanciamiento/calcular', (req: Request, res: Response) =>
 
 
 /*
-
-* RUTAS PARA LOS REPORTES DE CARTERA POR CIUDAD
+* RUTA PARA EL REPORTE DE CARTERA POR CIUDAD
 */
 
-router.get('/', ReporteCarteraCiudadController.obtenerReporte);
-
 /**
- * GET /api/reportes/cartera-ciudad/pivot
- * Obtiene el reporte en formato pivot (datos pivoteados)
+ * GET /api/amortizacion/reporte
+ * Obtiene el reporte completo de créditos por cartera y ciudad
+ * 
+ * Clasificación de carteras según franja_dias:
+ * - franja_dias='150' → Se agrupan como CASTIGADA
+ * - Otras franjas → Se muestran por su nombre específico (AL DIA, IDEAL, ALERTA, CRITICO, PREJURIDICO)
+ * - Créditos sin cartera → SE EXCLUYEN del reporte, solo se cuentan en estadísticas
+ * 
+ * Estados de créditos incluidos: ACTIVO, JURIDICO, PREJURIDICO, REFINANCIADO
+ * 
+ * Respuesta:
+ * {
+ *   "success": true,
+ *   "message": "Reporte de cartera obtenido correctamente",
+ *   "data": {
+ *     "titulo": "Reporte de Créditos por Cartera y Ciudad",
+ *     "fecha_generacion": "2024-02-28T10:30:00.000Z",
+ *     "datos": [
+ *       {
+ *         "ciudad": "Bogotá",
+ *         "carteras": {
+ *           "AL DIA": {
+ *             "cantidad": 150,
+ *             "total": 500000000,
+ *             "porcentaje": 25.50
+ *           },
+ *           "CASTIGADA": {
+ *             "cantidad": 10,
+ *             "total": 50000000,
+ *             "porcentaje": 2.55
+ *           }
+ *         },
+ *         "totalCiudad": {
+ *           "cantidad": 160,
+ *           "total": 1960784314
+ *         }
+ *       }
+ *     ],
+ *     "grandTotal": {
+ *       "cantidad": 500,
+ *       "total": 5000000000
+ *     },
+ *     "carterasUniques": ["AL DIA", "IDEAL", "ALERTA", "CRITICO", "PREJURIDICO", "CASTIGADA"],
+ *     "estadisticas": {
+ *       "totalCiudades": 5,
+ *       "totalCarteras": 6,
+ *       "totalCreditos": 500,
+ *       "totalValor": 5000000000,
+ *       "creditosSinCartera": 3,
+ *       "observacion": "Se han excluido 3 crédito(s) sin cartera asignada del reporte..."
+ *     }
+ *   }
+ * }
  */
-router.get('/pivot', ReporteCarteraCiudadController.obtenerReportePivot);
-
-/**
- * GET /api/reportes/cartera-ciudad/tabla
- * Obtiene el reporte en formato tabla (listo para Excel/tabla HTML)
- */
-router.get('/tabla', ReporteCarteraCiudadController.obtenerReporteTabla);
-
-/**
- * GET /api/reportes/cartera-ciudad/visual
- * Obtiene el reporte con formato visual/presentación
- */
-router.get('/visual', ReporteCarteraCiudadController.obtenerReporteVisual);
+router.get('/reporte', ReporteCarteraCiudadController.obtenerReporte);
 
 export default router;

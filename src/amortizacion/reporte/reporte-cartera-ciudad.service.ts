@@ -7,22 +7,24 @@ interface DatosRawCartera {
   ciudad: string;
   nombre_cartera: string;
   id_cartera: number;
+  franja_dias: string;
   cantidad_creditos: bigint;
   total_cuota: bigint;
 }
 
 /**
- * Interface para un grupo de cartera en una ciudad
+ * Interface para un grupo de cartera con porcentaje
  */
 interface CarteraGrupo {
   cantidad: number;
   total: number;
+  porcentaje: number;
 }
 
 /**
- * Interface para el reporte pivoteado
+ * Interface para los datos pivoteados por ciudad
  */
-interface ReportePivot {
+interface DatosCiudad {
   ciudad: string;
   carteras: {
     [nombreCartera: string]: CarteraGrupo;
@@ -34,16 +36,25 @@ interface ReportePivot {
 }
 
 /**
- * Interface para el reporte final completo
+ * Interface para el reporte final
  */
 interface ReporteFinal {
-  datos: ReportePivot[];
+  titulo: string;
+  fecha_generacion: Date;
+  datos: DatosCiudad[];
   grandTotal: {
     cantidad: number;
     total: number;
   };
   carterasUniques: string[];
-  timestamp: Date;
+  estadisticas: {
+    totalCiudades: number;
+    totalCarteras: number;
+    totalCreditos: number;
+    totalValor: number;
+    creditosSinCartera: number;
+    observacion: string;
+  };
 }
 
 /**
@@ -51,10 +62,17 @@ interface ReporteFinal {
  */
 const ESTADOS_VALIDOS = ['ACTIVO', 'JURIDICO', 'PREJURIDICO', 'REFINANCIADO'];
 
+/**
+ * Franja de días para clasificar como CASTIGADA
+ */
+const FRANJA_CASTIGADA = '150';
+
 export class ReporteCarteraCiudadService {
   /**
-   * Obtiene los datos crudos de la base de datos
-   * Agrupa por ciudad y cartera
+   * Obtiene los datos crudos de la base de datos (SOLO CON CARTERA)
+   * Agrupa por ciudad, cartera y franja_dias
+   * Las carteras con franja_dias='150' se clasifican como CASTIGADA
+   * Excluye créditos sin cartera asignada
    */
   private static async obtenerDatosRaw(): Promise<DatosRawCartera[]> {
     try {
@@ -62,8 +80,12 @@ export class ReporteCarteraCiudadService {
         `
         SELECT 
           COALESCE(ic.ciudad, 'SIN DATO') as ciudad,
-          COALESCE(c.nombre, 'SIN CARTERA') as nombre_cartera,
+          CASE 
+            WHEN c.franja_dias = '150' THEN 'CASTIGADA'
+            ELSE COALESCE(c.nombre, 'SIN CARTERA')
+          END as nombre_cartera,
           COALESCE(dc.id_cartera, 0) as id_cartera,
+          COALESCE(c.franja_dias, '') as franja_dias,
           COUNT(DISTINCT dc.prestamo_ID) as cantidad_creditos,
           COALESCE(SUM(CAST(am.total_cuota AS UNSIGNED)), 0) as total_cuota
         FROM detalle_credito dc
@@ -71,8 +93,10 @@ export class ReporteCarteraCiudadService {
         LEFT JOIN info_contacto ic ON dc.documento = ic.documento
         LEFT JOIN cartera c ON dc.id_cartera = c.id
         WHERE dc.estado IN ('ACTIVO', 'JURIDICO', 'PREJURIDICO', 'REFINANCIADO')
-        GROUP BY ic.ciudad, dc.id_cartera, c.nombre
-        ORDER BY ic.ciudad ASC, c.nombre ASC
+        AND dc.id_cartera IS NOT NULL
+        AND c.id IS NOT NULL
+        GROUP BY ic.ciudad, c.id, c.nombre, c.franja_dias
+        ORDER BY ic.ciudad ASC, nombre_cartera ASC
         `
       );
 
@@ -84,135 +108,128 @@ export class ReporteCarteraCiudadService {
   }
 
   /**
-   * Pivotea los datos para obtener un formato de tabla dinámica
-   * Agrupa por ciudad y crea columnas por cartera
+   * Obtiene el conteo de créditos SIN CARTERA asignada
    */
-  private static pivotarDatos(datos: DatosRawCartera[]): ReporteFinal {
-    const mapaCaras = new Map<string, ReportePivot>();
+  private static async obtenerCreditosSinCartera(): Promise<number> {
+    try {
+      const resultado = await prismaMainService.$queryRawUnsafe<
+        Array<{ cantidad: bigint }>
+      >(
+        `
+        SELECT COUNT(DISTINCT dc.prestamo_ID) as cantidad
+        FROM detalle_credito dc
+        INNER JOIN amortizacion am ON dc.prestamo_ID = am.prestamoID
+        WHERE dc.estado IN ('ACTIVO', 'JURIDICO', 'PREJURIDICO', 'REFINANCIADO')
+        AND (dc.id_cartera IS NULL OR dc.id_cartera = 0)
+        `
+      );
+
+      return resultado.length > 0 ? Number(resultado[0].cantidad) : 0;
+    } catch (error) {
+      console.error('Error al obtener créditos sin cartera:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Pivotea los datos agrupados por ciudad y cartera
+   * Calcula totales y porcentajes por ciudad
+   */
+  private static pivotarDatos(datos: DatosRawCartera[]): {
+    datos: DatosCiudad[];
+    carterasUniques: string[];
+    grandTotal: { cantidad: number; total: number };
+  } {
+    const mapaCiudades = new Map<string, DatosCiudad>();
     const carterasSet = new Set<string>();
 
-    // Agrupar por ciudad
+    // Agrupar por ciudad y cartera
     datos.forEach((row) => {
       const ciudadKey = row.ciudad;
-      carterasSet.add(row.nombre_cartera);
+      const carteraKey = row.nombre_cartera;
 
-      if (!mapaCaras.has(ciudadKey)) {
-        mapaCaras.set(ciudadKey, {
+      carterasSet.add(carteraKey);
+
+      if (!mapaCiudades.has(ciudadKey)) {
+        mapaCiudades.set(ciudadKey, {
           ciudad: ciudadKey,
           carteras: {},
           totalCiudad: { cantidad: 0, total: 0 },
         });
       }
 
-      const reporteCiudad = mapaCaras.get(ciudadKey)!;
+      const datosCiudad = mapaCiudades.get(ciudadKey)!;
 
-      // Asignar datos de la cartera
-      reporteCiudad.carteras[row.nombre_cartera] = {
+      // Almacenar datos sin porcentaje inicialmente
+      datosCiudad.carteras[carteraKey] = {
         cantidad: Number(row.cantidad_creditos),
         total: Number(row.total_cuota),
+        porcentaje: 0, // Se calcula después
       };
 
       // Sumar al total de la ciudad
-      reporteCiudad.totalCiudad.cantidad += Number(row.cantidad_creditos);
-      reporteCiudad.totalCiudad.total += Number(row.total_cuota);
+      datosCiudad.totalCiudad.cantidad += Number(row.cantidad_creditos);
+      datosCiudad.totalCiudad.total += Number(row.total_cuota);
     });
 
-    // Calcular gran total
+    // Calcular porcentajes por ciudad
+    const datosArray = Array.from(mapaCiudades.values());
+    datosArray.forEach((datosCiudad) => {
+      const totalCiudad = datosCiudad.totalCiudad.total;
+
+      Object.keys(datosCiudad.carteras).forEach((cartera) => {
+        const grupo = datosCiudad.carteras[cartera];
+        grupo.porcentaje = totalCiudad > 0 ? (grupo.total / totalCiudad) * 100 : 0;
+      });
+    });
+
+    // Calcular grand total
     let grandTotalCantidad = 0;
     let grandTotalSum = 0;
 
-    const reporteArray = Array.from(mapaCaras.values());
-    reporteArray.forEach((reporte) => {
-      grandTotalCantidad += reporte.totalCiudad.cantidad;
-      grandTotalSum += reporte.totalCiudad.total;
+    datosArray.forEach((datosCiudad) => {
+      grandTotalCantidad += datosCiudad.totalCiudad.cantidad;
+      grandTotalSum += datosCiudad.totalCiudad.total;
     });
 
     return {
-      datos: reporteArray,
+      datos: datosArray,
+      carterasUniques: Array.from(carterasSet).sort(),
       grandTotal: {
         cantidad: grandTotalCantidad,
         total: grandTotalSum,
       },
-      carterasUniques: Array.from(carterasSet).sort(),
-      timestamp: new Date(),
     };
   }
 
   /**
-   * Obtiene el reporte completo en formato pivot
-   * @returns Reporte pivoteado con datos por ciudad y cartera
+   * Obtiene el reporte completo con todo detalle
+   * @returns Reporte con ciudades, carteras, totales y porcentajes
    */
-  static async obtenerReporteCompleto(): Promise<ReporteFinal> {
+  static async obtenerReporte(): Promise<ReporteFinal> {
     const datosRaw = await this.obtenerDatosRaw();
-    return this.pivotarDatos(datosRaw);
-  }
+    const creditosSinCartera = await this.obtenerCreditosSinCartera();
+    const { datos, carterasUniques, grandTotal } = this.pivotarDatos(datosRaw);
 
-  /**
-   * Obtiene el reporte en formato "tabla" listo para renderizar
-   * Útil para Excel o visualización en tabla HTML
-   */
-  static async obtenerReporteTabla(): Promise<any[]> {
-    const reporte = await this.obtenerReporteCompleto();
-    const resultado = [];
-
-    // Agregar filas de datos
-    reporte.datos.forEach((fila) => {
-      const filaDatos: any = {
-        ciudad: fila.ciudad,
-      };
-
-      // Agregar cada cartera como columna
-      reporte.carterasUniques.forEach((cartera) => {
-        const grupo = fila.carteras[cartera];
-        if (grupo) {
-          filaDatos[`${cartera}_cantidad`] = grupo.cantidad;
-          filaDatos[`${cartera}_total`] = grupo.total;
-        } else {
-          filaDatos[`${cartera}_cantidad`] = 0;
-          filaDatos[`${cartera}_total`] = 0;
-        }
-      });
-
-      // Total de la ciudad
-      filaDatos['TOTAL_CIUDAD_cantidad'] = fila.totalCiudad.cantidad;
-      filaDatos['TOTAL_CIUDAD_total'] = fila.totalCiudad.total;
-
-      resultado.push(filaDatos);
-    });
-
-    // Agregar fila de gran total
-    const filaGrandTotal: any = {
-      ciudad: 'GRAN TOTAL',
+    return {
+      titulo: 'Reporte de Créditos por Cartera y Ciudad',
+      fecha_generacion: new Date(),
+      datos,
+      grandTotal,
+      carterasUniques,
+      estadisticas: {
+        totalCiudades: datos.length,
+        totalCarteras: carterasUniques.length,
+        totalCreditos: grandTotal.cantidad,
+        totalValor: grandTotal.total,
+        creditosSinCartera,
+        observacion: `Se han excluido ${creditosSinCartera} crédito(s) sin cartera asignada del reporte. Solo se muestran créditos con cartera válida.`,
+      },
     };
-
-    reporte.carterasUniques.forEach((cartera) => {
-      let cantidadTotal = 0;
-      let totalSum = 0;
-
-      reporte.datos.forEach((fila) => {
-        const grupo = fila.carteras[cartera];
-        if (grupo) {
-          cantidadTotal += grupo.cantidad;
-          totalSum += grupo.total;
-        }
-      });
-
-      filaGrandTotal[`${cartera}_cantidad`] = cantidadTotal;
-      filaGrandTotal[`${cartera}_total`] = totalSum;
-    });
-
-    filaGrandTotal['TOTAL_CIUDAD_cantidad'] = reporte.grandTotal.cantidad;
-    filaGrandTotal['TOTAL_CIUDAD_total'] = reporte.grandTotal.total;
-
-    resultado.push(filaGrandTotal);
-
-    return resultado;
   }
 
   /**
-   * Formatea los números como moneda
-   * @param valor Valor a formatear
-   * @returns String formateado con separadores de miles
+   * Formatea los números como moneda en COP
    */
   static formatearMoneda(valor: number): string {
     return new Intl.NumberFormat('es-CO', {
@@ -224,44 +241,9 @@ export class ReporteCarteraCiudadService {
   }
 
   /**
-   * Obtiene el reporte con formato visual para presentación
+   * Formatea un porcentaje a 2 decimales con símbolo %
    */
-  static async obtenerReporteVisual(): Promise<any> {
-    const reporte = await this.obtenerReporteCompleto();
-
-    return {
-      titulo: 'Reporte de Créditos por Cartera y Ciudad',
-      fecha_generacion: reporte.timestamp,
-      estadisticas_generales: {
-        total_ciudades: reporte.datos.length,
-        total_carteras: reporte.carterasUniques.length,
-        total_creditos: reporte.grandTotal.cantidad,
-        total_valor: this.formatearMoneda(reporte.grandTotal.total),
-        total_valor_numero: reporte.grandTotal.total,
-      },
-      carteras: reporte.carterasUniques,
-      datos: reporte.datos.map((fila) => ({
-        ciudad: fila.ciudad,
-        carteras_desglose: reporte.carterasUniques.map((cartera) => {
-          const grupo = fila.carteras[cartera];
-          return {
-            nombre: cartera,
-            cantidad: grupo?.cantidad || 0,
-            total: grupo?.total || 0,
-            total_formateado: this.formatearMoneda(grupo?.total || 0),
-          };
-        }),
-        total_ciudad: {
-          cantidad: fila.totalCiudad.cantidad,
-          total: fila.totalCiudad.total,
-          total_formateado: this.formatearMoneda(fila.totalCiudad.total),
-        },
-      })),
-      gran_total: {
-        total_creditos: reporte.grandTotal.cantidad,
-        total_valor: reporte.grandTotal.total,
-        total_valor_formateado: this.formatearMoneda(reporte.grandTotal.total),
-      },
-    };
+  static formatearPorcentaje(porcentaje: number): string {
+    return `${porcentaje.toFixed(2)}%`;
   }
 }
