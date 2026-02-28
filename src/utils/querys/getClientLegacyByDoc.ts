@@ -1,6 +1,5 @@
-import { prismaLegacyService } from "../../database/legacy/prisma-legacy.service";
 
-  export const  creditosData = async(documento:string)=>await prismaLegacyService.$queryRaw<any[]>`
+export const  getClientLegacyByDoc = async( prismaLegacyService: any,documento:string)=>await prismaLegacyService.$queryRaw<any[]>`
  SELECT 
 	clientes.num_doc AS documento,
 	precreditos.vlr_fin AS valor_prestamo,

@@ -5,12 +5,12 @@ import { ReferenceParser } from './reference-parser';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
-import { getTasabyPeriocidad } from '../../utils/functions/getTasabyPeriocidad';
-import { getIdbyFuzzy } from '../../utils/functions/getIdbyFuzzy';
-import { getDiaPago } from '../../utils/functions/getDiaPago';
-import { getDatacreditScore } from '../../utils/functions/getDatacreditScore';
+import { getTasabyPeriocidad, getDiaPago, parseFecha, getIdbyFuzzy, getDatacreditScore, getEstadoValidoFromList } from '../../utils/functions';
+
 import { raw } from '@prisma/client/runtime/library';
-import { getEstadoValidoFromList } from '../../utils/functions/getDataCreditState';
+import { getClientLegacyByDoc } from '../../utils/querys/getClientLegacyByDoc';
+
+
 
 /**************************************************************************************************
  * Servicio para datos Main
@@ -48,101 +48,10 @@ class MainDataService {
   }
 
   /**
-   * Obtiene el estado válido más parecido con fuzzy matching (70%+)
-   */
-  private async getEstadoValidoFromList(estadoLegacy: string): Promise<string> {
-    try {
-      const estadosValidos = await prismaMainService.lista_estado_credito.findMany({
-        select: { tipo: true }
-      });
-
-      if (!estadosValidos || estadosValidos.length === 0) {
-        return 'EN ESTUDIO';
-      }
-
-      const estadoNormalizado = String(estadoLegacy || '').trim().toUpperCase();
-
-      // Match exacto
-      const matchExacto = estadosValidos.find(e => e.tipo.toUpperCase() === estadoNormalizado);
-      if (matchExacto) {
-        return matchExacto.tipo;
-      }
-
-      // Fuzzy match
-      let mejorMatch = estadosValidos[0].tipo;
-      let mejorSimilitud = 0;
-
-      for (const estado of estadosValidos) {
-        const similitud = this.calcularSimilitud(estadoNormalizado, estado.tipo.toUpperCase());
-        if (similitud > mejorSimilitud) {
-          mejorSimilitud = similitud;
-          mejorMatch = estado.tipo;
-        }
-      }
-
-      if (mejorSimilitud >= 0.7) {
-        this.logger.info(`[ESTADO] Fuzzy: "${estadoLegacy}" → "${mejorMatch}" (${(mejorSimilitud * 100).toFixed(0)}%)`);
-        return mejorMatch;
-      }
-
-      return 'EN ESTUDIO';
-    } catch (error) {
-      this.logger.warn(`[ESTADO] Error: ${error}. Using fallback.`);
-      return 'EN ESTUDIO';
-    }
-  }
-
-  /**
    * Parsea fecha de forma segura
    * Intenta múltiples formatos y devuelve ISO string o fallback
    * Maneja: strings, Date objects, números (como día del mes)
    */
-  private parseFecha(fecha: any, fallbackDate: Date = new Date()): string {
-    try {
-      if (fecha === null || fecha === undefined || fecha === '') {
-        return fallbackDate.toISOString().split('T')[0];
-      }
-
-      // Si es Date object
-      if (fecha instanceof Date) {
-        if (!isNaN(fecha.getTime())) {
-          return fecha.toISOString().split('T')[0];
-        }
-      }
-
-      // Si es string, intenta parsear
-      if (typeof fecha === 'string') {
-        // Si es string vacío
-        if (fecha.trim() === '') {
-          return fallbackDate.toISOString().split('T')[0];
-        }
-
-        const parsed = new Date(fecha);
-        if (!isNaN(parsed.getTime())) {
-          return parsed.toISOString().split('T')[0];
-        }
-      }
-
-      // Si es número, interpretarlo como día del mes
-      if (typeof fecha === 'number') {
-        const dia = Math.floor(fecha);
-        // Validar que sea un día válido (1-31)
-        if (dia >= 1 && dia <= 31) {
-          const hoy = new Date(fallbackDate);
-          hoy.setDate(dia);
-          if (!isNaN(hoy.getTime())) {
-            return hoy.toISOString().split('T')[0];
-          }
-        }
-      }
-
-      // Fallback final
-      return fallbackDate.toISOString().split('T')[0];
-    } catch (error) {
-      this.logger.warn(`[PARSE_FECHA] Error parsing fecha=${fecha}: ${error}, using fallback`);
-      return fallbackDate.toISOString().split('T')[0];
-    }
-  }
 
   // ==================== USER CLIENTE ====================
 
@@ -356,61 +265,63 @@ class MainDataService {
    */
   async migrateClienteFromLegacy(documento: string): Promise<any> {
     // 1. Consultar cliente en LEGACY usando SQL directo para manejar enums vacíos
-    const clientesData = await prismaLegacyService.$queryRaw<any[]>`
-      SELECT 
-        CAST(id AS UNSIGNED) as id,
-        nombre,
-        primer_nombre,
-        segundo_nombre,
-        primer_apellido,
-        segundo_apellido,
-        tipo_doc,
-        num_doc,
-        fecha_nacimiento,
-        direccion,
-        barrio,
-        CAST(municipio_id AS UNSIGNED) as municipio_id,
-        movil,
-        fijo,
-        email,
-        placa,
-        ocupacion,
-        empresa,
-        NULLIF(tipo_actividad, '') as tipo_actividad,
-        CAST(codeudor_id AS UNSIGNED) as codeudor_id,
-        numero_de_creditos,
-        CAST(user_create_id AS UNSIGNED) as user_create_id,
-        CAST(user_update_id AS UNSIGNED) as user_update_id,
-        calificacion,
-        created_at,
-        updated_at,
-        dir_empresa,
-        tel_empresa,
-        CAST(conyuge_id AS UNSIGNED) as conyuge_id,
-        genero,
-        NULLIF(estado_civil, '') as estado_civil,
-        fecha_exp,
-        lugar_exp,
-        lugar_nacimiento,
-        NULLIF(nivel_estudios, '') as nivel_estudios,
-        antiguedad_movil,
-        anos_residencia,
-        NULLIF(envio_correspondencia, '') as envio_correspondencia,
-        NULLIF(estrato, '') as estrato,
-        meses_residencia,
-        NULLIF(tipo_vivienda, '') as tipo_vivienda,
-        nombre_arrendador,
-        telefono_arrendador,
-        cargo,
-        descripcion_actividad,
-        doc_empresa,
-        fecha_vinculacion,
-        NULLIF(tipo_contrato, '') as tipo_contrato,
-        reportado
-      FROM clientes
-      WHERE num_doc = ${documento}
-      LIMIT 1
-    `;
+    const clientesData = await getClientLegacyByDoc(prismaLegacyService,documento)
+    
+    // await prismaLegacyService.$queryRaw<any[]>`
+    //   SELECT 
+    //     CAST(id AS UNSIGNED) as id,
+    //     nombre,
+    //     primer_nombre,
+    //     segundo_nombre,
+    //     primer_apellido,
+    //     segundo_apellido,
+    //     tipo_doc,
+    //     num_doc,
+    //     fecha_nacimiento,
+    //     direccion,
+    //     barrio,
+    //     CAST(municipio_id AS UNSIGNED) as municipio_id,
+    //     movil,
+    //     fijo,
+    //     email,
+    //     placa,
+    //     ocupacion,
+    //     empresa,
+    //     NULLIF(tipo_actividad, '') as tipo_actividad,
+    //     CAST(codeudor_id AS UNSIGNED) as codeudor_id,
+    //     numero_de_creditos,
+    //     CAST(user_create_id AS UNSIGNED) as user_create_id,
+    //     CAST(user_update_id AS UNSIGNED) as user_update_id,
+    //     calificacion,
+    //     created_at,
+    //     updated_at,
+    //     dir_empresa,
+    //     tel_empresa,
+    //     CAST(conyuge_id AS UNSIGNED) as conyuge_id,
+    //     genero,
+    //     NULLIF(estado_civil, '') as estado_civil,
+    //     fecha_exp,
+    //     lugar_exp,
+    //     lugar_nacimiento,
+    //     NULLIF(nivel_estudios, '') as nivel_estudios,
+    //     antiguedad_movil,
+    //     anos_residencia,
+    //     NULLIF(envio_correspondencia, '') as envio_correspondencia,
+    //     NULLIF(estrato, '') as estrato,
+    //     meses_residencia,
+    //     NULLIF(tipo_vivienda, '') as tipo_vivienda,
+    //     nombre_arrendador,
+    //     telefono_arrendador,
+    //     cargo,
+    //     descripcion_actividad,
+    //     doc_empresa,
+    //     fecha_vinculacion,
+    //     NULLIF(tipo_contrato, '') as tipo_contrato,
+    //     reportado
+    //   FROM clientes
+    //   WHERE num_doc = ${documento}
+    //   LIMIT 1
+    // `;
 
     if (!clientesData || clientesData.length === 0) {
       throw new Error(`Cliente no encontrado en base de datos LEGACY: ${documento}`);
@@ -1001,7 +912,7 @@ ORDER BY precreditos.id DESC
             seguro_add: String(row.seguro_add || 0),
             castigo: row.es_castigada === 'Si' ? 'SI' : 'NO',
             dia_pago: getDiaPago(row.fecha_pago_1, row.fecha_pago_2),
-            fecha_Pago: this.parseFecha(row.fecha_pago_1),
+            fecha_Pago: parseFecha(row.fecha_pago_1),
             inicial: parseInt(row.cuota_inicial || 0),
             periocidad: mapPeriodicidad(row.periodicidad),
             id_estrategia: getIdbyFuzzy(row.nombre_cartera).estrategiaId,
