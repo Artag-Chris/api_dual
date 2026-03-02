@@ -10,14 +10,21 @@ interface DatosRawCartera {
   franja_dias: string;
   cantidad_creditos: bigint;
   total_cuota: bigint;
+  total_sanciones: bigint;
+  total_gastos_cartera: bigint;
 }
 
 /**
- * Interface para un grupo de cartera con porcentaje
+ * Interface para un grupo de cartera con porcentaje y desglose
  */
 interface CarteraGrupo {
   cantidad: number;
   total: number;
+  desglose: {
+    total_cuota: number;
+    total_sanciones: number;
+    total_gastos_cartera: number;
+  };
   porcentaje: number;
 }
 
@@ -32,6 +39,11 @@ interface DatosCiudad {
   totalCiudad: {
     cantidad: number;
     total: number;
+    desglose: {
+      total_cuota: number;
+      total_sanciones: number;
+      total_gastos_cartera: number;
+    };
   };
 }
 
@@ -45,6 +57,11 @@ interface ReporteFinal {
   grandTotal: {
     cantidad: number;
     total: number;
+    desglose: {
+      total_cuota: number;
+      total_sanciones: number;
+      total_gastos_cartera: number;
+    };
   };
   carterasUniques: string[];
   estadisticas: {
@@ -73,6 +90,7 @@ export class ReporteCarteraCiudadService {
    * Agrupa por ciudad, cartera y franja_dias
    * Las carteras con franja_dias='150' se clasifican como CASTIGADA
    * Excluye créditos sin cartera asignada
+   * INCLUYE: total_cuota, sanciones y gastos_cartera (prejuridico + juridico)
    */
   private static async obtenerDatosRaw(): Promise<DatosRawCartera[]> {
     try {
@@ -87,11 +105,14 @@ export class ReporteCarteraCiudadService {
           COALESCE(dc.id_cartera, 0) as id_cartera,
           COALESCE(c.franja_dias, '') as franja_dias,
           COUNT(DISTINCT dc.prestamo_ID) as cantidad_creditos,
-          COALESCE(SUM(CAST(am.total_cuota AS UNSIGNED)), 0) as total_cuota
+          COALESCE(SUM(CAST(am.total_cuota AS UNSIGNED)), 0) as total_cuota,
+          COALESCE(SUM(CAST(COALESCE(am.sancion, 0) AS UNSIGNED)), 0) as total_sanciones,
+          COALESCE(SUM(CAST(COALESCE(gc.prejuridico, 0) + COALESCE(gc.juridico, 0) AS UNSIGNED)), 0) as total_gastos_cartera
         FROM detalle_credito dc
         INNER JOIN amortizacion am ON dc.prestamo_ID = am.prestamoID
         LEFT JOIN info_contacto ic ON dc.documento = ic.documento
         LEFT JOIN cartera c ON dc.id_cartera = c.id
+        LEFT JOIN gastos_cartera gc ON dc.prestamo_ID = gc.prestamo_id
         WHERE dc.estado IN ('ACTIVO', 'JURIDICO', 'PREJURIDICO', 'REFINANCIADO')
         AND dc.id_cartera IS NOT NULL
         AND c.id IS NOT NULL
@@ -133,12 +154,12 @@ export class ReporteCarteraCiudadService {
 
   /**
    * Pivotea los datos agrupados por ciudad y cartera
-   * Calcula totales y porcentajes por ciudad
+   * Calcula totales, desglose y porcentajes por ciudad
    */
   private static pivotarDatos(datos: DatosRawCartera[]): {
     datos: DatosCiudad[];
     carterasUniques: string[];
-    grandTotal: { cantidad: number; total: number };
+    grandTotal: { cantidad: number; total: number; desglose: { total_cuota: number; total_sanciones: number; total_gastos_cartera: number } };
   } {
     const mapaCiudades = new Map<string, DatosCiudad>();
     const carterasSet = new Set<string>();
@@ -147,6 +168,10 @@ export class ReporteCarteraCiudadService {
     datos.forEach((row) => {
       const ciudadKey = row.ciudad;
       const carteraKey = row.nombre_cartera;
+      const totalCuota = Number(row.total_cuota);
+      const totalSanciones = Number(row.total_sanciones);
+      const totalGastosCartera = Number(row.total_gastos_cartera);
+      const totalGrupo = totalCuota + totalSanciones + totalGastosCartera;
 
       carterasSet.add(carteraKey);
 
@@ -154,22 +179,38 @@ export class ReporteCarteraCiudadService {
         mapaCiudades.set(ciudadKey, {
           ciudad: ciudadKey,
           carteras: {},
-          totalCiudad: { cantidad: 0, total: 0 },
+          totalCiudad: { 
+            cantidad: 0, 
+            total: 0,
+            desglose: {
+              total_cuota: 0,
+              total_sanciones: 0,
+              total_gastos_cartera: 0
+            }
+          },
         });
       }
 
       const datosCiudad = mapaCiudades.get(ciudadKey)!;
 
-      // Almacenar datos sin porcentaje inicialmente
+      // Almacenar datos con desglose
       datosCiudad.carteras[carteraKey] = {
         cantidad: Number(row.cantidad_creditos),
-        total: Number(row.total_cuota),
+        total: totalGrupo,
+        desglose: {
+          total_cuota: totalCuota,
+          total_sanciones: totalSanciones,
+          total_gastos_cartera: totalGastosCartera
+        },
         porcentaje: 0, // Se calcula después
       };
 
       // Sumar al total de la ciudad
       datosCiudad.totalCiudad.cantidad += Number(row.cantidad_creditos);
-      datosCiudad.totalCiudad.total += Number(row.total_cuota);
+      datosCiudad.totalCiudad.total += totalGrupo;
+      datosCiudad.totalCiudad.desglose.total_cuota += totalCuota;
+      datosCiudad.totalCiudad.desglose.total_sanciones += totalSanciones;
+      datosCiudad.totalCiudad.desglose.total_gastos_cartera += totalGastosCartera;
     });
 
     // Calcular porcentajes por ciudad
@@ -186,10 +227,16 @@ export class ReporteCarteraCiudadService {
     // Calcular grand total
     let grandTotalCantidad = 0;
     let grandTotalSum = 0;
+    let grandTotalCuota = 0;
+    let grandTotalSanciones = 0;
+    let grandTotalGastosCartera = 0;
 
     datosArray.forEach((datosCiudad) => {
       grandTotalCantidad += datosCiudad.totalCiudad.cantidad;
       grandTotalSum += datosCiudad.totalCiudad.total;
+      grandTotalCuota += datosCiudad.totalCiudad.desglose.total_cuota;
+      grandTotalSanciones += datosCiudad.totalCiudad.desglose.total_sanciones;
+      grandTotalGastosCartera += datosCiudad.totalCiudad.desglose.total_gastos_cartera;
     });
 
     return {
@@ -198,6 +245,11 @@ export class ReporteCarteraCiudadService {
       grandTotal: {
         cantidad: grandTotalCantidad,
         total: grandTotalSum,
+        desglose: {
+          total_cuota: grandTotalCuota,
+          total_sanciones: grandTotalSanciones,
+          total_gastos_cartera: grandTotalGastosCartera
+        }
       },
     };
   }

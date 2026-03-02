@@ -2,7 +2,7 @@
  * Servicio de Amortización Refinanciamiento
  */
 
-import { AmortizacionRefinanciamiento, RefinanciamientoItem, RefinanciamientoParams, InfoCreditoData, PagoRegistro, SancionRegistro, ResultadoRefinanciamientoConPagos } from './amortizacion-refinanciamiento.class';
+import { AmortizacionRefinanciamiento, RefinanciamientoItem, RefinanciamientoParams, InfoCreditoData, PagoRegistro, SancionRegistro, ResultadoRefinanciamientoConPagos, ExtraRegistro } from './amortizacion-refinanciamiento.class';
 import WinstonAdapter from '../config/adapters/winstonAdapter';
 import { prismaLegacyService } from '../database/legacy/prisma-legacy.service';
 
@@ -243,6 +243,76 @@ class RefinanciamientoService {
   }
 
   /**
+   * Obtiene las sanciones pagadas (estado = 'Ok') para un crédito
+   * 
+   * @param creditoId ID del crédito
+   * @returns Array de sanciones pagadas ordenado por fecha de creación
+   */
+  async obtenerSancionesPagadas(creditoId: number): Promise<SancionRegistro[]> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo sanciones pagadas del crédito ${creditoId}`);
+
+      const sanciones = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          s.id,
+          s.credito_id,
+          s.valor,
+          s.estado,
+          s.pago_id,
+          s.created_at
+        FROM sanciones s
+        WHERE s.credito_id = ${creditoId}
+        AND s.estado = 'Ok'
+        ORDER BY s.created_at ASC
+      `) as SancionRegistro[];
+
+      this.logger.info(`[REFINANCIAMIENTO-SVC] OK Se encontraron ${sanciones.length} sanciones pagadas`);
+      return sanciones;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener sanciones pagadas: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene gastos de cartera (prejuridico y juridico) pendientes del crédito
+   * Filtra solo los gastos con estado 'Debe' (pendientes de pagar)
+   * 
+   * @param creditoId ID del crédito
+   * @returns Array de registros extras del crédito con gastos cartera
+   */
+  async obtenerGastosCartera(creditoId: number): Promise<ExtraRegistro[]> {
+    try {
+      this.logger.info(`[REFINANCIAMIENTO-SVC] Obteniendo gastos de cartera del crédito ${creditoId}`);
+
+      const extras = (await prismaLegacyService.$queryRaw`
+        SELECT 
+          id,
+          credito_id,
+          concepto,
+          estado,
+          valor,
+          fecha,
+          descripcion,
+          created_at,
+          updated_at
+        FROM extras
+        WHERE credito_id = ${creditoId}
+        AND estado = 'Debe'
+        ORDER BY fecha DESC
+      `) as ExtraRegistro[];
+
+      this.logger.info(`[REFINANCIAMIENTO-SVC] OK Se encontraron ${extras.length} gastos de cartera pendientes`);
+      return extras;
+    } catch (error) {
+      this.logger.error(
+        `[REFINANCIAMIENTO-SVC] Error al obtener gastos de cartera: ${error instanceof Error ? error.message : 'Error desconocido'}`
+      );
+      throw error;
+    }
+  }
 
   /**
    * Calcula refinanciamiento con información de pagos desde BD
@@ -380,11 +450,37 @@ class RefinanciamientoService {
       }
 
       // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 4.5: OBTENER SANCIONES PAGADAS DEL CRÉDITO
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 4.5: Obteniendo sanciones pagadas del crédito ${creditoId}`);
+      
+      const sancionesPagadas = await this.obtenerSancionesPagadas(creditoId);
+
+      if (sancionesPagadas.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No hay sanciones pagadas para crédito ${creditoId}`);
+      } else {
+        this.logger.info(`[REFINANCIAMIENTO-SVC] ✅ Se encontraron ${sancionesPagadas.length} sanciones pagadas`);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // PASO 4.6: OBTENER GASTOS DE CARTERA DEL CRÉDITO
+      // ═══════════════════════════════════════════════════════════════════════════
+      this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 4.6: Obteniendo gastos de cartera del crédito ${creditoId}`);
+      
+      const gastosCartera = await this.obtenerGastosCartera(creditoId);
+
+      if (gastosCartera.length === 0) {
+        this.logger.warn(`[REFINANCIAMIENTO-SVC] No hay gastos de cartera pendientes para crédito ${creditoId}`);
+      } else {
+        this.logger.info(`[REFINANCIAMIENTO-SVC] ✅ Se encontraron ${gastosCartera.length} gastos de cartera`);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
       // PASO 5: CALCULAR REFINANCIAMIENTO Y PROCESAR PAGOS Y SANCIONES
       // ═══════════════════════════════════════════════════════════════════════════
       this.logger.info(`[REFINANCIAMIENTO-SVC] PASO 5: Calculando refinanciamiento, procesando pagos y sanciones`);
       
-      const resultado = AmortizacionRefinanciamiento.calcularRefinanciamientoConPagos(infoCredito, pagos, sanciones, sancionesExoneradas);
+      const resultado = AmortizacionRefinanciamiento.calcularRefinanciamientoConPagos(infoCredito, pagos, sanciones, sancionesExoneradas, sancionesPagadas, gastosCartera);
 
       if (resultado.exitoso) {
         this.logger.info(

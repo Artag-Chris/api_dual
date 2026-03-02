@@ -150,6 +150,18 @@ export interface SancionRegistro {
   created_at: string;
 }
 
+export interface ExtraRegistro {
+  id: number;
+  credito_id: number;
+  concepto: 'Prejuridico' | 'Juridico';
+  estado: 'Ok' | 'Debe' | 'Finalizado';
+  valor: number;
+  fecha: string;
+  descripcion?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface InfoCreditoData {
   documento: string;
   valor_prestamo: number;
@@ -199,12 +211,24 @@ export interface InfoPagosProcessados {
   };
 }
 
+export interface GastosCartera {
+  prejuridico: {
+    total: number;
+    cantidad: number;
+  };
+  juridico: {
+    total: number;
+    cantidad: number;
+  };
+}
+
 export interface ResultadoRefinanciamientoConPagos {
   exitoso: boolean;
   mensaje: string;
   errores: string[];
   infoCredito?: InfoCreditoData;
   infoPagos?: InfoPagosProcessados;
+  gastosCartera?: GastosCartera;
   amortizacionOriginal?: RefinanciamientoItem[];
   amortizacionActualizada?: RefinanciamientoItem[];
   estadisticas?: {
@@ -722,13 +746,65 @@ export class AmortizacionRefinanciamiento {
   }
 
   /**
+   * Procesa gastos de cartera (prejuridico y juridico) de la tabla extras
+   * Filtra solo los gastos con estado 'Debe' (pendientes de pagar)
+   * RESTA los pagos jurídicos ya realizados para obtener el saldo pendiente
+   * 
+   * Ejemplo:
+   * - Extras Prejuridico: 1,000,000
+   * - Pagos Prejuridico: 100,000
+   * - Gastos Cartera Final: 900,000
+   * 
+   * @param extras Array de registros extras del crédito
+   * @param infoPagos Información de pagos procesados (para restar pagos jurídicos)
+   * @returns Objeto con totales y cantidades netas de prejuridico y juridico
+   */
+  private static procesarGastosCartera(extras: ExtraRegistro[], infoPagos?: InfoPagosProcessados): GastosCartera {
+    const gastosCartera: GastosCartera = {
+      prejuridico: { total: 0, cantidad: 0 },
+      juridico: { total: 0, cantidad: 0 }
+    };
+
+    if (!extras || extras.length === 0) {
+      return gastosCartera;
+    }
+
+    // Filtrar solo los gastos pendientes (estado='Debe') y agrupar por concepto
+    extras.forEach(extra => {
+      if (extra.estado === 'Debe') {
+        if (extra.concepto === 'Prejuridico') {
+          gastosCartera.prejuridico.total += extra.valor;
+          gastosCartera.prejuridico.cantidad += 1;
+        } else if (extra.concepto === 'Juridico') {
+          gastosCartera.juridico.total += extra.valor;
+          gastosCartera.juridico.cantidad += 1;
+        }
+      }
+    });
+
+    // RESTAR los pagos jurídicos ya realizados del total de extras
+    // Esto da el saldo PENDIENTE de gastos cartera
+    if (infoPagos?.pagosJuridicos) {
+      gastosCartera.prejuridico.total = Math.max(0, gastosCartera.prejuridico.total - infoPagos.pagosJuridicos.totalPrejuridico);
+      gastosCartera.juridico.total = Math.max(0, gastosCartera.juridico.total - infoPagos.pagosJuridicos.totalJuridico);
+    }
+
+    return gastosCartera;
+  }
+
+  /**
    * Procesa y valida los pagos, extrayendo información relevante
    * Agrupa por número de cuota e identifica cuotas pagadas vs parciales
    * 
    * Caso especial: Si no hay pagos (array vacío), retorna infoPagos con valores por defecto
    * indicando que no hay cuotas pagadas y se generará amortización completa
    */
-  public static procesarPagos(pagos: PagoRegistro[], valorCuota: number, sancionesExoneradas?: SancionRegistro[]): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
+  public static procesarPagos(
+    pagos: PagoRegistro[], 
+    valorCuota: number, 
+    sancionesExoneradas?: SancionRegistro[],
+    sancionesPagadas?: SancionRegistro[]
+  ): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
     // PASO 1: Normalizar todos los pagos PRIMERO (convertir "debe" negativo a 0)
     // Esto debe ocurrir antes de la validación para que no falle por valores negativos
     const pagosNormalizados = pagos.map(p => this.normalizarDebeNegativo(p));
@@ -812,7 +888,8 @@ export class AmortizacionRefinanciamiento {
     // PROCESAR PAGOS DE SANCIONES (MORA)
     // ═════════════════════════════════════════════════════════════════════
     const totalPagadoEnMora = pagosSanciones.reduce((sum, p) => sum + p.abono, 0);
-    const cantidadSancionesPagadas = pagosSanciones.length;
+    // Contar sanciones pagadas desde el registro de sanciones (estado='Ok'), no desde los abonos de pago
+    const cantidadSancionesPagadas = (sancionesPagadas && sancionesPagadas.length > 0) ? sancionesPagadas.length : 0;
 
     // ═════════════════════════════════════════════════════════════════════
     // PROCESAR PAGOS JURÍDICOS (NO APLICAN A CUOTAS)
@@ -879,81 +956,75 @@ export class AmortizacionRefinanciamiento {
   }
 
   /**
-   * Mapea sanciones pendientes (estado='Debe') a cuotas con lógica de validación
+   * Mapea sanciones pendientes (estado='Debe') a cuotas con distribución proporcional
    * 
    * FLUJO:
-   * 1. Primero intenta emparejar sanciones con cuotas POR FECHA
-   *    - Si la sanción se creó entre dos fechas de pago, va a esa cuota
-   * 2. Para sanciones SIN emparejar por fecha:
-   *    - Se asignan a la cuota más morosa
-   * 3. Valida límites máximos por período:
-   *    - Quincenal: máx 15,000 por cuota (1000 x 15 días)
-   *    - Mensual: máx 30,000 por cuota (1000 x 30 días)
+   * 1. Suma TODAS las sanciones pendientes
+   * 2. Distribuye entre cuotas pendientes respetando límite máximo por período
+   *    - Mensual: máx 30,000 por cuota
+   *    - Quincenal: máx 15,000 por cuota
+   * 3. Llena cada cuota hasta el máximo
+   * 4. El RESTANTE de sanciones se asigna a la ÚLTIMA cuota pendiente
+   * 5. NO asigna sanciones a cuotas que ya están completamente pagadas
    * 
    * @param sanciones Array de sanciones pendientes (estado = 'Debe')
    * @param amortizacion Array de cuotas con fechaPago calculadas
-   * @param pagos Array de pagos registrados (para identificar cuota más morosa)
+   * @param pagos Array de pagos registrados (no usado en nueva lógica, mantenido por compatibilidad)
    * @param periocidad 'mensual' o 'quincenal' para validar límites
+   * @param cuotaMaximaPagada Última cuota completamente pagada (no asignar sanciones antes)
    * @returns Mapa de numeroCuota -> totalSancion acumulada
    */
   public static mapearSancionesACuotas(
     sanciones: SancionRegistro[],
     amortizacion: RefinanciamientoItem[],
     pagos?: PagoRegistro[],
-    periocidad?: 'mensual' | 'quincenal'
+    periocidad?: 'mensual' | 'quincenal',
+    cuotaMaximaPagada?: number
   ): Map<number, number> {
     const sancionPorCuota = new Map<number, number>();
 
-    // Inicializar todas las cuotas con sanción = 0
-    amortizacion.forEach(cuota => {
+    // Obtener cuotas pendientes
+    const cuotaMaxima = cuotaMaximaPagada || 0;
+    const cuotasPendientes = amortizacion.filter(cuota => cuota.numeroCuota > cuotaMaxima);
+
+    // Inicializar map con todas las cuotas pendientes en 0
+    cuotasPendientes.forEach(cuota => {
       sancionPorCuota.set(cuota.numeroCuota, 0);
     });
 
-    // Si no hay sanciones, retornar el mapa vacío
-    if (!sanciones || sanciones.length === 0) {
+    // Si no hay sanciones o no hay cuotas pendientes, retornar
+    if (!sanciones || sanciones.length === 0 || cuotasPendientes.length === 0) {
       return sancionPorCuota;
     }
 
     // ═════════════════════════════════════════════════════════════════════
-    // PASO 1: INTENTAR EMPAREJAR SANCIONES POR FECHA
+    // CALCULAR TOTAL DE SANCIONES A DISTRIBUIR
     // ═════════════════════════════════════════════════════════════════════
-    const { emparejadas, sinEmparejar } = this.emparejarSancionesPorFecha(
-      sanciones,
-      amortizacion
-    );
+    const totalSanciones = sanciones.reduce((sum, s) => sum + s.valor, 0);
+    const maximoSancionPorCuota = this.calcularMaximoSancionPorPeriodo(periocidad || 'mensual');
 
-    // Emparejar las sanciones que coincidieron por fecha
-    emparejadas.forEach((total, cuota) => {
-      if (total > 0) {
-        sancionPorCuota.set(cuota, total);
+    // ═════════════════════════════════════════════════════════════════════
+    // DISTRIBUIR SANCIONES ENTRE CUOTAS PENDIENTES
+    // Estrategia: Llenar cada cuota hasta el máximo, restante va a la última
+    // ═════════════════════════════════════════════════════════════════════
+    let sancionesRestantes = totalSanciones;
+    const cuotasNumeradas = Array.from(sancionPorCuota.keys()).sort((a, b) => a - b);
+
+    for (let i = 0; i < cuotasNumeradas.length && sancionesRestantes > 0; i++) {
+      const numeroCuota = cuotasNumeradas[i];
+      const esUltimaCuota = i === cuotasNumeradas.length - 1;
+
+      if (esUltimaCuota) {
+        // Última cuota: asignar TODO lo restante (sin límite)
+        sancionPorCuota.set(numeroCuota, sancionesRestantes);
+        sancionesRestantes = 0;
+      } else {
+        // Cuotas intermedias: asignar hasta el máximo
+        const aAsignar = Math.min(sancionesRestantes, maximoSancionPorCuota);
+        sancionPorCuota.set(numeroCuota, aAsignar);
+        sancionesRestantes -= aAsignar;
       }
-    });
-
-    // ═════════════════════════════════════════════════════════════════════
-    // PASO 2: ASIGNAR SANCIONES SIN EMPAREJAR A CUOTA MÁS MOROSA
-    // ═════════════════════════════════════════════════════════════════════
-    if (sinEmparejar.length > 0) {
-      const cuotaMasMoresa = pagos && pagos.length > 0 
-        ? this.encontrarCuotaMasMoresa(pagos)
-        : 1;
-
-      const totalSinEmparejar = sinEmparejar.reduce((sum, s) => sum + s.valor, 0);
-      const actual = sancionPorCuota.get(cuotaMasMoresa) || 0;
-      sancionPorCuota.set(cuotaMasMoresa, actual + totalSinEmparejar);
     }
-
-    // ═════════════════════════════════════════════════════════════════════
-    // PASO 3: VALIDAR LÍMITES MÁXIMOS POR PERÍODO
-    // ═════════════════════════════════════════════════════════════════════
-    const periodicidad = periocidad || 'mensual';
-    const maximoSancion = this.calcularMaximoSancionPorPeriodo(periodicidad);
-
-    sancionPorCuota.forEach((valor, cuota) => {
-      // Si las sanciones exceden el máximo, limitar al máximo
-      if (valor > maximoSancion) {
-        sancionPorCuota.set(cuota, maximoSancion);
-      }
-    });
 
     return sancionPorCuota;
   }
@@ -1057,14 +1128,14 @@ export class AmortizacionRefinanciamiento {
       }
     }
 
-    // Paso 3: Agregar sanciones a las cuotas correspondientes (solo informativo)
+    // Paso 3: Agregar sanciones a todas las cuotas pendientes (informativo)
     if (sancionPorCuota && sancionPorCuota.size > 0) {
       for (let i = 0; i < amortizacionActualizada.length; i++) {
         const cuota = amortizacionActualizada[i];
-        const sancionCuota = sancionPorCuota.get(cuota.numeroCuota) || 0;
+        const sancionCuota = sancionPorCuota.get(cuota.numeroCuota);
 
-        if (sancionCuota > 0) {
-          // Las sanciones se ponen solo como información, sin modificar cuotaTotal ni otros valores
+        // Agregar sanción si existe en el mapa (cuota pendiente)
+        if (sancionCuota !== undefined) {
           amortizacionActualizada[i] = {
             ...cuota,
             sancion: sancionCuota,
@@ -1375,7 +1446,9 @@ export class AmortizacionRefinanciamiento {
     infoCredito: InfoCreditoData,
     pagos: PagoRegistro[],
     sanciones?: SancionRegistro[],
-    sancionesExoneradas?: SancionRegistro[]
+    sancionesExoneradas?: SancionRegistro[],
+    sancionesPagadas?: SancionRegistro[],
+    extras?: ExtraRegistro[]
   ): ResultadoRefinanciamientoConPagos {
     const resultado: ResultadoRefinanciamientoConPagos = {
       exitoso: false,
@@ -1396,8 +1469,9 @@ export class AmortizacionRefinanciamiento {
       const creditoNormalizado = this.normalizarInfoCredito(infoCredito);
       resultado.infoCredito = creditoNormalizado;
 
-      // Paso 3: Validar y procesar pagos (pasar valor_cuota y sancionesExoneradas)
-      const procesoPagos = this.procesarPagos(pagos, creditoNormalizado.valor_cuota, sancionesExoneradas);
+
+      // Paso 3: Validar y procesar pagos con sanciones pagadas
+      const procesoPagos = this.procesarPagos(pagos, creditoNormalizado.valor_cuota, sancionesExoneradas, sancionesPagadas);
       if (!procesoPagos.valido) {
         resultado.errores = procesoPagos.errores;
         resultado.mensaje = 'Información de pagos inválida';
@@ -1429,12 +1503,14 @@ export class AmortizacionRefinanciamiento {
       resultado.amortizacionOriginal = amortizacionOriginal;
 
       // Paso 6: Mapear sanciones a cuotas más morosas (si existen)
+      // NO incluir sanciones en cuotas ya pagadas (cuotaMaximaPagada)
       let sancionPorCuota: Map<number, number> | undefined;
       if (sanciones && sanciones.length > 0) {
         const periocidadNormalizada = creditoNormalizado.periodicidad === 'Mensual' || creditoNormalizado.periodicidad === 'mensual' 
           ? 'mensual' 
           : 'quincenal';
-        sancionPorCuota = this.mapearSancionesACuotas(sanciones, amortizacionOriginal, pagos, periocidadNormalizada);
+        const cuotaMaximaPagada = resultado.infoPagos?.cuotaMaximaPagada || 0;
+        sancionPorCuota = this.mapearSancionesACuotas(sanciones, amortizacionOriginal, pagos, periocidadNormalizada, cuotaMaximaPagada);
       }
 
       // Paso 7: Actualizar amortización con pagos realizados (y sanciones si existen)
@@ -1452,7 +1528,18 @@ export class AmortizacionRefinanciamiento {
       // Paso 8: Calcular estadísticas
       resultado.estadisticas = this.calcularEstadisticas(amortizacionActualizada);
 
-      // Paso 9: Establecer resultado exitoso
+      // Paso 9: Procesar gastos de cartera (prejuridico y juridico)
+      // RESTA los pagos jurídicos ya realizados para obtener el saldo pendiente
+      if (extras && extras.length > 0) {
+        resultado.gastosCartera = this.procesarGastosCartera(extras, procesoPagos.infoPagos);
+      } else {
+        resultado.gastosCartera = {
+          prejuridico: { total: 0, cantidad: 0 },
+          juridico: { total: 0, cantidad: 0 }
+        };
+      }
+
+      // Paso 10: Establecer resultado exitoso
       resultado.exitoso = true;
       resultado.mensaje = `Refinanciamiento calculado exitosamente. Cuotas pendientes: ${amortizacionActualizada.length}`;
 

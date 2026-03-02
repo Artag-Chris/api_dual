@@ -5,7 +5,7 @@ import { ReferenceParser } from './reference-parser';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
-import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy } from '../../utils/functions';
+import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy, sanitizeFieldValue, normalizeDate, normalizeCastigo } from '../../utils/functions';
 import { getClientLegacyByDoc, getCreditLegacyDataByDoc } from '../../utils/querys';
 import { raw } from '@prisma/client/runtime/library';
 
@@ -351,22 +351,39 @@ class MainDataService {
 
     try {
       const result = await prismaMainService.$transaction(async (tx) => {
-        // 6. Crear user_cliente
-        const userCliente = await tx.user_cliente.create({
-          data: {
-            documento: userClienteDto!.documento,
-            nombre: userClienteDto!.nombre,
-            apellido: userClienteDto!.apellido,
-            tipo: userClienteDto!.tipo,
-            email: userClienteDto!.email || 'clienteSinEmail@Migradofacilito',
-            telefono: userClienteDto!.telefono,
-            nombre_completo: userClienteDto!.nombre_completo,
-            password: userClienteDto!.password,
-            estado_registro: userClienteDto!.estado_registro,
-          },
+        // 6. Crear user_cliente usando raw SQL con fuzzy matching para tipo
+        await tx.$executeRawUnsafe(
+          `INSERT INTO user_cliente (documento, nombre, apellido, tipo, email, telefono, nombre_completo, password, estado_registro, fecha_registro)
+           VALUES (?, ?, ?, 
+                   COALESCE(
+                     (SELECT tipo FROM lista_documentos WHERE tipo = ? LIMIT 1),
+                     (SELECT tipo FROM lista_documentos WHERE LOWER(tipo) LIKE CONCAT('%', LOWER(?), '%') LIMIT 1),
+                     (SELECT tipo FROM lista_documentos ORDER BY id ASC LIMIT 1),
+                     'CC'
+                   ),
+                   ?, ?, ?, ?, ?, NOW())`,
+          userClienteDto!.documento,
+          userClienteDto!.nombre,
+          userClienteDto!.apellido,
+          userClienteDto!.tipo || 'CC',
+          userClienteDto!.tipo || 'CC',
+          userClienteDto!.email || 'clienteSinEmail@Migradofacilito',
+          userClienteDto!.telefono,
+          userClienteDto!.nombre_completo,
+          userClienteDto!.password,
+          userClienteDto!.estado_registro || 'incompleto'
+        );
+
+        // 6.1 Retrieve created user_cliente
+        const userCliente = await tx.user_cliente.findUnique({
+          where: { documento: userClienteDto!.documento },
         });
 
         // 7. Crear info_personal using raw SQL with FK handling
+        // Ensure dates have safe defaults (use '1900-01-01' if normalization fails)
+        const fechaNacimientoSafe = normalizeDate(infoPersonalDto!.fecha_nacimiento) || '1900-01-01';
+        const fechaExpedicionSafe = normalizeDate(infoPersonalDto!.fecha_expedicion) || '1900-01-01';
+        
         await tx.$executeRawUnsafe(
           `INSERT INTO info_personal (documento, nombre, apellido, tipoDocumento, fecha_nacimiento, fecha_expedicion, lugar_expedicion, estudios, estrato, conyuge, fecha_registro) 
            VALUES (?, ?, ?, ?, ?, ?, ?, 
@@ -379,8 +396,8 @@ class MainDataService {
           infoPersonalDto!.nombre,
           infoPersonalDto!.apellido,
           infoPersonalDto!.tipoDocumento,
-          infoPersonalDto!.fecha_nacimiento || '',
-          infoPersonalDto!.fecha_expedicion || '',
+          fechaNacimientoSafe,
+          fechaExpedicionSafe,
           infoPersonalDto!.lugar_expedicion || '',
           infoPersonalDto!.estudios || 'N/A',
           infoPersonalDto!.estrato || 'N/A',
@@ -445,10 +462,10 @@ class MainDataService {
           infoContactoDto!.genero || null,
           infoContactoDto!.estado_civil || null,
           infoContactoDto!.estado_civil || null,
-          infoContactoDto!.barrio || null,
+          sanitizeFieldValue(infoContactoDto!.barrio, 50),
           infoContactoDto!.tipo_vivienda || null,
           infoContactoDto!.tipo_vivienda || null,
-          infoContactoDto!.telefono_residencial || '0',
+          sanitizeFieldValue(infoContactoDto!.telefono_residencial, 50),
           infoContactoDto!.tiempo_vivienda || null,
           infoContactoDto!.tiempo_vivienda || null
         );
@@ -482,9 +499,7 @@ class MainDataService {
           infoLaboralDto!.cargo || 'N/A',
           infoLaboralDto!.actividadEconomica || '',
           infoLaboralDto!.telefono || '0',
-          infoLaboralDto!.fecha_vinculacion
-            ? new Date(infoLaboralDto!.fecha_vinculacion as string).toISOString().split('T')[0]
-            : new Date().toISOString().split('T')[0],
+          normalizeDate(infoLaboralDto!.fecha_vinculacion) || new Date().toISOString().split('T')[0],
           infoLaboralDto!.descripcion || '',
           infoLaboralDto!.id_rango || 1
         );
@@ -498,22 +513,22 @@ class MainDataService {
         const infoReferencias = await tx.info_referencias.create({
           data: {
             documento: infoReferenciasDto!.documento,
-            nombreFamiliar: infoReferenciasDto!.nombreFamiliar || '',
-            parentescoFamiliar: infoReferenciasDto!.parentescoFamiliar || null,
-            telefonoFamiliar: infoReferenciasDto!.telefonoFamiliar || '0',
-            direccion_familiar: infoReferenciasDto!.direccion_familiar || '',
-            nombreFamiliar2: infoReferenciasDto!.nombreFamiliar2 || '',
-            parentescoFamiliar2: infoReferenciasDto!.parentescoFamiliar2 || null,
-            celularFamiliar2: infoReferenciasDto!.celularFamiliar2 || '0',
-            direccion_familiar_2: infoReferenciasDto!.direccion_familiar_2 || '',
-            nombrePersonal: infoReferenciasDto!.nombrePersonal || '',
-            parentescoPersonal: infoReferenciasDto!.parentescoPersonal || null,
-            telefonoPersonal: infoReferenciasDto!.telefonoPersonal || '0',
-            direcion_personal: infoReferenciasDto!.direcion_personal || '',
-            nombrePersonal2: infoReferenciasDto!.nombrePersonal2 || '',
-            parentescoPersonal2: infoReferenciasDto!.parentescoPersonal2 || null,
-            celularPersonal2: infoReferenciasDto!.celularPersonal2 || '0',
-            direccion_personal_2: infoReferenciasDto!.direccion_personal_2 || '',
+            nombreFamiliar: sanitizeFieldValue(infoReferenciasDto!.nombreFamiliar, 100),
+            parentescoFamiliar: sanitizeFieldValue(infoReferenciasDto!.parentescoFamiliar, 30),
+            telefonoFamiliar: sanitizeFieldValue(infoReferenciasDto!.telefonoFamiliar || '0', 100),
+            direccion_familiar: sanitizeFieldValue(infoReferenciasDto!.direccion_familiar, 150) || '',
+            nombreFamiliar2: sanitizeFieldValue(infoReferenciasDto!.nombreFamiliar2, 100),
+            parentescoFamiliar2: sanitizeFieldValue(infoReferenciasDto!.parentescoFamiliar2, 30),
+            celularFamiliar2: sanitizeFieldValue(infoReferenciasDto!.celularFamiliar2 || '0', 100),
+            direccion_familiar_2: sanitizeFieldValue(infoReferenciasDto!.direccion_familiar_2, 150) || '',
+            nombrePersonal: sanitizeFieldValue(infoReferenciasDto!.nombrePersonal, 100),
+            parentescoPersonal: sanitizeFieldValue(infoReferenciasDto!.parentescoPersonal, 30),
+            telefonoPersonal: sanitizeFieldValue(infoReferenciasDto!.telefonoPersonal || '0', 100),
+            direcion_personal: sanitizeFieldValue(infoReferenciasDto!.direcion_personal, 150) || '',
+            nombrePersonal2: sanitizeFieldValue(infoReferenciasDto!.nombrePersonal2, 100),
+            parentescoPersonal2: sanitizeFieldValue(infoReferenciasDto!.parentescoPersonal2, 30),
+            celularPersonal2: sanitizeFieldValue(infoReferenciasDto!.celularPersonal2 || '0', 100),
+            direccion_personal_2: sanitizeFieldValue(infoReferenciasDto!.direccion_personal_2, 150) || '',
           },
         });
 
@@ -753,7 +768,7 @@ class MainDataService {
             iva_aval: String(row.iva_aval || 0),
             pablok: 0,
             seguro_add: String(row.seguro_add || 0),
-            castigo: row.es_castigada.toUpperCase(),
+            castigo: normalizeCastigo(row.es_castigada),
             dia_pago: getDiaPago(row.fecha_pago_1, row.fecha_pago_2),
             fecha_Pago: parseFecha(row.fecha_pago_1),
             inicial: parseInt(row.cuota_inicial || 0),
@@ -1188,7 +1203,7 @@ class MainDataService {
           }
 
           // 2b. Mapear amortizaciones
-          const amortizacionesToCreate = resultado.amortizacionActualizada.map(cuota => ({
+          const amortizacionesToCreate = resultado.amortizacionActualizada.map((cuota: any) => ({
             prestamoID: credito.prestamo_ID,
             documento: documento,
             Numero_cuota: String(cuota.numeroCuota),
@@ -1198,7 +1213,7 @@ class MainDataService {
             IVA: parseInt(String(cuota.iva)) || 0,
             pablok: 0,
             seguro: 0,
-            sancion: 0,
+            sancion: parseInt(String(cuota.sancion)) || 0,
             total_cuota: parseInt(String(cuota.cuotaTotal)) || 0,
             saldo: String(cuota.saldo || '0'),
             fecha_pago: cuota.fechaPago || new Date().toISOString().split('T')[0]
@@ -1215,6 +1230,36 @@ class MainDataService {
           this.logger.info(`[PHASE 3B] ✅ ${createdAmortizaciones.count} amortizaciones creadas para prestamo_ID=${credito.prestamo_ID}`);
           totalAmortizacionesCreadas += createdAmortizaciones.count;
           creditosProcesados++;
+
+          // 2d. Guardar gastos de cartera si existen
+          try {
+            const gastosGuardados = await this.saveGastosCartera(
+              credito.prestamo_ID,
+              resultado.gastosCartera
+            );
+            if (gastosGuardados) {
+              this.logger.info(`[PHASE 3B] ✅ Gastos cartera guardados para prestamo_ID=${credito.prestamo_ID}`);
+            }
+          } catch (gastosError) {
+            const gastosMsg = gastosError instanceof Error ? gastosError.message : String(gastosError);
+            this.logger.warn(`[PHASE 3B] ⚠️ Error guardando gastos cartera para prestamo_ID=${credito.prestamo_ID}: ${gastosMsg}`);
+            // No fallar PHASE 3B por error en gastos cartera - continuar
+          }
+
+          // 2e. Guardar sanciones condonadas si existen
+          try {
+            const sancionesGuardadas = await this.saveSancionesCondonadas(
+              credito.prestamo_ID,
+              resultado.infoPagos
+            );
+            if (sancionesGuardadas) {
+              this.logger.info(`[PHASE 3B] ✅ Sanciones condonadas guardadas para prestamo_ID=${credito.prestamo_ID}`);
+            }
+          } catch (sancionesError) {
+            const sancionesMsg = sancionesError instanceof Error ? sancionesError.message : String(sancionesError);
+            this.logger.warn(`[PHASE 3B] ⚠️ Error guardando sanciones condonadas para prestamo_ID=${credito.prestamo_ID}: ${sancionesMsg}`);
+            // No fallar PHASE 3B por error en sanciones - continuar
+          }
 
         } catch (creditoError) {
           const errorMsg = creditoError instanceof Error ? creditoError.message : String(creditoError);
@@ -1428,6 +1473,178 @@ class MainDataService {
         totalPagos: 0,
         errores: [errorMsg]
       };
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GASTOS CARTERA - Guardar gastos de cartera desde cálculo de refinanciamiento
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Guarda gastos de cartera en la BD después del cálculo de amortizaciones
+   * 
+   * @param prestamoId - ID del crédito (prestamo_ID)
+   * @param gastosCartera - Objeto con estructura {prejuridico: {total, cantidad}, juridico: {total, cantidad}}
+   * @returns Promise<boolean> - true si se guardó, false si no hay datos o error
+   */
+  private async saveGastosCartera(prestamoId: number, gastosCartera?: any): Promise<boolean> {
+    try {
+      // 1. Validar que gastosCartera existe y tiene propiedades necesarias
+      if (!gastosCartera) {
+        this.logger.debug(`[GASTOS_CARTERA] ℹ️ Sin gastosCartera para prestamo_ID=${prestamoId}`);
+        return false;
+      }
+
+      // 2. Extraer valores de prejuridico y juridico
+      let prejuridicoTotal = 0;
+      let juridicoTotal = 0;
+
+      // Extraer prejuridico total
+      if (gastosCartera.prejuridico && typeof gastosCartera.prejuridico.total !== 'undefined') {
+        prejuridicoTotal = parseInt(String(gastosCartera.prejuridico.total)) || 0;
+      }
+
+      // Extraer juridico total
+      if (gastosCartera.juridico && typeof gastosCartera.juridico.total !== 'undefined') {
+        juridicoTotal = parseInt(String(gastosCartera.juridico.total)) || 0;
+      }
+
+      // 3. Si ambos valores son 0, no guardar
+      if (prejuridicoTotal === 0 && juridicoTotal === 0) {
+        this.logger.debug(`[GASTOS_CARTERA] ℹ️ Ambos gastos vacíos (prejuridico=0, juridico=0) para prestamo_ID=${prestamoId}`);
+        return false;
+      }
+
+      // 4. Buscar si ya existe registro para este prestamo_id
+      const gastosExistente = await prismaMainService.gastos_cartera.findFirst({
+        where: { prestamo_id: prestamoId }
+      });
+
+      // 5. Crear o actualizar según corresponda
+      if (gastosExistente) {
+        // Actualizar registro existente
+        await prismaMainService.gastos_cartera.update({
+          where: { id: gastosExistente.id },
+          data: {
+            prejuridico: prejuridicoTotal,
+            juridico: juridicoTotal,
+            fecha_actualizacion: new Date()
+          }
+        });
+        this.logger.debug(
+          `[GASTOS_CARTERA] ✅ Actualizado: prestamo_ID=${prestamoId}, prejuridico=${prejuridicoTotal}, juridico=${juridicoTotal}`
+        );
+      } else {
+        // Crear nuevo registro
+        await prismaMainService.gastos_cartera.create({
+          data: {
+            prestamo_id: prestamoId,
+            prejuridico: prejuridicoTotal,
+            juridico: juridicoTotal,
+            fecha_creacion: new Date(),
+            fecha_actualizacion: new Date()
+          }
+        });
+        this.logger.debug(
+          `[GASTOS_CARTERA] ✅ Creado: prestamo_ID=${prestamoId}, prejuridico=${prejuridicoTotal}, juridico=${juridicoTotal}`
+        );
+      }
+
+      return true;
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `[GASTOS_CARTERA] ⚠️ Error guardando gastos para prestamo_ID=${prestamoId}: ${errorMsg}`
+      );
+      // No lanzar error - retornar false para que el flujo continúe
+      return false;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SANCIONES CONDONADAS - Guardar sanciones condonadas desde cálculo de refinanciamiento
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Guarda sanciones condonadas en la BD después del cálculo de amortizaciones
+   * 
+   * @param prestamoId - ID del crédito (prestamo_ID)
+   * @param infoPagos - Objeto con estructura {sanciones_condonadas: number, dias_sanciones_condonadas: number, ...}
+   * @returns Promise<boolean> - true si se guardó, false si no hay datos o error
+   */
+  private async saveSancionesCondonadas(prestamoId: number, infoPagos?: any): Promise<boolean> {
+    try {
+      // 1. Validar que infoPagos existe
+      if (!infoPagos) {
+        this.logger.debug(`[SANCIONES_CONDONADAS] ℹ️ Sin infoPagos para prestamo_ID=${prestamoId}`);
+        return false;
+      }
+
+      // 2. Extraer valores de sanciones y días condonados
+      let montoCondonado = 0;
+      let diaCondonado = 0;
+
+      // Extraer monto condonado
+      if (typeof infoPagos.sanciones_condonadas !== 'undefined' && infoPagos.sanciones_condonadas !== null) {
+        montoCondonado = parseInt(String(infoPagos.sanciones_condonadas)) || 0;
+      }
+
+      // Extraer días condonados
+      if (typeof infoPagos.dias_sanciones_condonadas !== 'undefined' && infoPagos.dias_sanciones_condonadas !== null) {
+        diaCondonado = parseInt(String(infoPagos.dias_sanciones_condonadas)) || 0;
+      }
+
+      // 3. Si ambos valores son 0, no guardar
+      if (montoCondonado === 0 && diaCondonado === 0) {
+        this.logger.debug(`[SANCIONES_CONDONADAS] ℹ️ Ambas sanciones vacías (monto=0, dias=0) para prestamo_ID=${prestamoId}`);
+        return false;
+      }
+
+      // 4. Buscar si ya existe registro para este prestamo_id
+      const sancionExistente = await prismaMainService.sanciones_condonadas.findFirst({
+        where: { prestamo_id: prestamoId }
+      });
+
+      // 5. Crear o actualizar según corresponda
+      if (sancionExistente) {
+        // Actualizar registro existente
+        await prismaMainService.sanciones_condonadas.update({
+          where: { id: sancionExistente.id },
+          data: {
+            monto_condonado: montoCondonado,
+            dia_condonado: diaCondonado,
+            actualizado: new Date()
+          }
+        });
+        this.logger.debug(
+          `[SANCIONES_CONDONADAS] ✅ Actualizado: prestamo_ID=${prestamoId}, monto=${montoCondonado}, dias=${diaCondonado}`
+        );
+      } else {
+        // Crear nuevo registro
+        await prismaMainService.sanciones_condonadas.create({
+          data: {
+            prestamo_id: prestamoId,
+            monto_condonado: montoCondonado,
+            dia_condonado: diaCondonado,
+            fecha_registro: new Date(),
+            actualizado: new Date()
+          }
+        });
+        this.logger.debug(
+          `[SANCIONES_CONDONADAS] ✅ Creado: prestamo_ID=${prestamoId}, monto=${montoCondonado}, dias=${diaCondonado}`
+        );
+      }
+
+      return true;
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `[SANCIONES_CONDONADAS] ⚠️ Error guardando sanciones para prestamo_ID=${prestamoId}: ${errorMsg}`
+      );
+      // No lanzar error - retornar false para que el flujo continúe
+      return false;
     }
   }
 }

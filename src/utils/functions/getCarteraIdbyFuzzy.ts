@@ -78,8 +78,8 @@ export function getCarteraIdbyFuzzy(cartera: string, estadoLegacy?: string): Car
   let scoreCartera = 0;
 
   // Si el estado es JURIDICO, dar prioridad a carteras jurídicas
-  const esJuridico = estadoMapeado === 'JURIDICO' || /juridico/i.test(cartera);
-  const esPrejuridico = estadoMapeado === 'PREJURIDICO' || /prejuridico/i.test(cartera);
+  const esJuridico = estadoMapeado === 'Juridico' || /juridico/i.test(cartera);
+  const esPrejuridico = estadoMapeado === 'Prejuridico' || /prejuridico/i.test(cartera);
   
   carterasMap.forEach(carteraItem => {
     carteraItem.patrones.forEach(pattern => {

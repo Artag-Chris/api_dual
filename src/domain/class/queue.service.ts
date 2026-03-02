@@ -115,7 +115,17 @@ class QueueService {
    */
   async markCompleted(id: number) {
     try {
-      const item = await prismaMainService.migration_queue.update({
+      // Verificar que el item existe antes de actualizar
+      const item = await prismaMainService.migration_queue.findUnique({
+        where: { id }
+      });
+
+      if (!item) {
+        this.logger.warn(`[QUEUE] Item ${id} not found for markCompleted`);
+        return;
+      }
+
+      const updated = await prismaMainService.migration_queue.update({
         where: { id },
         data: {
           estado: 'COMPLETADO',
@@ -124,8 +134,8 @@ class QueueService {
         }
       });
 
-      this.logger.info(`[QUEUE] Completed: ${item.documento}`);
-      return item;
+      this.logger.info(`[QUEUE] Completed: ${updated.documento}`);
+      return updated;
       
     } catch (error) {
       this.logger.error(`[QUEUE] Error marking completed: ${(error as any).message}`);
@@ -275,28 +285,58 @@ class QueueService {
     errorMessage: string
   ) {
     try {
+      // Helper para convertir BigInt a string
+      const serializeBigInt = (obj: any): any => {
+        if (obj === null || obj === undefined) return obj;
+        
+        if (typeof obj === 'bigint') {
+          return obj.toString();
+        }
+        
+        if (typeof obj === 'object') {
+          if (Array.isArray(obj)) {
+            return obj.map(serializeBigInt);
+          }
+          const result: any = {};
+          for (const key in obj) {
+            result[key] = serializeBigInt(obj[key]);
+          }
+          return result;
+        }
+        
+        return obj;
+      };
+
       const errorObject = {
         tipo: 'CREDITO_FALLIDO',
         prestamo_ID: creditoId,
         fase,
         error_message: errorMessage,
         datos_credito: {
-          valor_prestamo: creditoData?.valor_prestamo,
-          numero_cuotas: creditoData?.numero_cuotas || creditoData?.plazo,
-          nombre_cartera: creditoData?.nombre_cartera,
-          estado: creditoData?.estado,
-          tasa: creditoData?.tasa,
-          periodicidad: creditoData?.periodicidad,
+          valor_prestamo: creditoData?.valor_prestamo ? String(creditoData.valor_prestamo) : null,
+          numero_cuotas: creditoData?.numero_cuotas ? Number(creditoData.numero_cuotas) : null,
+          nombre_cartera: creditoData?.nombre_cartera || null,
+          estado: creditoData?.estado || null,
+          tasa: creditoData?.tasa ? Number(creditoData.tasa) : null,
+          periodicidad: creditoData?.periodicidad || null,
+          plazo: creditoData?.plazo ? Number(creditoData.plazo) : null,
           fecha_creacion: creditoData?.fecha_creacion || new Date().toISOString()
         },
         guardado_en: new Date().toISOString()
       };
 
+      // Serializar con manejo de BigInt
+      const errorJSON = JSON.stringify(
+        serializeBigInt(errorObject),
+        null,
+        2
+      );
+
       await prismaMainService.migration_queue_dlq.create({
         data: {
           documento,
           fase,
-          error: JSON.stringify(errorObject, null, 2)
+          error: errorJSON
         }
       });
 
