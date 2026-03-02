@@ -258,6 +258,61 @@ class QueueService {
   }
 
   /**
+   * Guarda un crédito fallido en DLQ sin cambiar la tabla
+   * Usa el campo error como JSON para almacenar info del crédito
+   * 
+   * @param documento - Documento del cliente
+   * @param fase - PHASE 2, PHASE 3B, PHASE 4, etc
+   * @param creditoId - prestamo_ID (o credito_id_legacy, son iguales)
+   * @param creditoData - Objeto con datos del crédito (valor_prestamo, numero_cuotas, cartera, etc)
+   * @param errorMessage - Mensaje de error
+   */
+  async saveCreditoErrorToDLQ(
+    documento: string,
+    fase: string,
+    creditoId: number | null | undefined,
+    creditoData: any,
+    errorMessage: string
+  ) {
+    try {
+      const errorObject = {
+        tipo: 'CREDITO_FALLIDO',
+        prestamo_ID: creditoId,
+        fase,
+        error_message: errorMessage,
+        datos_credito: {
+          valor_prestamo: creditoData?.valor_prestamo,
+          numero_cuotas: creditoData?.numero_cuotas || creditoData?.plazo,
+          nombre_cartera: creditoData?.nombre_cartera,
+          estado: creditoData?.estado,
+          tasa: creditoData?.tasa,
+          periodicidad: creditoData?.periodicidad,
+          fecha_creacion: creditoData?.fecha_creacion || new Date().toISOString()
+        },
+        guardado_en: new Date().toISOString()
+      };
+
+      await prismaMainService.migration_queue_dlq.create({
+        data: {
+          documento,
+          fase,
+          error: JSON.stringify(errorObject, null, 2)
+        }
+      });
+
+      this.logger.warn(
+        `[QUEUE] 💾 Crédito fallido guardado en DLQ: documento=${documento}, prestamo_ID=${creditoId}, fase=${fase}`
+      );
+    } catch (dlqError) {
+      this.logger.error(
+        `[QUEUE] Error guardando crédito en DLQ: ${
+          dlqError instanceof Error ? dlqError.message : String(dlqError)
+        }`
+      );
+    }
+  }
+
+  /**
    * Obtiene items de Dead Letter Queue (errores graves)
    * 
    * @param limit - Cuántos mostrar

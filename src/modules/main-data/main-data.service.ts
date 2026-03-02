@@ -253,11 +253,21 @@ class MainDataService {
 
     // Obtener cónyuge relacionado (si existe) - AHORA con ID convertido a number
     if (clienteLegacy.conyuge_id) {
-      const conyugeData = await prismaLegacyService.conyuges.findUnique({
-        where: { id: clienteLegacy.conyuge_id },
-      });
-      if (conyugeData) {
-        clienteLegacy.conyuges = [conyugeData];
+      try {
+        const conyugeData = await prismaLegacyService.conyuges.findUnique({
+          where: { id: clienteLegacy.conyuge_id },
+        });
+        if (conyugeData) {
+          clienteLegacy.conyuges = [conyugeData];
+        }
+      } catch (conyugeError) {
+        // Si falla la lectura del cónyuge (por ej: enum inválido), simplemente continuamos sin él
+        this.logger.warn(
+          `[PHASE 2] ⚠️ Error al obtener cónyuge ${clienteLegacy.conyuge_id} para documento ${documento}: ${
+            conyugeError instanceof Error ? conyugeError.message : String(conyugeError)
+          }. Continuando sin cónyuge.`
+        );
+        clienteLegacy.conyuges = [];
       }
     }
 
@@ -328,8 +338,15 @@ class MainDataService {
     let conyugeDto: any = null;
     if (clienteLegacy.conyuges && clienteLegacy.conyuges.length > 0) {
       const [conyugeError, conyugeMapped] = mapperService.mapToConyuge(clienteLegacy.conyuges[0], documento);
-      if (conyugeError) throw new Error(`Error en mapeo Cónyuge: ${conyugeError}`);
-      conyugeDto = conyugeMapped;
+      if (conyugeError) {
+        // Si hay error en el mapeo del cónyuge, registrar warning y continuar sin cónyuge
+        // this.logger.warn(
+        //   `[PHASE 2] ⚠️ Error en mapeo del cónyuge para documento ${documento}: ${conyugeError}. Continuando sin cónyuge.`
+        // );
+        conyugeDto = null;
+      } else {
+        conyugeDto = conyugeMapped;
+      }
     }
 
     try {
@@ -501,7 +518,7 @@ class MainDataService {
         });
 
         // 11. Crear o actualizar cónyuge if exists (resiliente: error no falla el cliente)
-        let conyuge = null;
+        let conyuge: any = "NO";
         if (conyugeDto) {
           try {
             conyuge = await tx.conyuge.upsert({
@@ -509,7 +526,7 @@ class MainDataService {
               update: {
                 nombres: conyugeDto.nombres,
                 apellidos: conyugeDto.apellidos,
-                tipo_documento: conyugeDto.tipo_documento,
+                tipo_documento: conyugeDto.tipo_documento|| null,
                 documento_conyuge: conyugeDto.documento_conyuge,
                 telefono: conyugeDto.telefono,
               },
@@ -524,7 +541,7 @@ class MainDataService {
             });
        
           } catch (conyugeError) {
-            conyuge = null;
+            conyuge = "NO";
           }
         }
 
@@ -554,22 +571,8 @@ class MainDataService {
     }
   }
 
-
-
   // ==================== MIGRACIÓN DE CRÉDITOS - PHASE 2 ====================
 
-
-
-  /**
-   * MIGRATION PHASE 2: Migra créditos de un cliente desde Legacy a Main
-   * 
-   * Bifurcación SINGLE-QUERY:
-   * - Query 1 (INNER JOIN creditos): Busca créditos relacionados existentes
-   *   - Si 0 filas → PATH A: Registrar en documento_precredito (sin créditos)
-   *   - Si N filas → PATH B: Procesar y migrar cada crédito
-   * 
-   * Resilencia: error en 1 crédito NO falla el documento completo
-   */
   async migrateCreditsPhase(documento: string): Promise<{
     status: "SIN_CREDITOS" | "CREDITOS_MIGRADOS" | "TODOS_FALLIDOS",
     creditosMigrados?: number,
@@ -907,6 +910,29 @@ class MainDataService {
           const errorMsg = error instanceof Error ? error.message : String(error);
           this.logger.warn(`[Fase 2] ❌ Error crédito: ${errorMsg}`);
           errores.push(errorMsg);
+          
+          // ✅ Guardar crédito fallido en DLQ
+          try {
+            const queueService = QueueService.getInstance();
+            await queueService.saveCreditoErrorToDLQ(
+              documento,
+              'PHASE 2',
+              row.credito_id_legacy,
+              {
+                valor_prestamo: row.valor_prestamo,
+                numero_cuotas: row.numero_cuotas,
+                plazo: row.plazo,
+                nombre_cartera: row.nombre_cartera,
+                estado: row.estado,
+                tasa: row.tasa,
+                periodicidad: row.periodicidad,
+                fecha_creacion: row.fecha_creacion
+              },
+              errorMsg
+            );
+          } catch (dlqError) {
+            this.logger.error(`[Fase 2] Error guardando en DLQ: ${dlqError}`);
+          }
           // Continuar con próximo crédito (NO fallar documento)
         }
       }
@@ -1194,6 +1220,24 @@ class MainDataService {
           const errorMsg = creditoError instanceof Error ? creditoError.message : String(creditoError);
           this.logger.warn(`[PHASE 3B] ❌ Error procesando crédito prestamo_ID=${credito.prestamo_ID}: ${errorMsg}`);
           errores.push(errorMsg);
+          
+          // ✅ Guardar crédito fallido en DLQ
+          try {
+            const queueService = QueueService.getInstance();
+            await queueService.saveCreditoErrorToDLQ(
+              documento,
+              'PHASE 3B',
+              credito.prestamo_ID,
+              {
+                valor_prestamo: credito.valor_prestamo,
+                numero_cuotas: credito.numero_cuotas,
+                tasa: credito.tasa
+              },
+              errorMsg
+            );
+          } catch (dlqError) {
+            this.logger.error(`[PHASE 3B] Error guardando en DLQ: ${dlqError}`);
+          }
           // Continuar con próximo crédito (NO fallar documento completo)
         }
       }

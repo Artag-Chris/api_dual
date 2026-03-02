@@ -4,6 +4,97 @@
  * Capital distribuido equitativamente + Aval fijo por cuota
  */
 
+/**
+ * Tipos de conceptos de pagos
+ * Categoriza diferentes tipos de transacciones registradas
+ */
+export enum TipoConceptoPago {
+  // Pagos que aplican a cuotas
+  CUOTA = 'Cuota',
+  CUOTA_PARCIAL = 'Cuota Parcial',
+  AVAL = 'Aval',
+  
+  // Pagos de sanciones/mora
+  MORA = 'Mora',
+  
+  // Pagos jurídicos (NO aplican a cuotas)
+  PREJURIDICO = 'Prejuridico',
+  JURIDICO = 'Juridico',
+  
+  // Saldo a favor (reportar separado)
+  SALDO_A_FAVOR = 'Saldo a Favor',
+}
+
+/**
+ * Categoría de un concepto de pago
+ */
+export enum CategoriaConcepto {
+  CUOTA = 'CUOTA',
+  SANCION = 'SANCION',
+  JURIDICO = 'JURIDICO',
+  SALDO_FAVOR = 'SALDO_FAVOR',
+}
+
+/**
+ * Utilidad para categorizar conceptos
+ */
+export class CategorizadorConceptos {
+  private static readonly CONCEPTOS_CUOTA = ['Cuota', 'Cuota Parcial', 'Aval'];
+  private static readonly CONCEPTOS_SANCION = ['Mora'];
+  private static readonly CONCEPTOS_JURIDICO = ['Prejuridico', 'Juridico'];
+  private static readonly CONCEPTOS_SALDO_FAVOR = ['Saldo a Favor'];
+
+  /**
+   * Categoriza un concepto de pago
+   */
+  static categorizar(concepto: string): CategoriaConcepto {
+    const conceptoNormalizado = String(concepto).trim();
+    
+    if (this.CONCEPTOS_CUOTA.includes(conceptoNormalizado)) {
+      return CategoriaConcepto.CUOTA;
+    }
+    if (this.CONCEPTOS_SANCION.includes(conceptoNormalizado)) {
+      return CategoriaConcepto.SANCION;
+    }
+    if (this.CONCEPTOS_JURIDICO.includes(conceptoNormalizado)) {
+      return CategoriaConcepto.JURIDICO;
+    }
+    if (this.CONCEPTOS_SALDO_FAVOR.includes(conceptoNormalizado)) {
+      return CategoriaConcepto.SALDO_FAVOR;
+    }
+    
+    return CategoriaConcepto.CUOTA; // Default
+  }
+
+  /**
+   * Verifica si un concepto aplica a cuotas
+   */
+  static aplicaACuota(concepto: string): boolean {
+    return this.categorizar(concepto) === CategoriaConcepto.CUOTA;
+  }
+
+  /**
+   * Verifica si es un pago de sanción
+   */
+  static esSancion(concepto: string): boolean {
+    return this.categorizar(concepto) === CategoriaConcepto.SANCION;
+  }
+
+  /**
+   * Verifica si es jurídico
+   */
+  static esJuridico(concepto: string): boolean {
+    return this.categorizar(concepto) === CategoriaConcepto.JURIDICO;
+  }
+
+  /**
+   * Verifica si es saldo a favor
+   */
+  static esSaldoAFavor(concepto: string): boolean {
+    return this.categorizar(concepto) === CategoriaConcepto.SALDO_FAVOR;
+  }
+}
+
 export interface RefinanciamientoItem {
   prestamoId: string | number;
   documento: string;
@@ -91,6 +182,20 @@ export interface InfoPagosProcessados {
       iva: number;
       totalAbonado: number;
     };
+  };
+  // NUEVOS CAMPOS
+  pagosJuridicos: {
+    totalPrejuridico: number;
+    totalJuridico: number;
+    cantidadPagosJuridicos: number;
+  };
+  saldoAFavor: {
+    total: number;
+    cantidadRegistros: number;
+  };
+  pagosEnMora: {
+    totalPagadoEnMora: number;
+    cantidadSancionesPagadas: number;
   };
 }
 
@@ -329,6 +434,151 @@ export class AmortizacionRefinanciamiento {
   }
 
   /**
+   * Normaliza valores en "debe": Si son negativos, asigna 0
+   * Evita problemas con pagos parciales
+   */
+  private static normalizarDebeNegativo(pago: PagoRegistro): PagoRegistro {
+    return {
+      ...pago,
+      debe: pago.debe < 0 ? 0 : pago.debe,
+    };
+  }
+
+  /**
+   * Filtra pagos por categoría (solo aquellos que aplican a cuotas)
+   */
+  private static filtrarPagosCuota(pagos: PagoRegistro[]): PagoRegistro[] {
+    return pagos.filter(p => CategorizadorConceptos.aplicaACuota(p.concepto));
+  }
+
+  /**
+   * Filtra pagos de sanciones/mora
+   */
+  private static filtrarPagosSanciones(pagos: PagoRegistro[]): PagoRegistro[] {
+    return pagos.filter(p => CategorizadorConceptos.esSancion(p.concepto));
+  }
+
+  /**
+   * Filtra pagos jurídicos (NO aplican a cuotas)
+   */
+  private static filtrarPagosJuridico(pagos: PagoRegistro[]): PagoRegistro[] {
+    return pagos.filter(p => CategorizadorConceptos.esJuridico(p.concepto));
+  }
+
+  /**
+   * Filtra pagos de saldo a favor
+   */
+  private static filtrarSaldoAFavor(pagos: PagoRegistro[]): PagoRegistro[] {
+    return pagos.filter(p => CategorizadorConceptos.esSaldoAFavor(p.concepto));
+  }
+
+  /**
+   * Calcula el máximo de sanciones permitidas por cuota según el período
+   * - Quincenal: 1000 x 15 días = 15,000
+   * - Mensual: 1000 x 30 días = 30,000
+   */
+  private static calcularMaximoSancionPorPeriodo(periocidad: 'mensual' | 'quincenal'): number {
+    if (periocidad === 'quincenal') {
+      return 1000 * 15; // 15,000
+    } else {
+      return 1000 * 30; // 30,000
+    }
+  }
+
+  /**
+   * Verifica si una sanción coincide con la fecha de una cuota
+   * Considera que la sanción es de la cuota si fue creada después de la fecha de pago
+   * de la cuota anterior y antes o en la fecha de pago de la cuota actual
+   */
+  private static sancionCoincideConCuota(
+    fechaSancion: Date,
+    cuotaActual: RefinanciamientoItem,
+    cuotaAnterior?: RefinanciamientoItem
+  ): boolean {
+    const fechaActual = new Date(cuotaActual.fechaPago);
+    
+    if (cuotaAnterior) {
+      const fechaAnterior = new Date(cuotaAnterior.fechaPago);
+      // Sanción entre la cuota anterior y la actual
+      return fechaSancion > fechaAnterior && fechaSancion <= fechaActual;
+    } else {
+      // Para la primera cuota, cualquier sanción anterior o en la fecha es válida
+      return fechaSancion <= fechaActual;
+    }
+  }
+
+  /**
+   * Intenta emparejar sanciones con cuotas por fecha
+   * Retorna un mapa de cuota -> total de sanciones que coinciden por fecha
+   */
+  private static emparejarSancionesPorFecha(
+    sanciones: SancionRegistro[],
+    amortizacion: RefinanciamientoItem[]
+  ): { emparejadas: Map<number, number>; sinEmparejar: SancionRegistro[] } {
+    const sancionesEmparejadas = new Map<number, number>();
+    const sancionesSinEmparejar: SancionRegistro[] = [];
+
+    // Inicializar todas las cuotas
+    amortizacion.forEach(cuota => {
+      sancionesEmparejadas.set(cuota.numeroCuota, 0);
+    });
+
+    // Intentar emparejar cada sanción
+    sanciones.forEach(sancion => {
+      const fechaSancion = new Date(sancion.created_at);
+      let encontrada = false;
+
+      // Buscar la cuota que corresponde a esta sanción
+      for (let i = 0; i < amortizacion.length; i++) {
+        const cuotaActual = amortizacion[i];
+        const cuotaAnterior = i > 0 ? amortizacion[i - 1] : undefined;
+
+        if (this.sancionCoincideConCuota(fechaSancion, cuotaActual, cuotaAnterior)) {
+          // Sanción coincide con esta cuota
+          const actual = sancionesEmparejadas.get(cuotaActual.numeroCuota) || 0;
+          sancionesEmparejadas.set(cuotaActual.numeroCuota, actual + sancion.valor);
+          encontrada = true;
+          break;
+        }
+      }
+
+      // Si no se encontró coincidencia de fecha, agregarlo a sin emparejar
+      if (!encontrada) {
+        sancionesSinEmparejar.push(sancion);
+      }
+    });
+
+    return { emparejadas: sancionesEmparejadas, sinEmparejar: sancionesSinEmparejar };
+  }
+
+  /**
+   * Encuentra la cuota más morosa (con mayor índice de morosidad)
+   * Se usa para asignar sanciones pendientes
+   * 
+   * La cuota más morosa es la primera cuota pendiente de pago (num_cuota más alta sin completar)
+   */
+  private static encontrarCuotaMasMoresa(pagos: PagoRegistro[]): number {
+    // Si no hay pagos, la cuota más morosa es la 1
+    if (!pagos || pagos.length === 0) {
+      return 1;
+    }
+
+    // Obtener el máximo número de cuota con estado 'Ok' (completamente pagada)
+    const cuotasOk = pagos
+      .filter(p => p.estado === 'Ok' && p.num_cuota !== null && p.num_cuota !== undefined)
+      .map(p => p.num_cuota as number);
+
+    if (cuotasOk.length === 0) {
+      // Ninguna cuota está completamente pagada, la más morosa es la 1
+      return 1;
+    }
+
+    // La cuota más morosa es la siguiente después de la máxima pagada
+    const maxPagada = Math.max(...cuotasOk);
+    return maxPagada + 1;
+  }
+
+  /**
    * Asigna números de cuota a pagos con num_cuota = NULL
    * Solo procesa conceptos: 'Cuota', 'Cuota Parcial', 'Aval'
    * Agrupa múltiples pagos que juntos sumen el valor de la cuota
@@ -479,15 +729,18 @@ export class AmortizacionRefinanciamiento {
    * indicando que no hay cuotas pagadas y se generará amortización completa
    */
   public static procesarPagos(pagos: PagoRegistro[], valorCuota: number, sancionesExoneradas?: SancionRegistro[]): { valido: boolean; errores: string[]; infoPagos?: InfoPagosProcessados } {
-    // Validar estructura
-    const validacion = this.validarEstructuraPagos(pagos);
+    // PASO 1: Normalizar todos los pagos PRIMERO (convertir "debe" negativo a 0)
+    // Esto debe ocurrir antes de la validación para que no falle por valores negativos
+    const pagosNormalizados = pagos.map(p => this.normalizarDebeNegativo(p));
+
+    // PASO 2: Validar estructura de pagos ya normalizados
+    const validacion = this.validarEstructuraPagos(pagosNormalizados);
     if (!validacion.valido) {
       return { valido: false, errores: validacion.errores };
     }
 
     // CASO ESPECIAL: Sin pagos registrados (crédito nuevo)
-    // Retornar infoPagos con valores por defecto: no hay cuotas pagadas
-    if (pagos.length === 0) {
+    if (pagosNormalizados.length === 0) {
       const infoPagos: InfoPagosProcessados = {
         cuotaMaximaPagada: 0,
         tieneCuotaParciall: false,
@@ -496,27 +749,51 @@ export class AmortizacionRefinanciamiento {
         sanciones_condonadas: 0,
         dias_sanciones_condonadas: 0,
         desglosePagos: {},
+        pagosJuridicos: {
+          totalPrejuridico: 0,
+          totalJuridico: 0,
+          cantidadPagosJuridicos: 0,
+        },
+        saldoAFavor: {
+          total: 0,
+          cantidadRegistros: 0,
+        },
+        pagosEnMora: {
+          totalPagadoEnMora: 0,
+          cantidadSancionesPagadas: 0,
+        },
       };
       return { valido: true, errores: [], infoPagos };
     }
 
-    // Asignar cuota numbers a pagos con num_cuota = NULL (agrupa múltiples pagos por cuota)
-    const pagosConCuotasAsignadas = this.asignarCuotasANullPayments(pagos, valorCuota);
+    // ═════════════════════════════════════════════════════════════════════
+    // SEPARAR PAGOS POR CATEGORÍA
+    // ═════════════════════════════════════════════════════════════════════
+    const pagosCuota = this.filtrarPagosCuota(pagosNormalizados);
+    const pagosSanciones = this.filtrarPagosSanciones(pagosNormalizados);
+    const pagosJuridicos = this.filtrarPagosJuridico(pagosNormalizados);
+    const pagosAlFavor = this.filtrarSaldoAFavor(pagosNormalizados);
 
-    // Calcular desglose completo de pagos por cuota
+    // ═════════════════════════════════════════════════════════════════════
+    // PROCESAR PAGOS DE CUOTA (aplican a amortización)
+    // ═════════════════════════════════════════════════════════════════════
+    
+    // Asignar cuota numbers a pagos con num_cuota = NULL
+    const pagosConCuotasAsignadas = this.asignarCuotasANullPayments(pagosCuota, valorCuota);
+
+    // Calcular desglose completo de pagos
     const desglosePagosCompleto = this.calcularDesglosePagos(pagosConCuotasAsignadas);
 
-    // Obtener cuota máxima COMPLETAMENTE pagada (estado='Ok' en todos los registros)
+    // Obtener cuota máxima COMPLETAMENTE pagada
     let cuotaMaximaPagada = 0;
     Object.entries(desglosePagosCompleto).forEach(([numCuotaStr, desglose]) => {
-      const numCuota = parseInt(numCuotaStr);
-      // Una cuota está completamente pagada si su estado es 'Ok'
-      if (desglose.estado === 'Ok' && numCuota > cuotaMaximaPagada) {
-        cuotaMaximaPagada = numCuota;
+      if (desglose.estado === 'Ok') {
+        const numCuota = parseInt(numCuotaStr);
+        cuotaMaximaPagada = Math.max(cuotaMaximaPagada, numCuota);
       }
     });
 
-    // Detectar cuota parcial (la siguiente después de la máxima pagada)
+    // Detectar cuota parcial
     let tieneCuotaParcial = false;
     let montoPagadoCuotaParcial = 0;
     let montoDebe = 0;
@@ -524,7 +801,6 @@ export class AmortizacionRefinanciamiento {
     const numeroCuotaParcialPosible = cuotaMaximaPagada + 1;
     if (desglosePagosCompleto[numeroCuotaParcialPosible]) {
       const desglose = desglosePagosCompleto[numeroCuotaParcialPosible];
-      
       if (desglose.estado === 'parcial') {
         tieneCuotaParcial = true;
         montoPagadoCuotaParcial = desglose.totalAbonado;
@@ -532,15 +808,40 @@ export class AmortizacionRefinanciamiento {
       }
     }
 
-    // Procesar sanciones exoneradas
+    // ═════════════════════════════════════════════════════════════════════
+    // PROCESAR PAGOS DE SANCIONES (MORA)
+    // ═════════════════════════════════════════════════════════════════════
+    const totalPagadoEnMora = pagosSanciones.reduce((sum, p) => sum + p.abono, 0);
+    const cantidadSancionesPagadas = pagosSanciones.length;
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PROCESAR PAGOS JURÍDICOS (NO APLICAN A CUOTAS)
+    // ═════════════════════════════════════════════════════════════════════
+    const totalPrejuridico = pagosJuridicos
+      .filter(p => p.concepto === 'Prejuridico')
+      .reduce((sum, p) => sum + p.abono, 0);
+
+    const totalJuridico = pagosJuridicos
+      .filter(p => p.concepto === 'Juridico')
+      .reduce((sum, p) => sum + p.abono, 0);
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PROCESAR SALDO A FAVOR (REPORTAR SEPARADO)
+    // ═════════════════════════════════════════════════════════════════════
+    const totalSaldoAFavor = pagosAlFavor.reduce((sum, p) => sum + p.abono, 0);
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PROCESAR SANCIONES EXONERADAS
+    // ═════════════════════════════════════════════════════════════════════
     const { sanciones_condonadas, dias_sanciones_condonadas } = this.procesarSancionesExoneradas(sancionesExoneradas || []);
 
-    // Convertir desglose a formato esperado por InfoPagosProcessados
+    // ═════════════════════════════════════════════════════════════════════
+    // CONVERTIR DESGLOSE A FORMATO FINAL
+    // ═════════════════════════════════════════════════════════════════════
     const desglosePagos: { [key: number]: { capital: number; interes: number; aval: number; iva: number; totalAbonado: number } } = {};
     Object.entries(desglosePagosCompleto).forEach(([numCuotaStr, desglose]) => {
-      const numCuota = parseInt(numCuotaStr);
-      desglosePagos[numCuota] = {
-        capital: 0, // No se usa en este contexto
+      desglosePagos[parseInt(numCuotaStr)] = {
+        capital: 0,
         interes: 0,
         aval: 0,
         iva: 0,
@@ -548,6 +849,9 @@ export class AmortizacionRefinanciamiento {
       };
     });
 
+    // ═════════════════════════════════════════════════════════════════════
+    // ARMAR RESPUESTA FINAL
+    // ═════════════════════════════════════════════════════════════════════
     const infoPagos: InfoPagosProcessados = {
       cuotaMaximaPagada,
       tieneCuotaParciall: tieneCuotaParcial,
@@ -556,27 +860,47 @@ export class AmortizacionRefinanciamiento {
       sanciones_condonadas,
       dias_sanciones_condonadas,
       desglosePagos,
+      pagosJuridicos: {
+        totalPrejuridico,
+        totalJuridico,
+        cantidadPagosJuridicos: pagosJuridicos.length,
+      },
+      saldoAFavor: {
+        total: totalSaldoAFavor,
+        cantidadRegistros: pagosAlFavor.length,
+      },
+      pagosEnMora: {
+        totalPagadoEnMora,
+        cantidadSancionesPagadas,
+      },
     };
 
     return { valido: true, errores: [], infoPagos };
   }
 
   /**
-   * Mapea sanciones (penalties) a cuotas basado en rangos de fechas
+   * Mapea sanciones pendientes (estado='Debe') a cuotas con lógica de validación
    * 
-   * Lógica:
-   * - Para cada sanción, verifica su fecha (created_at)
-   * - Encuentra la cuota cuyo rango de fecha la contiene:
-   *   → Cuota N: desde fechaPago[N-1] hasta fechaPago[N]
-   * - Acumula el valor de la sanción a esa cuota
+   * FLUJO:
+   * 1. Primero intenta emparejar sanciones con cuotas POR FECHA
+   *    - Si la sanción se creó entre dos fechas de pago, va a esa cuota
+   * 2. Para sanciones SIN emparejar por fecha:
+   *    - Se asignan a la cuota más morosa
+   * 3. Valida límites máximos por período:
+   *    - Quincenal: máx 15,000 por cuota (1000 x 15 días)
+   *    - Mensual: máx 30,000 por cuota (1000 x 30 días)
    * 
    * @param sanciones Array de sanciones pendientes (estado = 'Debe')
    * @param amortizacion Array de cuotas con fechaPago calculadas
+   * @param pagos Array de pagos registrados (para identificar cuota más morosa)
+   * @param periocidad 'mensual' o 'quincenal' para validar límites
    * @returns Mapa de numeroCuota -> totalSancion acumulada
    */
   public static mapearSancionesACuotas(
     sanciones: SancionRegistro[],
-    amortizacion: RefinanciamientoItem[]
+    amortizacion: RefinanciamientoItem[],
+    pagos?: PagoRegistro[],
+    periocidad?: 'mensual' | 'quincenal'
   ): Map<number, number> {
     const sancionPorCuota = new Map<number, number>();
 
@@ -590,42 +914,44 @@ export class AmortizacionRefinanciamiento {
       return sancionPorCuota;
     }
 
-    // Para cada sanción, determinar a qué cuota pertenece
-    sanciones.forEach(sancion => {
-      const fechaSancion = new Date(sancion.created_at);
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 1: INTENTAR EMPAREJAR SANCIONES POR FECHA
+    // ═════════════════════════════════════════════════════════════════════
+    const { emparejadas, sinEmparejar } = this.emparejarSancionesPorFecha(
+      sanciones,
+      amortizacion
+    );
 
-      // Encontrar la cuota que contiene esta sanción
-      for (let i = 0; i < amortizacion.length; i++) {
-        const cuota = amortizacion[i];
-        const cuotaNumero = cuota.numeroCuota;
-        const fechaActual = new Date(cuota.fechaPago);
-
-        // Determinar el rango: desde la cuota anterior hasta la actual
-        let fechaInicio: Date;
-        
-        if (cuotaNumero === 1) {
-          // Primera cuota: desde el comienzo del tiempo
-          fechaInicio = new Date('1900-01-01');
-        } else {
-          // Otras cuotas: desde la fecha de pago de la cuota anterior
-          const cuotaAnterior = amortizacion[i - 1];
-          fechaInicio = new Date(cuotaAnterior.fechaPago);
-        }
-
-        // Verificar si la sanción cae en este rango (fechaInicio < sancion.created_at <= fechaPago)
-        if (fechaSancion > fechaInicio && fechaSancion <= fechaActual) {
-          const sancionActual = sancionPorCuota.get(cuotaNumero) || 0;
-          sancionPorCuota.set(cuotaNumero, sancionActual + sancion.valor);
-          break; // Sanción mapeada, pasar a la siguiente
-        }
+    // Emparejar las sanciones que coincidieron por fecha
+    emparejadas.forEach((total, cuota) => {
+      if (total > 0) {
+        sancionPorCuota.set(cuota, total);
       }
+    });
 
-      // Si la sanción es posterior a todas las cuotas, asignarla a la última
-      const fechaUltimaCuota = new Date(amortizacion[amortizacion.length - 1].fechaPago);
-      if (fechaSancion > fechaUltimaCuota) {
-        const ultimaCuota = amortizacion[amortizacion.length - 1].numeroCuota;
-        const sancionActual = sancionPorCuota.get(ultimaCuota) || 0;
-        sancionPorCuota.set(ultimaCuota, sancionActual + sancion.valor);
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 2: ASIGNAR SANCIONES SIN EMPAREJAR A CUOTA MÁS MOROSA
+    // ═════════════════════════════════════════════════════════════════════
+    if (sinEmparejar.length > 0) {
+      const cuotaMasMoresa = pagos && pagos.length > 0 
+        ? this.encontrarCuotaMasMoresa(pagos)
+        : 1;
+
+      const totalSinEmparejar = sinEmparejar.reduce((sum, s) => sum + s.valor, 0);
+      const actual = sancionPorCuota.get(cuotaMasMoresa) || 0;
+      sancionPorCuota.set(cuotaMasMoresa, actual + totalSinEmparejar);
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // PASO 3: VALIDAR LÍMITES MÁXIMOS POR PERÍODO
+    // ═════════════════════════════════════════════════════════════════════
+    const periodicidad = periocidad || 'mensual';
+    const maximoSancion = this.calcularMaximoSancionPorPeriodo(periodicidad);
+
+    sancionPorCuota.forEach((valor, cuota) => {
+      // Si las sanciones exceden el máximo, limitar al máximo
+      if (valor > maximoSancion) {
+        sancionPorCuota.set(cuota, maximoSancion);
       }
     });
 
@@ -858,6 +1184,114 @@ export class AmortizacionRefinanciamiento {
   }
 
   /**
+   * Calcula amortización ALTERNATIVA cuando cta_aval y cta_iva_aval son null/0/undefined
+   * 
+   * FLUJO:
+   * 1. Capital por cuota = valor_prestamo / cantidad_meses (x2 si es quincenal)
+   * 2. Excedente = valor_cuota - capital
+   * 3. Distribuye excedente:
+   *    - 60% para aval
+   *    - 10% para iva_aval
+   *    - 30% para intereses
+   * 4. Genera fechas de pago usando fecha_pago1 y fecha_pago2 según período
+   * 
+   * @param infoCredito Información del crédito normalizada
+   * @returns Array de RefinanciamientoItem
+   */
+  private static calcularAmortizacionAlternativa(infoCredito: InfoCreditoData): RefinanciamientoItem[] {
+    const {
+      credito_id,
+      documento,
+      valor_prestamo,
+      valor_cuota,
+      cantidad_meses,
+      periodicidad,
+      fecha_creacion,
+      fecha_pago1,
+      fecha_pago2,
+    } = infoCredito;
+
+    // Normalizar periodicidad
+    const periocidadNormalizada = String(periodicidad).toLowerCase() === 'mensual' ? 'mensual' : 'quincenal';
+
+    // Calcular número de cuotas según período
+    const numeroCuotas = periocidadNormalizada === 'quincenal' ? cantidad_meses * 2 : cantidad_meses;
+    
+    // Capital por cuota (distribución simple)
+    const capitalPorCuota = Math.round(valor_prestamo / numeroCuotas);
+    
+    // Excedente entre valor_cuota y capital
+    const excedente = valor_cuota - capitalPorCuota;
+    
+    // Distribución del excedente
+    const avalExcedente = Math.round(excedente * 0.6); // 60%
+    const ivaExcedente = Math.round(excedente * 0.1); // 10%
+    const interesExcedente = Math.round(excedente * 0.3); // 30%
+    
+    // Construir array de dias de pago según período
+    const diasPago: number[] = [];
+    if (periocidadNormalizada === 'quincenal') {
+      // Quincenal: usar fecha_pago1 y fecha_pago2
+      diasPago.push(Number(fecha_pago1) || 1);
+      if (fecha_pago2) {
+        diasPago.push(Number(fecha_pago2) || 1);
+      } else {
+        // Si solo hay fecha_pago1, usar el mismo día duas veces
+        diasPago.push(Number(fecha_pago1) || 1);
+      }
+    } else {
+      // Mensual: usar solo fecha_pago1
+      diasPago.push(Number(fecha_pago1) || 1);
+    }
+    
+    // Calcular fecha del primer pago
+    const fechaPrimerPago = this.calcularFechaPrimerPago(
+      new Date(fecha_creacion),
+      periocidadNormalizada,
+      diasPago
+    );
+
+    const amortizacion: RefinanciamientoItem[] = [];
+    let saldoRestante = valor_prestamo;
+
+    for (let i = 0; i < numeroCuotas; i++) {
+      // Última cuota: usar saldo restante como capital
+      let capital = i === numeroCuotas - 1 ? saldoRestante : capitalPorCuota;
+      
+      // Cuota total
+      const cuotaTotal = capital + interesExcedente + avalExcedente + ivaExcedente;
+
+      // Actualizar saldo
+      saldoRestante -= capital;
+      saldoRestante = Math.max(0, saldoRestante);
+
+      // Calcular fecha de pago para esta cuota
+      const fechaPago = this.calcularSiguienteFechaPago(
+        fechaPrimerPago,
+        periocidadNormalizada,
+        i,
+        diasPago
+      );
+
+      amortizacion.push({
+        prestamoId: credito_id,
+        documento,
+        numeroCuota: i + 1,
+        capitalEnMora: valor_prestamo,
+        capital,
+        interes: interesExcedente,
+        aval: avalExcedente,
+        iva: ivaExcedente,
+        cuotaTotal,
+        saldo: saldoRestante,
+        fechaPago: fechaPago.toISOString().split('T')[0],
+      });
+    }
+
+    return amortizacion;
+  }
+
+  /**
    * Crea parámetros de refinanciamiento a partir de la información del crédito
    * Calcula automáticamente la fecha del primer pago usando los días de pago
    */
@@ -972,17 +1406,35 @@ export class AmortizacionRefinanciamiento {
 
       resultado.infoPagos = procesoPagos.infoPagos;
 
-      // Paso 4: Crear parámetros de refinanciamiento
-      const params = this.crearParametrosRefinanciamiento(creditoNormalizado);
+      // Paso 4: Detectar si necesita amortización alternativa (cta_aval/cta_iva_aval nulos)
+      const requiereAmortizacionAlternativa = 
+        (creditoNormalizado.cta_aval === null || creditoNormalizado.cta_aval === undefined || creditoNormalizado.cta_aval === 0) &&
+        (creditoNormalizado.cta_iva_aval === null || creditoNormalizado.cta_iva_aval === undefined || creditoNormalizado.cta_iva_aval === 0);
 
-      // Paso 5: Calcular amortización original
-      const amortizacionOriginal = this.calcularRefinanciamiento(params);
+      // Paso 5: Calcular amortización original (por método alternativo o estándar)
+      let amortizacionOriginal: RefinanciamientoItem[];
+      let params: RefinanciamientoParams;
+      
+      if (requiereAmortizacionAlternativa) {
+        // Usar amortización alternativa cuando no hay cta_aval/cta_iva_aval
+        amortizacionOriginal = this.calcularAmortizacionAlternativa(creditoNormalizado);
+        // Crear parámetros solo para obtener diasPago
+        params = this.crearParametrosRefinanciamiento(creditoNormalizado);
+      } else {
+        // Usar amortización estándar de refinanciamiento
+        params = this.crearParametrosRefinanciamiento(creditoNormalizado);
+        amortizacionOriginal = this.calcularRefinanciamiento(params);
+      }
+      
       resultado.amortizacionOriginal = amortizacionOriginal;
 
-      // Paso 6: Mapear sanciones a cuotas (si existen)
+      // Paso 6: Mapear sanciones a cuotas más morosas (si existen)
       let sancionPorCuota: Map<number, number> | undefined;
       if (sanciones && sanciones.length > 0) {
-        sancionPorCuota = this.mapearSancionesACuotas(sanciones, amortizacionOriginal);
+        const periocidadNormalizada = creditoNormalizado.periodicidad === 'Mensual' || creditoNormalizado.periodicidad === 'mensual' 
+          ? 'mensual' 
+          : 'quincenal';
+        sancionPorCuota = this.mapearSancionesACuotas(sanciones, amortizacionOriginal, pagos, periocidadNormalizada);
       }
 
       // Paso 7: Actualizar amortización con pagos realizados (y sanciones si existen)

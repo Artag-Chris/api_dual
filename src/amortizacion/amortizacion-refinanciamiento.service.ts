@@ -313,6 +313,19 @@ class RefinanciamientoService {
             sanciones_condonadas: 0,
             dias_sanciones_condonadas: 0,
             desglosePagos: {},
+            pagosJuridicos: {
+              totalPrejuridico: 0,
+              totalJuridico: 0,
+              cantidadPagosJuridicos: 0,
+            },
+            saldoAFavor: {
+              total: 0,
+              cantidadRegistros: 0,
+            },
+            pagosEnMora: {
+              totalPagadoEnMora: 0,
+              cantidadSancionesPagadas: 0,
+            },
           },
           amortizacionOriginal: amortizacionCancelada,
           amortizacionActualizada: amortizacionCancelada,
