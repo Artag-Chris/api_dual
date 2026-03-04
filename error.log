@@ -59647,3 +59647,65 @@ Raw query failed. Code: `1406`. Message: `Data too long for column 'telefono_res
 2026-02-24T18:34:20.827Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Información de pagos inválida - Errores: El array de pagos está vacío
 2026-02-24T18:34:20.827Z error: [Fase Amortizacion] ❌ RefinanciamientoService falló: Información de pagos inválida
 2026-02-24T18:34:20.828Z error: [AmortizacionesConsumer] ❌ Error procesando: Información de pagos inválida, El array de pagos está vacío
+2026-03-04T17:10:02.315Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-03-04T17:10:02.397Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-03-04T17:10:02.460Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-03-04T17:10:02.465Z error: [QUEUE] Max retries reached: 1088312312
+2026-03-04T17:39:30.030Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-03-04T17:39:30.154Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-03-04T17:39:30.261Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-03-04T17:39:30.264Z error: [QUEUE] Max retries reached: 93236230
+2026-03-04T17:40:12.392Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:40:12.568Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:40:12.746Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:40:12.753Z error: [QUEUE] Max retries reached: 070608195
+2026-03-04T17:46:54.574Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:46:54.754Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:46:54.913Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Raw query failed. Code: `1452`. Message: `Cannot add or update a child row: a foreign key constraint fails (`FACILCREDITOS`.`info_personal`, CONSTRAINT `id_lista_docuemntos` FOREIGN KEY (`tipoDocumento`) REFERENCES `lista_documentos` (`tipo`) ON DELETE RESTRICT ON UPDATE CASCADE)`
+2026-03-04T17:46:54.917Z error: [QUEUE] Max retries reached: 654041
+2026-03-04T18:21:41.064Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-03-04T18:21:41.295Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-03-04T18:21:41.538Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-03-04T18:21:41.542Z error: [QUEUE] Max retries reached: 1088013618
+2026-03-04T18:31:02.907Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-03-04T18:31:03.079Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-03-04T18:31:03.264Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-03-04T18:31:03.270Z error: [QUEUE] Max retries reached: 5964797
+2026-03-04T19:02:01.236Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Error al procesar refinanciamiento - Errores: La cuota acordada ($49550) debe ser >= cuota mínima ($50675)
+2026-03-04T19:13:59.579Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Error al procesar refinanciamiento - Errores: La cuota acordada ($48200) debe ser >= cuota mínima ($48938)

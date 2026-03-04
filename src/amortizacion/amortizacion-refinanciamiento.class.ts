@@ -769,24 +769,33 @@ export class AmortizacionRefinanciamiento {
       return gastosCartera;
     }
 
-    // Filtrar solo los gastos pendientes (estado='Debe') y agrupar por concepto
-    extras.forEach(extra => {
-      if (extra.estado === 'Debe') {
-        if (extra.concepto === 'Prejuridico') {
-          gastosCartera.prejuridico.total += extra.valor;
-          gastosCartera.prejuridico.cantidad += 1;
-        } else if (extra.concepto === 'Juridico') {
-          gastosCartera.juridico.total += extra.valor;
-          gastosCartera.juridico.cantidad += 1;
-        }
+    // Filtrar solo los gastos pendientes (estado='Debe') con valor > 0 y agrupar por concepto
+    const extrasValidos = extras.filter(extra => extra.estado === 'Debe' && extra.valor > 0);
+    
+    extrasValidos.forEach(extra => {
+      if (extra.concepto === 'Prejuridico') {
+        gastosCartera.prejuridico.total += extra.valor;
+        gastosCartera.prejuridico.cantidad += 1;
+      } else if (extra.concepto === 'Juridico') {
+        gastosCartera.juridico.total += extra.valor;
+        gastosCartera.juridico.cantidad += 1;
       }
     });
 
-    // RESTAR los pagos jurídicos ya realizados del total de extras
-    // Esto da el saldo PENDIENTE de gastos cartera
+    // RESTAR PAGOS PARCIALES: Si hay pagos con estado='Debe', usar la columna 'debe' como saldo pendiente
+    // Esto es importante para créditos con pagos parciales pendientes
     if (infoPagos?.pagosJuridicos) {
-      gastosCartera.prejuridico.total = Math.max(0, gastosCartera.prejuridico.total - infoPagos.pagosJuridicos.totalPrejuridico);
-      gastosCartera.juridico.total = Math.max(0, gastosCartera.juridico.total - infoPagos.pagosJuridicos.totalJuridico);
+      // Para prejuridico: buscar si hay pagos parciales pendientes
+      if (gastosCartera.prejuridico.total > 0 && infoPagos.pagosJuridicos.totalPrejuridico > 0) {
+        // Si hay pagos registrados para prejuridico, restar lo ya abonado
+        gastosCartera.prejuridico.total = Math.max(0, gastosCartera.prejuridico.total - infoPagos.pagosJuridicos.totalPrejuridico);
+      }
+      
+      // Para juridico: buscar si hay pagos parciales pendientes
+      if (gastosCartera.juridico.total > 0 && infoPagos.pagosJuridicos.totalJuridico > 0) {
+        // Si hay pagos registrados para juridico, restar lo ya abonado
+        gastosCartera.juridico.total = Math.max(0, gastosCartera.juridico.total - infoPagos.pagosJuridicos.totalJuridico);
+      }
     }
 
     return gastosCartera;
@@ -1088,9 +1097,35 @@ export class AmortizacionRefinanciamiento {
     // ═══════════════════════════════════════════════════════════════════════════
     // PASO 1: SINCRONIZAR CON CUOTAS COMPLETAMENTE PAGADAS
     // Marcar con capital=0 solo las cuotas completamente pagadas (estado='Ok')
+    // 
+    // LÓGICA DE SINCRONIZACIÓN:
+    // - Calcular cuotasPagadasSegunCuotasFaltantes = numero_cuotas - cuotas_faltantes
+    // - Comparar con cuotaMaximaPagada (máximo número de cuota pagada en registros)
+    // - Si NO coinciden (hay asincronización), usar cuotasPagadasSegunCuotasFaltantes
+    // - Si coinciden, usar cuotaMaximaPagada (no hay asincronización)
+    // - Ajustar por cuota parcial si existe (restar 1 al total)
     // ═══════════════════════════════════════════════════════════════════════════
-    // Usar cuotaMaximaPagada como fuente de verdad (es el máximo número de cuota con estado='Ok')
-    const cuotasAMarcaEnCero = infoPagos.cuotaMaximaPagada;
+    
+    let cuotasAMarcaEnCero = infoPagos.cuotaMaximaPagada;
+    
+    // Calcular cuotas pagadas según cuotas_faltantes (fuente de verdad complementaria)
+    const cuotasPagadasSegunCuotasFaltantes = (numero_cuotas && cuotas_faltantes !== undefined) 
+      ? Math.max(0, numero_cuotas - cuotas_faltantes)
+      : cuotasAMarcaEnCero;
+    
+    // DETECCIÓN DE ASINCRONIZACIÓN:
+    // Si los números NO coinciden, hay discrepancia entre registros de pagos y cuotas_faltantes
+    const hayAsincronizacion = cuotasAMarcaEnCero !== cuotasPagadasSegunCuotasFaltantes;
+    
+    if (hayAsincronizacion && cuotasPagadasSegunCuotasFaltantes > 0) {
+      // Usar el valor de cuotas_faltantes como referencia (es más confiable del BD)
+      cuotasAMarcaEnCero = cuotasPagadasSegunCuotasFaltantes;
+    }
+    
+    // Ajustar por cuota parcial: si existe, las pagadas completas son una menos
+    if (infoPagos.tieneCuotaParciall && cuotasAMarcaEnCero > 0) {
+      cuotasAMarcaEnCero = cuotasAMarcaEnCero - 1;
+    }
 
     // Marcar cuotas como pagadas (todas sus componentes en 0)
     for (let i = 0; i < amortizacionActualizada.length; i++) {
@@ -1171,15 +1206,90 @@ export class AmortizacionRefinanciamiento {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
-    // PASO 3: AGREGAR SANCIONES A CUOTAS PENDIENTES (INFORMATIVO)
+    // PASO 3: AGREGAR SANCIONES A CUOTAS PENDIENTES (CON REASIGNACIÓN)
+    // Si hay sanciones mapeadas a cuotas que están en 0, transferirlas a cuotas con valores
+    // Respetando el máximo de sanciones por período (30k mensual, 15k quincenal)
     // ═══════════════════════════════════════════════════════════════════════════
     if (sancionPorCuota && sancionPorCuota.size > 0) {
+      // Detectar asincronización: comparar cuotaMaximaPagada con cuotasAMarcaEnCero
+      const hayAsincronizacionEnSanciones = (numero_cuotas && cuotas_faltantes !== undefined) && 
+                                            (infoPagos.cuotaMaximaPagada !== (numero_cuotas - cuotas_faltantes));
+      
+      // Crear mapa ajustado de sanciones
+      const sancionAjustada = new Map<number, number>();
+      
+      // Separar sanciones según asincronización:
+      // - SI hay asincronización: acumular TODAS las sanciones para redistribución
+      // - NO hay asincronización: mantener sanciones de cuotas sin valores, reasignar las de cuotas en 0
+      let sancionesReasignadasTotal = 0;
+      
+      if (hayAsincronizacionEnSanciones) {
+        // CON ASINCRONIZACIÓN: Acumular TODAS las sanciones (de cualquier cuota) para redistribuir
+        for (const [numeroCuota, sancion] of sancionPorCuota.entries()) {
+          sancionesReasignadasTotal += sancion;
+        }
+      } else {
+        // SIN ASINCRONIZACIÓN: Separar sanciones de cuotas pagadas vs no pagadas
+        for (const [numeroCuota, sancion] of sancionPorCuota.entries()) {
+          if (numeroCuota <= cuotasAMarcaEnCero) {
+            // Sanción de una cuota que se marca en 0: reasignar
+            sancionesReasignadasTotal += sancion;
+          } else {
+            // Sanción de una cuota con valores: mantener
+            sancionAjustada.set(numeroCuota, sancion);
+          }
+        }
+      }
+      
+      // Reasignar sanciones que venían de cuotas en 0 a las cuotas reales pendientes
+      // Respetando el máximo de 30,000 por período mensual (o 15,000 para quincenal)
+      // EXCEPTO la última cuota que acumula sin restricción
+      if (sancionesReasignadasTotal > 0) {
+        // Encontrar las cuotas reales que tienen valores (numeroCuota > cuotasAMarcaEnCero)
+        const cuotasReales: number[] = [];
+        for (let i = 0; i < amortizacionActualizada.length; i++) {
+          const cuota = amortizacionActualizada[i];
+          if (cuota.numeroCuota > cuotasAMarcaEnCero && cuota.capital > 0) {
+            cuotasReales.push(cuota.numeroCuota);
+          }
+        }
+        
+        if (cuotasReales.length > 0) {
+          // Máximo de sanciones por período (30,000 para mensual, 15,000 para quincenal)
+          const SANCION_MAX_POR_PERIODO = periocidad === 'quincenal' ? 15000 : 30000;
+          
+          // Identificar la última cuota real (número más alto)
+          const ultimaCuotaReal = Math.max(...cuotasReales);
+          
+          let sancionAcumulada = 0;
+          
+          // Distribuir sanciones respetando el máximo por período
+          for (let i = 0; i < cuotasReales.length; i++) {
+            const numeroCuota = cuotasReales[i];
+            
+            if (numeroCuota === ultimaCuotaReal) {
+              // Última cuota real (numero_cuotas): asignar TODO lo que reste (sin restricción)
+              const sancionNueva = sancionesReasignadasTotal - sancionAcumulada;
+              sancionAjustada.set(numeroCuota, sancionNueva);
+            } else {
+              // Cuotas normales (que no son la última): respetar máximo por período
+              const sancionNueva = Math.min(
+                SANCION_MAX_POR_PERIODO,
+                sancionesReasignadasTotal - sancionAcumulada
+              );
+              sancionAjustada.set(numeroCuota, sancionNueva);
+              sancionAcumulada += sancionNueva;
+            }
+          }
+        }
+      }
+      
+      // Aplicar el mapa de sanciones ajustado a la amortización
       for (let i = 0; i < amortizacionActualizada.length; i++) {
         const cuota = amortizacionActualizada[i];
-        const sancionCuota = sancionPorCuota.get(cuota.numeroCuota);
-
-        // Agregar sanción si existe en el mapa (solo en cuotas pendientes)
-        if (sancionCuota !== undefined && cuota.numeroCuota > cuotasAMarcaEnCero) {
+        const sancionCuota = sancionAjustada.get(cuota.numeroCuota);
+        
+        if (sancionCuota !== undefined && sancionCuota > 0 && cuota.numeroCuota > cuotasAMarcaEnCero) {
           amortizacionActualizada[i] = {
             ...cuota,
             sancion: sancionCuota,
