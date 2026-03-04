@@ -102,17 +102,28 @@ export class ReporteCarteraCiudadService {
             WHEN c.franja_dias = '150' THEN 'CASTIGADA'
             ELSE COALESCE(c.nombre, 'SIN CARTERA')
           END as nombre_cartera,
-          COALESCE(dc.id_cartera, 0) as id_cartera,
+          COALESCE(c.id, 0) as id_cartera,
           COALESCE(c.franja_dias, '') as franja_dias,
           COUNT(DISTINCT dc.prestamo_ID) as cantidad_creditos,
-          COALESCE(SUM(CAST(am.total_cuota AS UNSIGNED)), 0) as total_cuota,
-          COALESCE(SUM(CAST(COALESCE(am.sancion, 0) AS UNSIGNED)), 0) as total_sanciones,
-          COALESCE(SUM(CAST(COALESCE(gc.prejuridico, 0) + COALESCE(gc.juridico, 0) AS UNSIGNED)), 0) as total_gastos_cartera
+          COALESCE((
+            SELECT SUM(CAST(am.total_cuota AS UNSIGNED))
+            FROM amortizacion am
+            WHERE am.prestamoID = dc.prestamo_ID
+          ), 0) as total_cuota,
+          COALESCE((
+            SELECT SUM(CAST(COALESCE(am.sancion, 0) AS UNSIGNED))
+            FROM amortizacion am
+            WHERE am.prestamoID = dc.prestamo_ID
+          ), 0) as total_sanciones,
+          COALESCE((
+            SELECT SUM(CAST(COALESCE(gc.prejuridico, 0) AS UNSIGNED)) +
+                   SUM(CAST(COALESCE(gc.juridico, 0) AS UNSIGNED))
+            FROM gastos_cartera gc
+            WHERE gc.prestamo_id = dc.prestamo_ID
+          ), 0) as total_gastos_cartera
         FROM detalle_credito dc
-        INNER JOIN amortizacion am ON dc.prestamo_ID = am.prestamoID
         LEFT JOIN info_contacto ic ON dc.documento = ic.documento
         LEFT JOIN cartera c ON dc.id_cartera = c.id
-        LEFT JOIN gastos_cartera gc ON dc.prestamo_ID = gc.prestamo_id
         WHERE dc.estado IN ('ACTIVO', 'JURIDICO', 'PREJURIDICO', 'REFINANCIADO')
         AND dc.id_cartera IS NOT NULL
         AND c.id IS NOT NULL

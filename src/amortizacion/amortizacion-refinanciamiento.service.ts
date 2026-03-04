@@ -91,6 +91,7 @@ class RefinanciamientoService {
           precreditos.vlr_cuota AS valor_cuota,
           precreditos.periodo AS periodicidad,
           precreditos.meses AS cantidad_meses,
+          precreditos.cuotas AS numero_cuotas,
           precreditos.created_at AS fecha_creacion,
           precreditos.p_fecha AS fecha_pago1,
           precreditos.s_fecha AS fecha_pago2,

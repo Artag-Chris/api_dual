@@ -6,6 +6,7 @@
 import { Router, Request, Response } from 'express';
 import AmortizacionController from './amortizacion.controller';
 import { ReporteCarteraCiudadController } from '../amortizacion/reporte/reporte-cartera-ciudad.controller';
+import { ReporteCredítosActivosController } from '../amortizacion/reporte/reporte-creditos-activos.controller';
 
 
 const router = Router();
@@ -200,5 +201,53 @@ router.post('/refinanciamiento/calcular', (req: Request, res: Response) =>
  * }
  */
 router.get('/reporte', ReporteCarteraCiudadController.obtenerReporte);
+
+/**
+ * GET /api/amortizacion/reporte/creditos-activos
+ * 
+ * Obtiene el reporte detallado de créditos activos desde la fecha 2026-03-03 17:44:29
+ * 
+ * Retorna:
+ * - Lista de todos los créditos en estado ACTIVO, JURIDICO, PREJURIDICO, REFINANCIADO
+ * - Para cada crédito: suma de cuotas, sanciones, gastos prejuridico, gastos juridico
+ * - Totales consolidados
+ * 
+ * Respuesta:
+ * {
+ *   "success": true,
+ *   "message": "Reporte de créditos activos obtenido correctamente",
+ *   "data": {
+ *     "titulo": "Reporte de Créditos Activos - Amortizaciones y Gastos",
+ *     "fecha_generacion": "2026-03-03T17:44:29Z",
+ *     "fecha_filtro": "2026-03-03 17:44:29",
+ *     "creditos": [
+ *       {
+ *         "prestamo_id": 12360,
+ *         "documento": "46644209",
+ *         "estado": "ACTIVO",
+ *         "total_cuota": 2295600,
+ *         "total_sanciones": 133870,
+ *         "total_prejuridico": 631713479,
+ *         "total_juridico": 20985000,
+ *         "total_gastos": 652698479
+ *       },
+ *       ...
+ *     ],
+ *     "totales": {
+ *       "cantidad_creditos": 150,
+ *       "total_cuota": 28800000,
+ *       "total_sanciones": 1200000,
+ *       "total_prejuridico": 800000000,
+ *       "total_juridico": 50000000,
+ *       "total_gastos": 850000000,
+ *       "gran_total": 880000000
+ *     }
+ *   }
+ * }
+ * 
+ * Ejemplo:
+ * curl -X GET "http://localhost:3000/api/amortizacion/reporte/creditos-activos"
+ */
+router.get('/reporte/creditos-activos', ReporteCredítosActivosController.obtenerReporte);
 
 export default router;

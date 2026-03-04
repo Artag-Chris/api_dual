@@ -660,7 +660,7 @@ class MainDataService {
               'PREJURIDICO': 'PREJURIDICO', // Legacy: "Prejuridico" → Main: "PREJURIDICO"
               'JURIDICO': 'JURIDICO',       // Legacy: "Juridico" → Main: "JURIDICO"
               'CANCELADO': 'FINALIZADO',    // Legacy: "Cancelado" → Main: "FINALIZADO"
-              'CANCELADO POR REFINANCIACION': 'REFINANCIADO'  // Legacy con espacios
+              'CANCELADO POR REFINANCIACION': 'CANCELADO REFINANCIADO'  // Legacy con espacios
             };
 
             // 3. Intentar match exacto primero
@@ -801,7 +801,8 @@ class MainDataService {
               seguro_add: detalleCreditoData.seguro_add ? parseFloat(String(detalleCreditoData.seguro_add)) : 0,
               fecha_actualizacion: new Date(),
               id_estrategia: detalleCreditoData.id_estrategia,
-              id_cartera: detalleCreditoData.id_cartera
+              id_cartera: detalleCreditoData.id_cartera,
+              castigo:detalleCreditoData.castigo
             };
 
             // Si tenemos credito_id_legacy de Query 1, usarlo como prestamo_ID para correlacionar con facturas

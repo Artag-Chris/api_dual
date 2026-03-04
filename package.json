@@ -16,7 +16,16 @@
     "prisma:studio:main": "prisma studio --schema=./prisma/schema-main.prisma",
     "prisma:push:main": "prisma db push --schema=./prisma/schema-main.prisma",
     "prisma:generate": "npm run prisma:generate:legacy && npm run prisma:generate:main",
-    "postinstall": "npm run prisma:generate"
+    "postinstall": "npm run prisma:generate",
+    "debug:castigo:test": "tsnd --clear test-castigo-normalization.ts",
+    "debug:castigo:bd": "tsnd --clear debug-castigo.ts",
+    "debug:castigo": "npm run debug:castigo:test && npm run debug:castigo:bd",
+    "debug:castigo:quick": "tsnd --clear quick-castigo-diagnostic.ts",
+    "test:castigo:save-si": "tsnd --clear test-castigo-si-save.ts",
+    "test:castigo:write": "tsnd --clear test-castigo-write.ts",
+    "test:castigo:migration": "tsnd --clear test-castigo-migration-flow.ts",
+    "test:castigo:flow": "tsnd --clear test-castigo-data-flow.ts",
+    "test:viz": "tsnd --clear test.ts"
   },
   "keywords": [],
   "author": "",
