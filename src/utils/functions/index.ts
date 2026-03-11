@@ -7,4 +7,5 @@ export * from "./parseFecha"
 export * from "./sanitizeFieldValue"
 export * from "./normalizeDate"
 export * from "./normalizeCastigo"
+export * from "./calculateAge"
 

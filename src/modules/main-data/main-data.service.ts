@@ -6,7 +6,7 @@ import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
 import AmortizacionPatternService from '../../amortizacionPattern/amortizacionPattern.service';
-import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy, sanitizeFieldValue, normalizeDate, normalizeCastigo } from '../../utils/functions';
+import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy, sanitizeFieldValue, normalizeDate, normalizeCastigo, calculateAge } from '../../utils/functions';
 import { getClientLegacyByDoc, getCreditLegacyDataByDoc } from '../../utils/querys';
 import { raw } from '@prisma/client/runtime/library';
 
@@ -860,12 +860,19 @@ class MainDataService {
               try {
                 const scoreValor = getDatacreditScore(row.puntaje_datacredito_fc || '0');
                 const estadoValor = await getEstadoValidoFromList(row.estado);
+                
+                // Obtener fecha_nacimiento del cliente para calcular edad
+                const infoPersonalCliente = await tx.info_personal.findUnique({
+                  where: { documento }
+                });
+                const edadCliente = calculateAge(infoPersonalCliente?.fecha_nacimiento);
 
                 await tx.estudio_de_credito.upsert({
                   where: { documento },
                   update: {
                     score: scoreValor,
                     estado: estadoValor,
+                    edad: edadCliente,
                     observacion: `Actualizado. Asesor: ${row.cal_asesor || 'N/A'}`
                   },
                   create: {
@@ -875,6 +882,7 @@ class MainDataService {
                     sect_coop: '0',
                     sect_telco: '0',
                     score: scoreValor,
+                    edad: edadCliente,
                     observacion: `Migrado. Asesor: ${row.cal_asesor || 'N/A'}, Cal: ${row.cal_estudio || 'N/A'}`,
                     estado: estadoValor,
                     creador: 1,
@@ -916,7 +924,7 @@ class MainDataService {
                   const wrapMsg = comentarioWrapError instanceof Error ? comentarioWrapError.message : String(comentarioWrapError);
                   this.logger.warn(`[COMENTARIO] ⚠️ Error: ${wrapMsg}`);
                 }
-                this.logger.info(`[ESTUDIO] ✅ Creado para doc=${documento}, score=${scoreValor}, estado=${estadoValor}`);
+                this.logger.info(`[ESTUDIO] ✅ Creado para doc=${documento}, score=${scoreValor}, estado=${estadoValor}, edad=${edadCliente} años`);
               } catch (estudioError) {
                 const msg = estudioError instanceof Error ? estudioError.message : String(estudioError);
                 this.logger.warn(`[ESTUDIO] ⚠️ Error: ${msg}. Continuando...`);

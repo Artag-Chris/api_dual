@@ -13,8 +13,8 @@ export class UserClienteCreateDto {
     public readonly email: string,
     public readonly telefono: string,
     public readonly nombre_completo: string,
-    public readonly password: string = 'changeme',
-    public readonly estado_registro: 'completo' | 'incompleto' = 'incompleto'
+    public readonly password: string = documento,
+    public readonly estado_registro: 'completo' | 'incompleto' = 'completo'
   ) {}
 
   static create(props: { [key: string]: any }): [string?, UserClienteCreateDto?] {
@@ -38,8 +38,8 @@ export class UserClienteCreateDto {
         emailFinal,
         telefono,
         nombre_completo,
-        password || 'changeme',
-        estado_registro || 'incompleto'
+        password || documento,
+        estado_registro || 'completo'
       ),
     ];
   }
