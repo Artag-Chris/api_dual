@@ -3,6 +3,7 @@ import { prismaMainService } from '../../database/main/prisma-main.service';
 import LegacyDataService from '../legacy-data/legacy-data.service';
 import MainDataService from '../main-data/main-data.service';
 import QueueService from '../../domain/class/queue.service';
+import CommentsAndCallsMigrationService from '../../domain/class/comments-and-calls-migration.service';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
 /**
@@ -208,6 +209,10 @@ class MigrationService {
     
     this.procesarPagosTodoConsumer().catch(err => 
       this.logger.error(`[MIGRATION] Consumidor PAGOS_TODO error: ${err.message}`)
+    );
+
+    this.procesarComentariosTodoConsumer().catch(err => 
+      this.logger.error(`[MIGRATION] Consumidor COMENTARIOS_TODO error: ${err.message}`)
     );
 
     // 🔴 DESHABILITADO: Consumidores AMPLIAR_PAGO y GASTOS_CARTERA comentados por ahora
@@ -473,7 +478,89 @@ class MigrationService {
   }
 
   /**
-   * CONSUMIDOR 5: Procesa ampliar pagos - PHASE 5
+   * CONSUMIDOR 5: Procesa comentarios - FASE COMENTARIOS
+   * Migra observaciones de precreditos y llamadas como comentarios
+   * 
+   * Flow:
+   * 1. Dequeue item de COMENTARIOS_TODO con documento
+   * 2. Validar documento (string, no vacío)
+   * 3. Llamar migrateAllCommentsForDocument(documento) - procesará todos los créditos del cliente
+   * 4. Log resultado: comentarios migrados, sin créditos, sin comentarios, o error
+   * 5. Marcar como completado
+   */
+  private async procesarComentariosTodoConsumer(): Promise<void> {
+    const consumerName = 'ComentariosConsumer';
+    let heartbeatCounter = 0;
+
+    while (this.consumersRunning) {
+      try {
+        // Heartbeat logging cada 10 iteraciones
+        heartbeatCounter++;
+        if (heartbeatCounter % 10 === 0) {
+          this.logger.debug(`[${consumerName}] ♥️ Consumer activo, esperando items en COMENTARIOS_TODO...`);
+        }
+
+        const item = await this.queueService.dequeue('COMENTARIOS_TODO');
+
+        if (!item) {
+          await this.sleep(1000);
+          continue;
+        }
+
+        this.logger.info(`[${consumerName}] 📦 Item recibido: documento=${item.documento}`);
+
+        try {
+          // Validar que item.documento es string válido
+          if (!item.documento || String(item.documento).trim() === '') {
+            throw new Error(`documento vacío o inválido`);
+          }
+          
+          const documento = String(item.documento).trim();
+          this.logger.info(`[${consumerName}] Iniciando migrateAllCommentsForDocument para documento=${documento}`);
+
+          // Llamar FASE COMENTARIOS: migrateAllCommentsForDocument con documento
+          const resultado = await CommentsAndCallsMigrationService.getInstance().migrateAllCommentsForDocument(documento);
+          
+          if (resultado.status === 'COMENTARIOS_MIGRADOS') {
+            this.logger.info(
+              `[${consumerName}] ✅ Comentarios completado para documento=${documento}: ` +
+              `${resultado.creditosProcesados} crédito(s), ${resultado.totalComentarios} comentarios migrados`
+            );
+          } else if (resultado.status === 'SIN_CREDITOS') {
+            this.logger.info(`[${consumerName}] ℹ️ Sin créditos para documento=${documento}`);
+          } else if (resultado.status === 'SIN_COMENTARIOS') {
+            this.logger.info(
+              `[${consumerName}] ℹ️ Sin comentarios encontrados para documento=${documento} (${resultado.creditosProcesados} crédito(s) procesado(s))`
+            );
+          } else if (resultado.status === 'TODOS_FALLIDOS') {
+            this.logger.warn(
+              `[${consumerName}] ⚠️ Todos los créditos fallaron para documento=${documento}. Errores: ${resultado.errores?.join(', ')}`
+            );
+          } else {
+            this.logger.error(
+              `[${consumerName}] ❌ Error procesando documento=${documento}: ${resultado.errores?.join(', ')}`
+            );
+          }
+          
+          await this.queueService.markCompleted(item.id);
+          this.logger.info(`[${consumerName}] ✅ Item completado: documento=${documento}`);
+
+        } catch (processError) {
+          this.logger.error(
+            `[${consumerName}] Error procesando: ${(processError as any).message}`
+          );
+          await this.queueService.markError(item.id, (processError as any).message);
+        }
+
+      } catch (error) {
+        this.logger.warn(`[${consumerName}] Error en loop: ${(error as any).message}`);
+        await this.sleep(1000);
+      }
+    }
+  }
+
+  /**
+   * CONSUMIDOR 6: Procesa ampliar pagos - PHASE 6
    * 🔴 DESHABILITADO POR AHORA
    * 
    * Flow:

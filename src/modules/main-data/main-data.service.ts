@@ -912,7 +912,7 @@ class MainDataService {
                         data: {
                           documento: documento,
                           comentario: comentarioTexto,
-                          tipo: "ESTUDIO",
+                          tipo: "MIGRACION",
                           fecha_registro: new Date()
                         }
                       });
@@ -970,15 +970,15 @@ class MainDataService {
         }
       }
 
-      // iii. DESPUÉS del loop: Enqueuear UNA VEZ el documento a AMORTIZACIONES y PAGOS
+      // iii. DESPUÉS del loop: Enqueuear UNA VEZ el documento a AMORTIZACIONES, PAGOS y COMENTARIOS
       if (creditosMigrados > 0) {
         try {
           const queueService = QueueService.getInstance();
-          this.logger.info(`[Fase 2] 🔄 Enqueuando documento=${documento} a AMORTIZACIONES_TODO y PAGOS_TODO (${creditosMigrados} crédito(s) procesado(s))...`);
           await queueService.enqueue(documento, 'AMORTIZACIONES_TODO');
           await queueService.enqueue(documento, 'PAGOS_TODO');
+        //  await queueService.enqueue(documento, 'COMENTARIOS_TODO');
           enqueuedAmortizaciones = 1; // Marcamos como enqueuado una vez
-          this.logger.info(`[Fase 2] ✅ Documento enqueuado a Phase 3B y Phase 4`);
+          this.logger.info(`[Fase 2] ✅ Documento enqueuado a Phase 3B, Phase 4 y Phase Comentarios`);
         } catch (queueError) {
           const qErrorMsg = queueError instanceof Error ? queueError.message : String(queueError);
           this.logger.warn(`[Fase 2] ⚠️ Error al enqueuear documento=${documento}: ${qErrorMsg}`);
