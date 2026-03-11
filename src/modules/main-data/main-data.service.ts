@@ -5,6 +5,7 @@ import { ReferenceParser } from './reference-parser';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import QueueService from '../../domain/class/queue.service';
 import RefinanciamientoService from '../../amortizacion/amortizacion-refinanciamiento.service';
+import AmortizacionPatternService from '../../amortizacionPattern/amortizacionPattern.service';
 import { getTasabyPeriocidad, getDiaPago, parseFecha, getDatacreditScore, getEstadoValidoFromList, getCarteraIdbyFuzzy, sanitizeFieldValue, normalizeDate, normalizeCastigo } from '../../utils/functions';
 import { getClientLegacyByDoc, getCreditLegacyDataByDoc } from '../../utils/querys';
 import { raw } from '@prisma/client/runtime/library';
@@ -386,7 +387,14 @@ class MainDataService {
         
         await tx.$executeRawUnsafe(
           `INSERT INTO info_personal (documento, nombre, apellido, tipoDocumento, fecha_nacimiento, fecha_expedicion, lugar_expedicion, estudios, estrato, conyuge, fecha_registro) 
-           VALUES (?, ?, ?, ?, ?, ?, ?, 
+           VALUES (?, ?, ?, 
+                   COALESCE(
+                     (SELECT tipo FROM lista_documentos WHERE tipo = ? LIMIT 1),
+                     (SELECT tipo FROM lista_documentos WHERE LOWER(tipo) LIKE CONCAT('%', LOWER(?), '%') LIMIT 1),
+                     (SELECT tipo FROM lista_documentos ORDER BY id ASC LIMIT 1),
+                     'CC'
+                   ),
+                   ?, ?, ?, 
                    COALESCE((SELECT tipo FROM lista_estudios WHERE tipo = ? LIMIT 1), 
                             (SELECT tipo FROM lista_estudios LIMIT 1), 'N/A'),
                    COALESCE((SELECT tipo FROM lista_estrato WHERE tipo = ? LIMIT 1), 
@@ -395,7 +403,8 @@ class MainDataService {
           infoPersonalDto!.documento,
           infoPersonalDto!.nombre,
           infoPersonalDto!.apellido,
-          infoPersonalDto!.tipoDocumento,
+          infoPersonalDto!.tipoDocumento || 'CC',
+          infoPersonalDto!.tipoDocumento || 'CC',
           fechaNacimientoSafe,
           fechaExpedicionSafe,
           infoPersonalDto!.lugar_expedicion || '',
@@ -1159,15 +1168,13 @@ class MainDataService {
     errores?: string[];
   }> {
     try {
-      this.logger.info(`[PHASE 3B] Iniciando migrateAmortizacionesPhase para documento=${documento}`);
-
       // 1. Buscar TODOS los créditos del cliente en main
       const creditosMain = await prismaMainService.detalle_credito.findMany({
         where: { documento }
       });
 
       if (!creditosMain || creditosMain.length === 0) {
-        this.logger.info(`[PHASE 3B] ℹ️ Sin créditos encontrados para documento=${documento}`);
+        
         return {
           status: "SIN_CREDITOS",
           creditosProcesados: 0,
@@ -1187,24 +1194,23 @@ class MainDataService {
         try {
           this.logger.info(`[PHASE 3B] 🔄 Procesando crédito ${creditosProcesados + 1}/${creditosMain.length}: prestamo_ID=${credito.prestamo_ID}`);
 
-          // 2a. Llamar a RefinanciamientoService para obtener amortizaciones
-          const refinanciamientoService = RefinanciamientoService.getInstance();
-          const resultado = await refinanciamientoService.calcularRefinanciamientoConPagos(credito.prestamo_ID);
+          // 2a. Llamar a AmortizacionPatternService para ejecutar las 3 fases (Factory, Pagos, Sanciones)
+          const resultado = await AmortizacionPatternService.getInstance().ejecutarCompleto(credito.prestamo_ID);
 
-          if (!resultado.exitoso) {
-            const msg = `RefinanciamientoService falló para prestamo_ID=${credito.prestamo_ID}: ${resultado.mensaje}`;
+          if (!resultado.success) {
+            const msg = `AmortizacionPatternService falló para prestamo_ID=${credito.prestamo_ID}: ${resultado.message}`;
             this.logger.warn(`[PHASE 3B] ⚠️ ${msg}`);
             errores.push(msg);
             continue; // Pasar al siguiente crédito
           }
 
-          if (!resultado.amortizacionActualizada || resultado.amortizacionActualizada.length === 0) {
+          if (!resultado.amortizacionFinal || resultado.amortizacionFinal.length === 0) {
             this.logger.warn(`[PHASE 3B] ⚠️ Sin amortizaciones calculadas para prestamo_ID=${credito.prestamo_ID}`);
             continue; // Pasar al siguiente crédito
           }
 
           // 2b. Mapear amortizaciones
-          const amortizacionesToCreate = resultado.amortizacionActualizada.map((cuota: any) => ({
+          const amortizacionesToCreate = resultado.amortizacionFinal.map((cuota: any) => ({
             prestamoID: credito.prestamo_ID,
             documento: documento,
             Numero_cuota: String(cuota.numeroCuota),
@@ -1236,7 +1242,7 @@ class MainDataService {
           try {
             const gastosGuardados = await this.saveGastosCartera(
               credito.prestamo_ID,
-              resultado.gastosCartera
+              resultado.fase3?.gastosCartera
             );
             if (gastosGuardados) {
               this.logger.info(`[PHASE 3B] ✅ Gastos cartera guardados para prestamo_ID=${credito.prestamo_ID}`);
@@ -1247,11 +1253,11 @@ class MainDataService {
             // No fallar PHASE 3B por error en gastos cartera - continuar
           }
 
-          // 2e. Guardar sanciones condonadas si existen
+          // // 2e. Guardar sanciones condonadas si existen
           try {
             const sancionesGuardadas = await this.saveSancionesCondonadas(
               credito.prestamo_ID,
-              resultado.infoPagos
+              resultado.fase2?.infoPagos
             );
             if (sancionesGuardadas) {
               this.logger.info(`[PHASE 3B] ✅ Sanciones condonadas guardadas para prestamo_ID=${credito.prestamo_ID}`);

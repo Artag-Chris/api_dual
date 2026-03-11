@@ -32,6 +32,7 @@ class ClienteMapperService {
   mapToUserCliente(clienteLegacy: any): [string?, UserClienteCreateDto?] {
     const nombres = this.buildNombres(clienteLegacy);
     const apellidos = this.buildApellidos(clienteLegacy);
+    //TODO : se cambia el telefono temporalmente
 
     const props = {
       documento: clienteLegacy.num_doc || '',
@@ -39,7 +40,7 @@ class ClienteMapperService {
       apellido: apellidos || '',
       tipo: clienteLegacy.tipo_doc ? this.mapTipoDoc(clienteLegacy.tipo_doc) : 'CC',
       email: clienteLegacy.email || '',
-      telefono: clienteLegacy.movil || '',
+      telefono: "3100000000", //clienteLegacy.movil || '',
       nombre_completo: nombres + ' ' + apellidos,
       estado_registro: this.determineEstadoRegistro(clienteLegacy) as 'completo' | 'incompleto',
     };
@@ -83,7 +84,7 @@ class ClienteMapperService {
     
     const props = {
       documento: clienteLegacy.num_doc || '',
-      celular: clienteLegacy.movil || '',
+      celular:"3100000000", //clienteLegacy.movil || '',
       email: clienteLegacy.email || '',
       direccion: clienteLegacy.direccion || '',
       ciudad: ciudad,
@@ -416,6 +417,7 @@ class ClienteMapperService {
 
   /**
    * Formatea fecha a formato YYYY-MM-DD
+   * Valida que no haya zeros en año, mes o día (ej: 0000-00-00, 2020-00-15)
    */
 private formatDate(date: any): string | null {
   if (!date) return null;
@@ -424,6 +426,10 @@ private formatDate(date: any): string | null {
     let fechaObj: Date;
 
     if (typeof date === 'string') {
+      // Validación previa: detectar strings con zeros (0000-00-00, etc)
+      if (/^0000-/.test(date) || /-00-/.test(date) || /-00$/.test(date)) {
+        return null;
+      }
       fechaObj = new Date(date);
     } else if (date instanceof Date) {
       fechaObj = date;
@@ -437,10 +443,23 @@ private formatDate(date: any): string | null {
 
     // Retorna en formato YYYY-MM-DD garantizado
     const year = fechaObj.getFullYear();
-    const month = String(fechaObj.getMonth() + 1).padStart(2, '0');
-    const day = String(fechaObj.getDate()).padStart(2, '0');
+    const month = fechaObj.getMonth() + 1;
+    const day = fechaObj.getDate();
 
-    return `${year}-${month}-${day}`;
+    // Validar que no haya zeros luego de parsear
+    if (year === 0 || month === 0 || day === 0) {
+      return null;
+    }
+
+    // Validar rangos válidos para mes y día
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+      return null;
+    }
+
+    const monthStr = String(month).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+
+    return `${year}-${monthStr}-${dayStr}`;
   } catch (error) {
     return null;
   }

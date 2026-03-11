@@ -7,6 +7,7 @@ import { Router, Request, Response } from 'express';
 import AmortizacionController from './amortizacion.controller';
 import { ReporteCarteraCiudadController } from '../amortizacion/reporte/reporte-cartera-ciudad.controller';
 import { ReporteCredítosActivosController } from '../amortizacion/reporte/reporte-creditos-activos.controller';
+import { ReporteComparativoController } from '../amortizacion/reporte/reporte-comparativo.controller';
 
 
 const router = Router();
@@ -249,5 +250,40 @@ router.get('/reporte', ReporteCarteraCiudadController.obtenerReporte);
  * curl -X GET "http://localhost:3000/api/amortizacion/reporte/creditos-activos"
  */
 router.get('/reporte/creditos-activos', ReporteCredítosActivosController.obtenerReporte);
+
+/**
+ * GET /api/amortizacion/reporte/comparativo-1
+ *
+ * Comparativo detallado crédito por crédito entre FACILCREDITOS y FACILITO.
+ * Requiere que ambas bases de datos estén en el mismo servidor MySQL.
+ * Compara: cuotas pendientes, sanciones (Debe) y gastos cartera (extras Prejuridico/Juridico).
+ * Ordenado por diferencia absoluta total DESC — los más discrepantes primero.
+ *
+ * Respuesta incluye:
+ * - creditos[]: cada crédito con valores Main, Legacy y diferencias campo a campo
+ * - resumen: contadores y totales globales de diferencias
+ *
+ * Ejemplo:
+ * curl -X GET "http://localhost:3000/api/amortizacion/reporte/comparativo-1"
+ */
+router.get('/reporte/comparativo-1', ReporteComparativoController.obtenerComparativo1);
+
+/**
+ * GET /api/amortizacion/reporte/comparativo-2
+ *
+ * Análisis multidimensional FACILCREDITOS vs FACILITO.
+ * Requiere que ambas bases de datos estén en el mismo servidor MySQL.
+ *
+ * Incluye:
+ * - resumen_por_estado: cantidad y totales por ACTIVO/PREJURIDICO/JURIDICO
+ * - creditos_huerfanos: créditos activos solo en una de las dos BDs
+ * - analisis_brechas: distribución de créditos por rango de diferencia
+ * - top_discrepancias: top10 más discrepantes, cuotas=0 en main, sanciones sin legacy
+ * - totales_globales: gran total main vs legacy con % de diferencia
+ *
+ * Ejemplo:
+ * curl -X GET "http://localhost:3000/api/amortizacion/reporte/comparativo-2"
+ */
+router.get('/reporte/comparativo-2', ReporteComparativoController.obtenerComparativo2);
 
 export default router;

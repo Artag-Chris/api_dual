@@ -11,16 +11,30 @@ import WinstonAdapter from '../../config/adapters/winstonAdapter';
  * Características:
  * - Procesa 32k clientes en batches automáticos
  * - Utiliza colas persistentes en BD (migration_queue)
- * - Múltiples consumidores (4) en paralelo sin interferer
+ * - Múltiples consumidores (6) en paralelo sin interferer
  * - Reintenta automáticamente en caso de error (máx 3)
  * - Patrón Singleton
  * 
- * Arquitectura:
+ * Arquitectura de Flujo (Encadenado):
  * PRODUCTOR: Obtiene clientes de LEGACY en batches → enqueue a CLIENTES
- * CONSUMIDOR 1: Dequeue CLIENTES → migrateClienteFromLegacy() → final
- * CONSUMIDOR 2: Dequeue CREDITOS → procesar → enqueue PAGOS
- * CONSUMIDOR 3: Dequeue PAGOS → procesar → enqueue AMORTIZACIONES
- * CONSUMIDOR 4: Dequeue AMORTIZACIONES → procesar → final
+ * 
+ * Rama 1 (Clientes):
+ * CONSUMIDOR 1: Dequeue CLIENTES → migrateClienteFromLegacy() → enqueue CREDITOS
+ * 
+ * Rama 2 (Créditos):
+ * CONSUMIDOR 2: Dequeue CREDITOS → migrateCreditsPhase() → enqueue AMORTIZACIONES_TODO
+ * 
+ * Rama 3 (Amortizaciones):
+ * CONSUMIDOR 3: Dequeue AMORTIZACIONES_TODO → migrateAmortizacionesPhase() → enqueue AMPLIAR_PAGO
+ * 
+ * Rama 4 (Pagos - Paralela):
+ * CONSUMIDOR 4: Dequeue PAGOS_TODO → migratePaymentHistoryPhase() → Final
+ * 
+ * Rama 5 (Ampliar Pago):
+ * CONSUMIDOR 5: Dequeue AMPLIAR_PAGO → procesar → enqueue GASTOS_CARTERA
+ * 
+ * Rama 6 (Gastos de Cartera - Final):
+ * CONSUMIDOR 6: Dequeue GASTOS_CARTERA → procesar → Final
  */
 class MigrationService {
   private static instance: MigrationService;
@@ -86,7 +100,29 @@ class MigrationService {
             this.logger.info(
               `[MIGRATION] Batch ${i + 1}/${totalBatches}: procesando clientes ${skip}-${skip + batchSize}`
             );
-
+            
+            // Query optimizada: Obtiene documentos de clientes con créditos activos/mora
+            const batch = await prismaLegacyService.$queryRaw<any[]>`
+              SELECT CAST(c.num_doc AS CHAR) as documento
+              FROM clientes c
+              WHERE c.id IN (
+                SELECT DISTINCT c.id
+                FROM clientes c
+                INNER JOIN precreditos pr ON pr.cliente_id = c.id
+                INNER JOIN creditos cr ON cr.precredito_id = pr.id
+                WHERE c.num_doc IS NOT NULL 
+                  AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
+                  AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
+              )
+              ORDER BY c.id ASC
+              LIMIT ${batchSize}
+              OFFSET ${skip}
+            `;
+            
+            
+            // QUERY ANTERIOR (archivada):
+            // Esta query simple obtenía TODOS los documentos sin filtrar por créditos
+            /*
             const batch = await prismaLegacyService.$queryRaw<any[]>`
               SELECT CAST(num_doc AS CHAR) as documento
               FROM clientes
@@ -97,7 +133,7 @@ class MigrationService {
               LIMIT ${batchSize}
               OFFSET ${skip}
             `;
-
+            */
             if (!batch || batch.length === 0) {
               this.logger.info(`[MIGRATION] Batch ${i + 1} vacío, terminando`);
               break;
@@ -173,6 +209,15 @@ class MigrationService {
     this.procesarPagosTodoConsumer().catch(err => 
       this.logger.error(`[MIGRATION] Consumidor PAGOS_TODO error: ${err.message}`)
     );
+
+    // 🔴 DESHABILITADO: Consumidores AMPLIAR_PAGO y GASTOS_CARTERA comentados por ahora
+    // this.procesarAmplarPagoConsumer().catch(err => 
+    //   this.logger.error(`[MIGRATION] Consumidor AMPLIAR_PAGO error: ${err.message}`)
+    // );
+    
+    // this.procesarGastosCarteraConsumer().catch(err => 
+    //   this.logger.error(`[MIGRATION] Consumidor GASTOS_CARTERA error: ${err.message}`)
+    // );
 
     this.logger.info('[MIGRATION] ✓ Todos los consumidores iniciados en paralelo');
   }
@@ -327,6 +372,10 @@ class MigrationService {
           await this.queueService.markCompleted(item.id);
           this.logger.info(`[${consumerName}] ✅ Item completado: documento=${documento}`);
 
+          // 🔴 DESHABILITADO: Enqueue a AMPLIAR_PAGO comentado por ahora
+          // await this.queueService.enqueue(item.documento, 'AMPLIAR_PAGO');
+          // this.logger.info(`[${consumerName}] 📤 Enqueued a AMPLIAR_PAGO: documento=${documento}`);
+
         } catch (processError) {
           this.logger.error(
             `[${consumerName}] Error procesando: ${(processError as any).message}`
@@ -361,7 +410,7 @@ class MigrationService {
         // Heartbeat logging cada 10 iteraciones
         heartbeatCounter++;
         if (heartbeatCounter % 10 === 0) {
-          this.logger.debug(`[${consumerName}] ♥️ Consumer activo, esperando items en PAGOS_TODO...`);
+          this.logger.debug(`[${consumerName}] Consumer activo, esperando items en PAGOS_TODO...`);
         }
 
         const item = await this.queueService.dequeue('PAGOS_TODO');
@@ -422,6 +471,134 @@ class MigrationService {
       }
     }
   }
+
+  /**
+   * CONSUMIDOR 5: Procesa ampliar pagos - PHASE 5
+   * 🔴 DESHABILITADO POR AHORA
+   * 
+   * Flow:
+   * 1. Dequeue item de AMPLIAR_PAGO con documento
+   * 2. Validar documento (string, no vacío)
+   * 3. Procesar ampliar pago
+   * 4. Marcar como completado o error
+   * 5. Auto-enqueue a GASTOS_CARTERA
+   */
+  /*
+  private async procesarAmplarPagoConsumer(): Promise<void> {
+    const consumerName = 'AmplarPagoConsumer';
+    let heartbeatCounter = 0;
+
+    while (this.consumersRunning) {
+      try {
+        // Heartbeat logging cada 10 iteraciones
+        heartbeatCounter++;
+        if (heartbeatCounter % 10 === 0) {
+          this.logger.debug(`[${consumerName}] Consumer activo, esperando items en AMPLIAR_PAGO...`);
+        }
+
+        const item = await this.queueService.dequeue('AMPLIAR_PAGO');
+
+        if (!item) {
+          await this.sleep(1000);
+          continue;
+        }
+
+        this.logger.info(`[${consumerName}] 📦 Item recibido: documento=${item.documento}`);
+
+        try {
+          // Validar que item.documento es string válido
+          if (!item.documento || String(item.documento).trim() === '') {
+            throw new Error(`documento vacío o inválido`);
+          }
+          
+          const documento = String(item.documento).trim();
+          this.logger.info(`[${consumerName}] Iniciando PHASE 5 - Ampliar Pago para documento=${documento}`);
+
+  // TODO: Implementar lógica de ampliar pago
+          // Actualmente solo marca como completado
+          
+          await this.queueService.markCompleted(item.id);
+          
+          // Auto-enqueue a GASTOS_CARTERA Phase
+          await this.queueService.enqueue(item.documento, 'GASTOS_CARTERA');
+          this.logger.info(`[${consumerName}] ✅ PHASE 5 completado - Enqueued a GASTOS_CARTERA: documento=${documento}`);
+
+        } catch (processError) {
+          this.logger.error(
+            `[${consumerName}] Error procesando: ${(processError as any).message}`
+          );
+          await this.queueService.markError(item.id, (processError as any).message);
+        }
+
+      } catch (error) {
+        this.logger.warn(`[${consumerName}] Error en loop: ${(error as any).message}`);
+        await this.sleep(1000);
+      }
+    }
+  }
+
+  /**
+   * CONSUMIDOR 6: Procesa gastos de cartera - PHASE 6
+   * 🔴 DESHABILITADO POR AHORA
+   * 
+   * Flow:
+   * 1. Dequeue item de GASTOS_CARTERA con documento
+   * 2. Validar documento (string, no vacío)
+   * 3. Procesar gastos de cartera
+   * 4. Marcar como completado o error
+   */
+  /*
+  private async procesarGastosCarteraConsumer(): Promise<void> {
+    const consumerName = 'GastosCarteraConsumer';
+    let heartbeatCounter = 0;
+
+    while (this.consumersRunning) {
+      try {
+        // Heartbeat logging cada 10 iteraciones
+        heartbeatCounter++;
+        if (heartbeatCounter % 10 === 0) {
+          this.logger.debug(`[${consumerName}] Consumer activo, esperando items en GASTOS_CARTERA...`);
+        }
+
+        const item = await this.queueService.dequeue('GASTOS_CARTERA');
+
+        if (!item) {
+          await this.sleep(1000);
+          continue;
+        }
+
+        this.logger.info(`[${consumerName}] 📦 Item recibido: documento=${item.documento}`);
+
+        try {
+          // Validar que item.documento es string válido
+          if (!item.documento || String(item.documento).trim() === '') {
+            throw new Error(`documento vacío o inválido`);
+          }
+          
+          const documento = String(item.documento).trim();
+          this.logger.info(`[${consumerName}] Iniciando procesamiento para documento=${documento}`);
+
+          // TODO: Implementar lógica de gastos de cartera
+          // Por ahora solo marcamos como completado
+          
+          await this.queueService.markCompleted(item.id);
+          this.logger.info(`[${consumerName}] ✅ Item completado: documento=${documento}`);
+
+        } catch (processError) {
+          this.logger.error(
+            `[${consumerName}] Error procesando: ${(processError as any).message}`
+          );
+          await this.queueService.markError(item.id, (processError as any).message);
+        }
+
+      } catch (error) {
+        this.logger.warn(`[${consumerName}] Error en loop: ${(error as any).message}`);
+        await this.sleep(1000);
+      }
+    }
+  }
+
+  */
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CONTROL Y MONITOREO
@@ -563,6 +740,31 @@ class MigrationService {
   /**
    * Obtiene total de clientes
    */
+  
+  private async getTotalClientesLegacy(): Promise<number> {
+    
+    try {
+      // Query optimizada: Cuenta solo clientes con créditos activos/mora
+      const result = await prismaLegacyService.$queryRaw<any[]>`
+        SELECT COUNT(DISTINCT c.id) as count
+        FROM clientes c
+        INNER JOIN precreditos pr ON pr.cliente_id = c.id
+        INNER JOIN creditos cr ON cr.precredito_id = pr.id
+        WHERE c.num_doc IS NOT NULL 
+          AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
+          AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
+      `;
+      return Number(result[0].count);
+    } catch (error) {
+      this.logger.error(`[MIGRATION] Error contando: ${(error as any).message}`);
+      return 0;
+    }
+  }
+    
+  
+  // QUERY ANTERIOR (archivada):
+  // Esta query simple contaba TODOS los clientes con documento, sin filtrar por créditos
+  /*
   private async getTotalClientesLegacy(): Promise<number> {
     try {
       const result = await prismaLegacyService.$queryRaw<any[]>`
@@ -577,6 +779,34 @@ class MigrationService {
       return 0;
     }
   }
+  */
+
+  /* 
+  SELECT COUNT(DISTINCT c.id) as count
+FROM clientes c
+INNER JOIN precreditos pr ON pr.cliente_id = c.id
+INNER JOIN creditos cr ON cr.precredito_id = pr.id
+WHERE c.num_doc IS NOT NULL 
+  AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
+  AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
+
+//arreglar limit and offset 
+SELECT CAST(c.num_doc AS CHAR) as documento
+FROM clientes c
+WHERE c.id IN (
+  SELECT DISTINCT c.id
+  FROM clientes c
+  INNER JOIN precreditos pr ON pr.cliente_id = c.id
+  INNER JOIN creditos cr ON cr.precredito_id = pr.id
+  WHERE c.num_doc IS NOT NULL 
+    AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
+    AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
+)
+ORDER BY c.id ASC
+
+
+
+  */
 
   /**
    * Sleep utility

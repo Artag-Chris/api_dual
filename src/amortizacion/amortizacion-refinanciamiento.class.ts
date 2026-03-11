@@ -1112,6 +1112,7 @@ export class AmortizacionRefinanciamiento {
     const cuotasPagadasSegunCuotasFaltantes = (numero_cuotas && cuotas_faltantes !== undefined) 
       ? Math.max(0, numero_cuotas - cuotas_faltantes)
       : cuotasAMarcaEnCero;
+      
     
     // DETECCIÓN DE ASINCRONIZACIÓN:
     // Si los números NO coinciden, hay discrepancia entre registros de pagos y cuotas_faltantes
@@ -1122,10 +1123,10 @@ export class AmortizacionRefinanciamiento {
       cuotasAMarcaEnCero = cuotasPagadasSegunCuotasFaltantes;
     }
     
-    // Ajustar por cuota parcial: si existe, las pagadas completas son una menos
-    if (infoPagos.tieneCuotaParciall && cuotasAMarcaEnCero > 0) {
-      cuotasAMarcaEnCero = cuotasAMarcaEnCero - 1;
-    }
+    // IMPORTANTE: NO restar por cuota parcial aquí
+    // cuotaMaximaPagada = 4 significa que cuotas 1-4 están completamente pagadas
+    // La cuota parcial es siempre cuotaMaximaPagada + 1
+    // Si hay cuota parcial, será procesada en el PASO 2
 
     // Marcar cuotas como pagadas (todas sus componentes en 0)
     for (let i = 0; i < amortizacionActualizada.length; i++) {
