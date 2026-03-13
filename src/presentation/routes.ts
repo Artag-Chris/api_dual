@@ -6,6 +6,7 @@ import migrationRoutes from '../modules/migration/migration.routes';
 import amortizacionRoutes from '../amortizacion/amortizacion.routes';
 import amortizacionPatternRoutes from '../amortizacionPattern/amortizacionPattern.routes';
 import { UsuariosRoutes } from '../modules/usuarios/usuarios.routes';
+import { CodeudoresRoutes } from '../modules/codeudores/codeudores.routes';
 
 //import { PrismaRoutes } from '../prisma/prisma.routes';
 
@@ -29,6 +30,7 @@ export class AppRoutes {
     router.use(`/api/amortizacion`, amortizacionRoutes);
     router.use(`/api/amortizacion-pattern`, amortizacionPatternRoutes);
     router.use(`/api/admin`, UsuariosRoutes.routes);
+    router.use(`/api/admin`, CodeudoresRoutes.routes);
     
     // Ruta comentada - antigua implementación con una sola base de datos
     // router.use(`/api/prisma`, PrismaRoutes.routes);
