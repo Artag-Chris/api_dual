@@ -976,7 +976,7 @@ class MainDataService {
           const queueService = QueueService.getInstance();
           await queueService.enqueue(documento, 'AMORTIZACIONES_TODO');
           await queueService.enqueue(documento, 'PAGOS_TODO');
-        //  await queueService.enqueue(documento, 'COMENTARIOS_TODO');
+          await queueService.enqueue(documento, 'COMENTARIOS_TODO');
           enqueuedAmortizaciones = 1; // Marcamos como enqueuado una vez
           this.logger.info(`[Fase 2] ✅ Documento enqueuado a Phase 3B, Phase 4 y Phase Comentarios`);
         } catch (queueError) {

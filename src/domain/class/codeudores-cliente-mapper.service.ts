@@ -27,7 +27,7 @@ interface CodeudorMappeado {
   tipo: string; // Tipo de documento válido (CC, etc.)
   password: string;
   fecha_registro: Date;
-  estado_registro: 'COMPLETO' | 'INCOMPLETO' | 'CONTADO';
+  estado_registro: 'completo' | 'incompleto' | 'contado';
 }
 
 interface MigracionResultado {
@@ -151,9 +151,9 @@ class CodeudoresClienteMapperService {
             email &&
             codeudor.movilc
           );
-          const estadoRegistro: 'COMPLETO' | 'INCOMPLETO' | 'CONTADO' = esCompleto
-            ? 'COMPLETO'
-            : 'INCOMPLETO';
+          const estadoRegistro: 'completo' | 'incompleto' | 'contado' = esCompleto
+            ? 'completo'
+            : 'incompleto';
 
           if (!esCompleto) {
             resultado.incompletos++;
