@@ -39,6 +39,28 @@ export class UsuariosRoutes {
     router.post('/migrate-users', usuariosMigrationController.migrateUsersAdmin.bind(usuariosMigrationController));
 
     /**
+     * POST /api/admin/migrate-users-inactive
+     * Migra SOLO usuarios inactivos de legacy.users a main.user_admin
+     * Establece: tipo='CC', estado='INACTIVO'
+     * 
+     * RUTA SEPARADA para evitar mezclar con usuarios activos (tipo='ADMINISTRADOR')
+     * 
+     * Respuesta:
+     * {
+     *   success: boolean,
+     *   status: "USUARIOS_MIGRADOS" | "TODOS_FALLIDOS" | "ERROR",
+     *   data: {
+     *     usuariosMigrados: number,
+     *     usuariosProcesados: number,
+     *     tipo: "CC",
+     *     estado: "INACTIVO"
+     *   },
+     *   errores: string[]
+     * }
+     */
+    router.post('/migrate-users-inactive', usuariosMigrationController.migrateInactiveUsersAdmin.bind(usuariosMigrationController));
+
+    /**
      * POST /api/admin/update-users-from-excel
      * Actualiza información de usuarios admin desde archivo Excel
      * 

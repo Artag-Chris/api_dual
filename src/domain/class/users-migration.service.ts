@@ -43,6 +43,153 @@ class UsersMigrationService {
   }
 
   /**
+   * MÉTODO - Migra solo usuarios INACTIVOS de legacy
+   * Establece tipo = 'CC' y estado = 'INACTIVO'
+   */
+  async migrateInactiveUsersAdmin(): Promise<{
+    status: "USUARIOS_MIGRADOS" | "TODOS_FALLIDOS" | "ERROR";
+    usuariosMigrados?: number;
+    usuariosProcesados?: number;
+    errores?: string[];
+  }> {
+    try {
+      this.logger.info(`[USUARIOS] 🔄 Iniciando migrateInactiveUsersAdmin (tipo=CC)`);
+      
+      this.nombreCompletoUsados.clear();
+
+      const ultimoDocumento = await this.getUltimoDocumento();
+      let proximoDocumento = ultimoDocumento + 1;
+
+      const usuariosInactivos = await this.getAllUsersInactiveLegacy();
+      this.logger.info(`[USUARIOS] 👥 ${usuariosInactivos.length} usuarios INACTIVOS encontrados`);
+
+      if (!usuariosInactivos || usuariosInactivos.length === 0) {
+        return {
+          status: "TODOS_FALLIDOS",
+          usuariosProcesados: 0,
+          usuariosMigrados: 0,
+          errores: ["No se encontraron usuarios inactivos en legacy"]
+        };
+      }
+
+      const [rolesMap, permisosMain, zonasMain, puntosLegacy, nombresExistentes] = await Promise.all([
+        this.getRoleToPermisoMap(),
+        this.getPermisosMain(),
+        this.getZonasMain(),
+        this.getPuntosLegacy(),
+        this.getNombresCompletoExistentes()
+      ]);
+
+      for (const nombre of nombresExistentes) {
+        this.nombreCompletoUsados.add(nombre);
+      }
+
+      const usersToCreate: any[] = [];
+      const errores: string[] = [];
+      let usuariosProcesados = 0;
+
+      for (const userInactivo of usuariosInactivos) {
+        try {
+          const { nombre, apellido } = this.splitNombre(userInactivo.name);
+          const idPermiso = this.mapRoleToPermiso(userInactivo.rol, rolesMap);
+          const zonaId = this.fuzzyMatchPuntoToZona(userInactivo.punto_id, puntosLegacy, zonasMain);
+
+          let documento = String(proximoDocumento);
+          proximoDocumento++;
+
+          let nombreCompleto = `${nombre} ${apellido}`.trim().substring(0, 100);
+          let contador = 0;
+
+          while (this.nombreCompletoUsados.has(nombreCompleto) && contador < 10) {
+            nombreCompleto = `${nombre} ${apellido} (${proximoDocumento})`.substring(0, 100);
+            contador++;
+          }
+
+          this.nombreCompletoUsados.add(nombreCompleto);
+
+          usersToCreate.push({
+            nombre,
+            apellido,
+            tipo: 'CC',  // ← TIPO CC PARA INACTIVOS
+            documento,
+            telefono: userInactivo.telefono || '',
+            email: userInactivo.email,
+            password: userInactivo.password,
+            estado: 'INACTIVO',
+            nombre_completo: nombreCompleto,
+            id_permiso: idPermiso,
+            zona_id: zonaId
+          });
+
+          usuariosProcesados++;
+        } catch (userError) {
+          const msg = userError instanceof Error ? userError.message : String(userError);
+          this.logger.warn(`[USUARIOS] ❌ Error procesando inactivo ${userInactivo.id}: ${msg}`);
+          errores.push(`Usuario ${userInactivo.id} (${userInactivo.name}): ${msg}`);
+        }
+      }
+
+      if (usersToCreate.length === 0) {
+        return {
+          status: "TODOS_FALLIDOS",
+          usuariosProcesados,
+          usuariosMigrados: 0,
+          errores: errores.length > 0 ? errores : ["Ningún usuario válido para migrar"]
+        };
+      }
+
+      try {
+        this.logger.info(`[USUARIOS] 🔄 Insertando ${usersToCreate.length} usuarios INACTIVOS`);
+        
+        const result = await prismaMainService.$transaction(async (tx) => {
+          return await tx.user_admin.createMany({ data: usersToCreate, skipDuplicates: true });
+        });
+
+        this.logger.info(`[USUARIOS] ✅ ${result.count} usuarios INACTIVOS migrados (tipo=CC)`);
+
+        return {
+          status: "USUARIOS_MIGRADOS",
+          usuariosMigrados: result.count,
+          usuariosProcesados,
+          errores: errores.length > 0 ? errores : undefined
+        };
+
+      } catch (txError) {
+        const msg = txError instanceof Error ? txError.message : String(txError);
+        this.logger.error(`[USUARIOS] ❌ Error en transacción: ${msg}`);
+        
+        let insertadosParcial = 0;
+        const errorSpecificos: string[] = [];
+        
+        for (const usuario of usersToCreate) {
+          try {
+            await prismaMainService.user_admin.create({ data: usuario });
+            insertadosParcial++;
+          } catch (singleError) {
+            const singleMsg = singleError instanceof Error ? singleError.message : String(singleError);
+            errorSpecificos.push(`Usuario ${usuario.documento}: ${singleMsg}`);
+          }
+        }
+        
+        return {
+          status: insertadosParcial > 0 ? "USUARIOS_MIGRADOS" : "ERROR",
+          usuariosMigrados: insertadosParcial,
+          usuariosProcesados,
+          errores: errorSpecificos.slice(0, 10)
+        };
+      }
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[USUARIOS] ❌ Error fatal en migrateInactiveUsersAdmin: ${msg}`);
+      return {
+        status: "ERROR",
+        errores: [msg]
+      };
+    }
+  }
+
+  /**
    * MÉTODO PRINCIPAL - Migra todos los usuarios legacy a main
    */
   async migrateAllUsersAdmin(): Promise<{
@@ -154,7 +301,7 @@ class UsersMigrationService {
           usersToCreate.push({
             nombre,
             apellido,
-            tipo: 'ADMINISTRADOR',
+            tipo: 'CC',
             documento,
             telefono: userLegacy.telefono || '',
             email,
@@ -267,6 +414,19 @@ class UsersMigrationService {
     }
   }
 
+  private async getAllUsersInactiveLegacy(): Promise<any[]> {
+    try {
+      return await prismaLegacyService.$queryRawUnsafe<any[]>(`
+        SELECT id, name, email, password, telefono, punto_id, estado, rol
+        FROM ${LEGACY_DB}.users
+        WHERE estado = 'Inactivo'
+      `);
+    } catch (error) {
+      this.logger.warn(`[QUERY] ⚠️ Error en getAllUsersInactiveLegacy: ${error}`);
+      return [];
+    }
+  }
+
   /**
    * MAPEO EXPLÍCITO DE ROLES
    * Convierte roles legacy al id_permiso correspondiente en main
@@ -353,7 +513,7 @@ class UsersMigrationService {
       `);
 
       const maxDoc = result && result.length > 0 ? result[0]?.max_doc : null;
-      return maxDoc || 989999;
+      return maxDoc ? Number(maxDoc) : 989999;
     } catch (error) {
       this.logger.warn(`[QUERY] ⚠️ Error en getUltimoDocumento: ${error}`);
       return 989999;

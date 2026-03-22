@@ -40,6 +40,38 @@ class UsuariosMigrationController {
     }
   }
 
+  async migrateInactiveUsersAdmin(req: Request, res: Response) {
+    try {
+      this.logger.info(`[API] POST /api/admin/migrate-users-inactive - Iniciando migración de usuarios inactivos`);
+
+      const result = await this.migrationService.migrateInactiveUsersAdmin();
+
+      this.logger.info(`[API] Resultado migración inactivos: ${result.status}`);
+
+      return res.status(200).json({
+        success: result.status === "USUARIOS_MIGRADOS",
+        status: result.status,
+        data: {
+          usuariosMigrados: result.usuariosMigrados || 0,
+          usuariosProcesados: result.usuariosProcesados || 0,
+          tipo: 'CC',
+          estado: 'INACTIVO'
+        },
+        errores: result.errores || []
+      });
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[API] Error en migrateInactiveUsersAdmin: ${msg}`);
+      
+      return res.status(500).json({
+        success: false,
+        status: "ERROR",
+        message: msg
+      });
+    }
+  }
+
   /**
    * POST /api/admin/update-users-from-excel
    * Actualiza información de usuarios admin desde archivo Excel
