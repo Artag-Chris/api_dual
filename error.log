@@ -59709,3 +59709,499 @@ Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `f
 2026-03-04T18:31:03.270Z error: [QUEUE] Max retries reached: 5964797
 2026-03-04T19:02:01.236Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Error al procesar refinanciamiento - Errores: La cuota acordada ($49550) debe ser >= cuota mínima ($50675)
 2026-03-04T19:13:59.579Z error: [REFINANCIAMIENTO-SVC] ❌ Error: Error al procesar refinanciamiento - Errores: La cuota acordada ($48200) debe ser >= cuota mínima ($48938)
+2026-04-21T01:56:33.693Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088292793
+2026-04-21T01:56:33.805Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088292793
+2026-04-21T01:56:33.916Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088292793
+2026-04-21T01:56:33.919Z error: [QUEUE] Max retries reached: 1088292793
+2026-04-21T01:56:52.650Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24606466
+2026-04-21T01:56:52.785Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24606466
+2026-04-21T01:56:52.926Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24606466
+2026-04-21T01:56:52.929Z error: [QUEUE] Max retries reached: 24606466
+2026-04-21T01:56:54.250Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42022296
+2026-04-21T01:56:54.393Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42022296
+2026-04-21T01:56:54.650Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42022296
+2026-04-21T01:56:54.656Z error: [QUEUE] Max retries reached: 42022296
+2026-04-21T01:56:59.369Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019482
+2026-04-21T01:56:59.588Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019482
+2026-04-21T01:56:59.757Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019482
+2026-04-21T01:56:59.760Z error: [QUEUE] Max retries reached: 1088019482
+2026-04-21T01:57:01.390Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019422
+2026-04-21T01:57:01.604Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019422
+2026-04-21T01:57:01.792Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088019422
+2026-04-21T01:57:01.796Z error: [QUEUE] Max retries reached: 1088019422
+2026-04-21T01:57:06.848Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 30348957
+2026-04-21T01:57:07.063Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 30348957
+2026-04-21T01:57:07.255Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 30348957
+2026-04-21T01:57:07.258Z error: [QUEUE] Max retries reached: 30348957
+2026-04-21T01:57:08.959Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24338537
+2026-04-21T01:57:09.220Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24338537
+2026-04-21T01:57:09.530Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 24338537
+2026-04-21T01:57:09.534Z error: [QUEUE] Max retries reached: 24338537
+2026-04-21T01:57:09.951Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4539507
+2026-04-21T01:57:10.118Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4539507
+2026-04-21T01:57:10.301Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4539507
+2026-04-21T01:57:10.304Z error: [QUEUE] Max retries reached: 4539507
+2026-04-21T01:57:11.143Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 71992426
+2026-04-21T01:57:11.282Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 71992426
+2026-04-21T01:57:11.424Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 71992426
+2026-04-21T01:57:11.427Z error: [QUEUE] Max retries reached: 71992426
+2026-04-21T01:57:24.138Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088307623
+2026-04-21T01:57:24.371Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088307623
+2026-04-21T01:57:24.573Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088307623
+2026-04-21T01:57:24.576Z error: [QUEUE] Max retries reached: 1088307623
+2026-04-21T02:16:27.332Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088242967
+2026-04-21T02:16:27.458Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088242967
+2026-04-21T02:16:27.746Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088242967
+2026-04-21T02:16:27.750Z error: [QUEUE] Max retries reached: 1088242967
+2026-04-21T02:16:30.935Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 43047541
+2026-04-21T02:16:31.106Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 43047541
+2026-04-21T02:16:31.292Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 43047541
+2026-04-21T02:16:31.297Z error: [QUEUE] Max retries reached: 43047541
+2026-04-21T02:16:38.530Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42131508
+2026-04-21T02:16:38.726Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42131508
+2026-04-21T02:16:38.888Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42131508
+2026-04-21T02:16:38.892Z error: [QUEUE] Max retries reached: 42131508
+2026-04-21T02:16:46.728Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1126595970
+2026-04-21T02:16:46.898Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1126595970
+2026-04-21T02:16:47.062Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1126595970
+2026-04-21T02:16:47.066Z error: [QUEUE] Max retries reached: 1126595970
+2026-04-21T02:16:48.597Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 18507263
+2026-04-21T02:16:48.808Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 18507263
+2026-04-21T02:16:49.029Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 18507263
+2026-04-21T02:16:49.032Z error: [QUEUE] Max retries reached: 18507263
+2026-04-21T02:16:51.685Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42149160
+2026-04-21T02:16:51.857Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42149160
+2026-04-21T02:16:52.028Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42149160
+2026-04-21T02:16:52.032Z error: [QUEUE] Max retries reached: 42149160
+2026-04-21T02:16:52.573Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060595128
+2026-04-21T02:16:52.774Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060595128
+2026-04-21T02:16:52.945Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060595128
+2026-04-21T02:16:52.948Z error: [QUEUE] Max retries reached: 1060595128
+2026-04-21T02:16:53.609Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15922296
+2026-04-21T02:16:53.829Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15922296
+2026-04-21T02:16:54.065Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15922296
+2026-04-21T02:16:54.068Z error: [QUEUE] Max retries reached: 15922296
+2026-04-21T02:16:54.463Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088303277
+2026-04-21T02:16:54.597Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088303277
+2026-04-21T02:16:54.804Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088303277
+2026-04-21T02:16:54.807Z error: [QUEUE] Max retries reached: 1088303277
+2026-04-21T02:17:15.562Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060597150
+2026-04-21T02:17:15.807Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060597150
+2026-04-21T02:17:16.024Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060597150
+2026-04-21T02:17:16.029Z error: [QUEUE] Max retries reached: 1060597150
+2026-04-21T02:17:16.509Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10000489
+2026-04-21T02:17:16.649Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10000489
+2026-04-21T02:17:16.787Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10000489
+2026-04-21T02:17:16.791Z error: [QUEUE] Max retries reached: 10000489
+2026-04-21T02:17:18.421Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10121113
+2026-04-21T02:17:18.679Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10121113
+2026-04-21T02:17:18.863Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10121113
+2026-04-21T02:17:18.867Z error: [QUEUE] Max retries reached: 10121113
+2026-04-21T02:17:35.096Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42001168
+2026-04-21T02:17:35.306Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42001168
+2026-04-21T02:17:35.498Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42001168
+2026-04-21T02:17:35.501Z error: [QUEUE] Max retries reached: 42001168
+2026-04-21T02:17:37.654Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928915
+2026-04-21T02:17:37.787Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928915
+2026-04-21T02:17:37.915Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928915
+2026-04-21T02:17:37.918Z error: [QUEUE] Max retries reached: 15928915
+2026-04-21T02:17:40.861Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110529807
+2026-04-21T02:17:41.033Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110529807
+2026-04-21T02:17:41.188Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110529807
+2026-04-21T02:17:41.191Z error: [QUEUE] Max retries reached: 1110529807
+2026-04-21T02:17:44.831Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4446237
+2026-04-21T02:17:45.077Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4446237
+2026-04-21T02:17:45.299Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 4446237
+2026-04-21T02:17:45.302Z error: [QUEUE] Max retries reached: 4446237
+2026-04-21T02:17:47.096Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25211534
+2026-04-21T02:17:47.300Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25211534
+2026-04-21T02:17:47.494Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25211534
+2026-04-21T02:17:47.496Z error: [QUEUE] Max retries reached: 25211534
+2026-04-21T02:18:15.214Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088016742
+2026-04-21T02:18:15.456Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088016742
+2026-04-21T02:18:15.733Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088016742
+2026-04-21T02:18:15.739Z error: [QUEUE] Max retries reached: 1088016742
+2026-04-21T02:18:25.062Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110453192
+2026-04-21T02:18:25.261Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110453192
+2026-04-21T02:18:25.479Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1110453192
+2026-04-21T02:18:25.483Z error: [QUEUE] Max retries reached: 1110453192
+2026-04-21T02:18:35.258Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25156419
+2026-04-21T02:18:35.459Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25156419
+2026-04-21T02:18:35.674Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 25156419
+2026-04-21T02:18:35.677Z error: [QUEUE] Max retries reached: 25156419
+2026-04-21T02:18:38.241Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 9862124
+2026-04-21T02:18:38.418Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 9862124
+2026-04-21T02:18:38.600Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 9862124
+2026-04-21T02:18:38.603Z error: [QUEUE] Max retries reached: 9862124
+2026-04-21T02:19:08.849Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088338220
+2026-04-21T02:19:09.114Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088338220
+2026-04-21T02:19:09.384Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088338220
+2026-04-21T02:19:09.387Z error: [QUEUE] Max retries reached: 1088338220
+2026-04-21T02:19:11.863Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1107094587
+2026-04-21T02:19:12.070Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1107094587
+2026-04-21T02:19:12.256Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1107094587
+2026-04-21T02:19:12.260Z error: [QUEUE] Max retries reached: 1107094587
+2026-04-21T02:19:33.643Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15927192
+2026-04-21T02:19:33.875Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15927192
+2026-04-21T02:19:34.120Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15927192
+2026-04-21T02:19:34.123Z error: [QUEUE] Max retries reached: 15927192
+2026-04-21T02:19:36.223Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 75038536
+2026-04-21T02:19:36.409Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 75038536
+2026-04-21T02:19:36.605Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 75038536
+2026-04-21T02:19:36.608Z error: [QUEUE] Max retries reached: 75038536
+2026-04-21T02:19:40.476Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088250510
+2026-04-21T02:19:40.651Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088250510
+2026-04-21T02:19:40.840Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088250510
+2026-04-21T02:19:40.844Z error: [QUEUE] Max retries reached: 1088250510
+2026-04-21T02:19:47.989Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10134008
+2026-04-21T02:19:48.211Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10134008
+2026-04-21T02:19:48.349Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10134008
+2026-04-21T02:19:48.353Z error: [QUEUE] Max retries reached: 10134008
+2026-04-21T02:19:54.773Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33990589
+2026-04-21T02:19:54.995Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33990589
+2026-04-21T02:19:55.157Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33990589
+2026-04-21T02:19:55.161Z error: [QUEUE] Max retries reached: 33990589
+2026-04-21T02:20:01.650Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588248
+2026-04-21T02:20:01.772Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588248
+2026-04-21T02:20:01.994Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588248
+2026-04-21T02:20:01.998Z error: [QUEUE] Max retries reached: 1060588248
+2026-04-21T02:20:03.938Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928843
+2026-04-21T02:20:04.255Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928843
+2026-04-21T02:20:04.534Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15928843
+2026-04-21T02:20:04.537Z error: [QUEUE] Max retries reached: 15928843
+2026-04-21T02:20:08.513Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1058228041
+2026-04-21T02:20:08.680Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1058228041
+2026-04-21T02:20:08.861Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1058228041
+2026-04-21T02:20:08.864Z error: [QUEUE] Max retries reached: 1058228041
+2026-04-21T02:20:11.628Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15926841
+2026-04-21T02:20:11.809Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15926841
+2026-04-21T02:20:11.988Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15926841
+2026-04-21T02:20:11.991Z error: [QUEUE] Max retries reached: 15926841
+2026-04-21T02:20:12.588Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088008729
+2026-04-21T02:20:12.733Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088008729
+2026-04-21T02:20:12.863Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088008729
+2026-04-21T02:20:12.866Z error: [QUEUE] Max retries reached: 1088008729
+2026-04-21T02:20:15.564Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588227
+2026-04-21T02:20:15.812Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588227
+2026-04-21T02:20:16.063Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1060588227
+2026-04-21T02:20:16.067Z error: [QUEUE] Max retries reached: 1060588227
+2026-04-21T02:20:30.339Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 7792500
+2026-04-21T02:20:30.502Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 7792500
+2026-04-21T02:20:30.757Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 7792500
+2026-04-21T02:20:30.760Z error: [QUEUE] Max retries reached: 7792500
+2026-04-21T02:20:39.591Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10004364
+2026-04-21T02:20:39.805Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10004364
+2026-04-21T02:20:40.018Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10004364
+2026-04-21T02:20:40.021Z error: [QUEUE] Max retries reached: 10004364
+2026-04-21T02:20:42.000Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 38261944
+2026-04-21T02:20:42.138Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 38261944
+2026-04-21T02:20:42.346Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 38261944
+2026-04-21T02:20:42.349Z error: [QUEUE] Max retries reached: 38261944
+2026-04-21T02:20:50.700Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5848144
+2026-04-21T02:20:50.995Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5848144
+2026-04-21T02:20:51.240Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5848144
+2026-04-21T02:20:51.243Z error: [QUEUE] Max retries reached: 5848144
+2026-04-21T02:20:51.825Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1225088065
+2026-04-21T02:20:52.010Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1225088065
+2026-04-21T02:20:52.293Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1225088065
+2026-04-21T02:20:52.297Z error: [QUEUE] Max retries reached: 1225088065
+2026-04-21T02:20:57.494Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33915027
+2026-04-21T02:20:57.656Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33915027
+2026-04-21T02:20:57.834Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 33915027
+2026-04-21T02:20:57.837Z error: [QUEUE] Max retries reached: 33915027
+2026-04-21T02:21:02.621Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10019975
+2026-04-21T02:21:02.750Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10019975
+2026-04-21T02:21:02.876Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10019975
+2026-04-21T02:21:02.879Z error: [QUEUE] Max retries reached: 10019975
+2026-04-21T02:21:07.853Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42072082
+2026-04-21T02:21:08.000Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42072082
+2026-04-21T02:21:08.137Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42072082
+2026-04-21T02:21:08.139Z error: [QUEUE] Max retries reached: 42072082
+2026-04-21T02:21:15.351Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42127898
+2026-04-21T02:21:15.565Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42127898
+2026-04-21T02:21:15.759Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 42127898
+2026-04-21T02:21:15.762Z error: [QUEUE] Max retries reached: 42127898
+2026-04-21T02:21:16.474Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5946085
+2026-04-21T02:21:16.724Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5946085
+2026-04-21T02:21:16.913Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 5946085
+2026-04-21T02:21:16.916Z error: [QUEUE] Max retries reached: 5946085
+2026-04-21T02:21:20.615Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088021790
+2026-04-21T02:21:20.761Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088021790
+2026-04-21T02:21:20.980Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088021790
+2026-04-21T02:21:20.984Z error: [QUEUE] Max retries reached: 1088021790
+2026-04-21T02:21:27.045Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 29296525
+2026-04-21T02:21:27.297Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 29296525
+2026-04-21T02:21:27.537Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 29296525
+2026-04-21T02:21:27.541Z error: [QUEUE] Max retries reached: 29296525
+2026-04-21T02:22:00.457Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15915695
+2026-04-21T02:22:00.667Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15915695
+2026-04-21T02:22:00.824Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 15915695
+2026-04-21T02:22:00.828Z error: [QUEUE] Max retries reached: 15915695
+2026-04-21T02:22:12.426Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 65767058
+2026-04-21T02:22:12.555Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 65767058
+2026-04-21T02:22:12.682Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 65767058
+2026-04-21T02:22:12.685Z error: [QUEUE] Max retries reached: 65767058
+2026-04-21T02:22:17.318Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10024248
+2026-04-21T02:22:17.563Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10024248
+2026-04-21T02:22:17.780Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 10024248
+2026-04-21T02:22:17.783Z error: [QUEUE] Max retries reached: 10024248
+2026-04-21T03:06:12.604Z error: [FACTORY-SVC] ❌ Fase 1 fallida: Información del crédito inválida - Errores: Valor del préstamo inválido
+2026-04-21T03:08:59.213Z error: [FACTORY-SVC] ❌ Fase 1 fallida: Información del crédito inválida - Errores: Valor del préstamo inválido
+2026-04-21T03:36:02.792Z error: [COMENTARIOS] ❌ Error en transacción de comentarios: 
+Invalid `tx.comentarios.createMany()` invocation in
+/home/node/app/src/domain/class/comments-and-calls-migration.service.ts:182:39
+
+  179 // 6. Insertar todos los comentarios en UNA transacción
+  180 try {
+  181   const createdComments = await prismaMainService.$transaction(async (tx) => {
+→ 182     return await tx.comentarios.createMany(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5780 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:36:02.793Z error: [ComentariosConsumer] ❌ Error procesando documento=39577746: Transaction error: 
+Invalid `tx.comentarios.createMany()` invocation in
+/home/node/app/src/domain/class/comments-and-calls-migration.service.ts:182:39
+
+  179 // 6. Insertar todos los comentarios en UNA transacción
+  180 try {
+  181   const createdComments = await prismaMainService.$transaction(async (tx) => {
+→ 182     return await tx.comentarios.createMany(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5780 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:36:21.995Z error: [QUEUE] Error enqueuing: 
+Invalid `prismaMainService.migration_queue.create()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:41:60
+
+  38  */
+  39 async enqueue(documento: string, fase: string) {
+  40   try {
+→ 41     const item = await prismaMainService.migration_queue.create(
+Could not figure out an ID in create
+
+This is a non-recoverable error which probably happens when the Prisma Query Engine has a panic.
+
+https://github.com/prisma/prisma/issues/new?body=Hi+Prisma+Team%21+My+Prisma+Client+just+crashed.+This+is+the+report%3A%0A%23%23+Versions%0A%0A%7C+Name++++++++++++%7C+Version++++++++++++%7C%0A%7C-----------------%7C--------------------%7C%0A%7C+Node++++++++++++%7C+v22.22.2+++++++++++%7C+%0A%7C+OS++++++++++++++%7C+debian-openssl-3.0.x%7C%0A%7C+Prisma+Client+++%7C+6.19.2+++++++++++++%7C%0A%7C+Query+Engine++++%7C+c2990dca591cba766e3b7ef5d9e8a84796e47ab7%7C%0A%7C+Database++++++++%7C+mysql++++++++++++++%7C%0A%0A%0A%0A%23%23+Logs%0A%60%60%60%0Aity+gc%0A++++++++++++++++++++++JOIN+geo_department+gd+ON+gc.departamento+%3D+gd.id%0A++++++++++++++++++++++WHERE+LOWER%28gc.ciudad%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29%0A++++++++++++++++++++++AND+gd.code+%3D+%3F%0A++++++++++++++++++++++LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+CONCAT%28gc.ciudad%2C+%27+-+%27%2C+gd.name%29%0A++++++++++++++++++++++FROM+geo_city+gc%0A++++++++++++++++++++++JOIN+geo_department+gd+ON+gc.departamento+%3D+gd.id%0A++++++++++++++++++++++WHERE+LOWER%28gc.ciudad%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29%0A++++++++++++++++++++++LIMIT+1%29%2C%0A+++++++++++++++++++++CONCAT%28%3F%2C+%27+-+%27%2C+%3F%29%2C%0A+++++++++++++++++++++%27N%2FA%27%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_genero+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+NULL%29%2C%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++NOW%28%29%29%2C+%5B%225956908%22%2C%223100000000%22%2C%22LEONMORENO%40GMAIL.COM%22%2C%22CRA+15+24+94%22%2C%22HONDA%7CTOLIMA%22%2C%2273%22%2C%22HONDA%7CTOLIMA%22%2C%22HONDA%22%2C%22TOLIMA%22%2C%22MASCULINO%22%2C%22Soltero%2Fa%22%2C%22Soltero%2Fa%22%2C%22CONQUISTADORES%22%2C%22Familiar%22%2C%22Familiar%22%2C%220%22%2C%221-2+a%C3%B1os%22%2C%221-2+a%C3%B1os%22%5D%29%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient+prisma.%24executeRawUnsafe%28INSERT+INTO+info_laboral+%28documento%2C+ocupacion_oficio%2C+empresa%2C+direccion_empresa%2C+nit%2C+tipo_contrato%2C+cargo%2C+actividadEconomica%2C+telefono%2C+fecha_vinculacion%2C+descripcion%2C+id_rango%2C+fecha_registro%29%0A+++++++++++VALUES+%28%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_ocupacion+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+%0A++++++++++++++++++++++++++++%28SELECT+tipo+FROM+lista_ocupacion+LIMIT+1%29%2C+%27N%2FA%27%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%3F%2C+%27%27%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_contrato+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+%27N%2FA%27%29%2C%0A+++++++++++++++++++%3F%2C+%3F%2C+%3F%2C+%3F%2C+%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+id+FROM+lista_salario+WHERE+id+%3D+%3F+LIMIT+1%29%2C%0A++++++++++++++++++++++++++++%28SELECT+id+FROM+lista_salario+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A++++++++++++++++++++++++++++1%29%2C%0A+++++++++++++++++++NOW%28%29%29%2C+%5B%225956908%22%2C%22Tendero%22%2C%22TIENDA+HECTOR%22%2C%22CRA+15+24+94+CONQUISTADORES+HONDA+TOLIMA%22%2C%22N%2FA%22%2C%22N%2FA%22%2C%22N%2FA%22%2C%22INDEPENDIENTE%22%2C%223222014976%22%2C%222020-12-01%22%2C%22TIENDA%2C+VENTA+DE+GASEOSA+ETC%22%2C1%5D%29%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3Arequest_handler+%7B%22code%22%3A%22P2028%22%2C%22meta%22%3A%7B%22error%22%3A%22Transaction+already+closed%3A+A+query+cannot+be+executed+on+an+expired+transaction.+The+timeout+for+this+transaction+was+5000+ms%2C+however+5780+ms+passed+since+the+start+of+the+transaction.+Consider+increasing+the+interactive+transaction+timeout+or+doing+less+work+in+the+transaction.%22%7D%2C%22clientVersion%22%3A%226.19.2%22%2C%22name%22%3A%22PrismaClientKnownRequestError%22%7D%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0A%60%60%60%0A%0A%23%23+Client+Snippet%0A%60%60%60ts%0A%2F%2F+PLEASE+FILL+YOUR+CODE+SNIPPET+HERE%0A%60%60%60%0A%0A%23%23+Schema%0A%60%60%60prisma%0A%2F%2F+PLEASE+ADD+YOUR+SCHEMA+HERE+IF+POSSIBLE%0A%60%60%60%0A%0A%23%23+Prisma+Engine+Query%0A%60%60%60%0A%7B%22X%22%3Atrue%7D%7D%7D%0A%60%60%60%0A&title=Could+not+figure+out+an+ID+in+create&template=bug_report.yml
+
+If you want the Prisma team to look into it, please open the link above 🙏
+To increase the chance of success, please post your schema and a snippet of
+how you used Prisma Client in the issue. 
+
+2026-04-21T03:36:21.997Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prismaMainService.migration_queue.create()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:41:60
+
+  38  */
+  39 async enqueue(documento: string, fase: string) {
+  40   try {
+→ 41     const item = await prismaMainService.migration_queue.create(
+Could not figure out an ID in create
+
+This is a non-recoverable error which probably happens when the Prisma Query Engine has a panic.
+
+https://github.com/prisma/prisma/issues/new?body=Hi+Prisma+Team%21+My+Prisma+Client+just+crashed.+This+is+the+report%3A%0A%23%23+Versions%0A%0A%7C+Name++++++++++++%7C+Version++++++++++++%7C%0A%7C-----------------%7C--------------------%7C%0A%7C+Node++++++++++++%7C+v22.22.2+++++++++++%7C+%0A%7C+OS++++++++++++++%7C+debian-openssl-3.0.x%7C%0A%7C+Prisma+Client+++%7C+6.19.2+++++++++++++%7C%0A%7C+Query+Engine++++%7C+c2990dca591cba766e3b7ef5d9e8a84796e47ab7%7C%0A%7C+Database++++++++%7C+mysql++++++++++++++%7C%0A%0A%0A%0A%23%23+Logs%0A%60%60%60%0Aity+gc%0A++++++++++++++++++++++JOIN+geo_department+gd+ON+gc.departamento+%3D+gd.id%0A++++++++++++++++++++++WHERE+LOWER%28gc.ciudad%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29%0A++++++++++++++++++++++AND+gd.code+%3D+%3F%0A++++++++++++++++++++++LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+CONCAT%28gc.ciudad%2C+%27+-+%27%2C+gd.name%29%0A++++++++++++++++++++++FROM+geo_city+gc%0A++++++++++++++++++++++JOIN+geo_department+gd+ON+gc.departamento+%3D+gd.id%0A++++++++++++++++++++++WHERE+LOWER%28gc.ciudad%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29%0A++++++++++++++++++++++LIMIT+1%29%2C%0A+++++++++++++++++++++CONCAT%28%3F%2C+%27+-+%27%2C+%3F%29%2C%0A+++++++++++++++++++++%27N%2FA%27%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_genero+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+NULL%29%2C%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_civil+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+lista_vivienda+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+WHERE+LOWER%28tipo%29+LIKE+CONCAT%28%27%25%27%2C+LOWER%28%3F%29%2C+%27%25%27%29+LIMIT+1%29%2C%0A+++++++++++++++++++++%28SELECT+tipo+FROM+listado_tiempo_vivienda+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A+++++++++++++++++++++NULL%0A+++++++++++++++++++%29%2C%0A+++++++++++++++++++NOW%28%29%29%2C+%5B%225956908%22%2C%223100000000%22%2C%22LEONMORENO%40GMAIL.COM%22%2C%22CRA+15+24+94%22%2C%22HONDA%7CTOLIMA%22%2C%2273%22%2C%22HONDA%7CTOLIMA%22%2C%22HONDA%22%2C%22TOLIMA%22%2C%22MASCULINO%22%2C%22Soltero%2Fa%22%2C%22Soltero%2Fa%22%2C%22CONQUISTADORES%22%2C%22Familiar%22%2C%22Familiar%22%2C%220%22%2C%221-2+a%C3%B1os%22%2C%221-2+a%C3%B1os%22%5D%29%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient+prisma.%24executeRawUnsafe%28INSERT+INTO+info_laboral+%28documento%2C+ocupacion_oficio%2C+empresa%2C+direccion_empresa%2C+nit%2C+tipo_contrato%2C+cargo%2C+actividadEconomica%2C+telefono%2C+fecha_vinculacion%2C+descripcion%2C+id_rango%2C+fecha_registro%29%0A+++++++++++VALUES+%28%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_ocupacion+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+%0A++++++++++++++++++++++++++++%28SELECT+tipo+FROM+lista_ocupacion+LIMIT+1%29%2C+%27N%2FA%27%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%3F%2C+%27%27%29%2C%0A+++++++++++++++++++%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+tipo+FROM+lista_contrato+WHERE+tipo+%3D+%3F+LIMIT+1%29%2C+%27N%2FA%27%29%2C%0A+++++++++++++++++++%3F%2C+%3F%2C+%3F%2C+%3F%2C+%3F%2C+%0A+++++++++++++++++++COALESCE%28%28SELECT+id+FROM+lista_salario+WHERE+id+%3D+%3F+LIMIT+1%29%2C%0A++++++++++++++++++++++++++++%28SELECT+id+FROM+lista_salario+ORDER+BY+id+ASC+LIMIT+1%29%2C%0A++++++++++++++++++++++++++++1%29%2C%0A+++++++++++++++++++NOW%28%29%29%2C+%5B%225956908%22%2C%22Tendero%22%2C%22TIENDA+HECTOR%22%2C%22CRA+15+24+94+CONQUISTADORES+HONDA+TOLIMA%22%2C%22N%2FA%22%2C%22N%2FA%22%2C%22N%2FA%22%2C%22INDEPENDIENTE%22%2C%223222014976%22%2C%222020-12-01%22%2C%22TIENDA%2C+VENTA+DE+GASEOSA+ETC%22%2C1%5D%29%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3Arequest_handler+%7B%22code%22%3A%22P2028%22%2C%22meta%22%3A%7B%22error%22%3A%22Transaction+already+closed%3A+A+query+cannot+be+executed+on+an+expired+transaction.+The+timeout+for+this+transaction+was+5000+ms%2C+however+5780+ms+passed+since+the+start+of+the+transaction.+Consider+increasing+the+interactive+transaction+timeout+or+doing+less+work+in+the+transaction.%22%7D%2C%22clientVersion%22%3A%226.19.2%22%2C%22name%22%3A%22PrismaClientKnownRequestError%22%7D%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0A%60%60%60%0A%0A%23%23+Client+Snippet%0A%60%60%60ts%0A%2F%2F+PLEASE+FILL+YOUR+CODE+SNIPPET+HERE%0A%60%60%60%0A%0A%23%23+Schema%0A%60%60%60prisma%0A%2F%2F+PLEASE+ADD+YOUR+SCHEMA+HERE+IF+POSSIBLE%0A%60%60%60%0A%0A%23%23+Prisma+Engine+Query%0A%60%60%60%0A%7B%22X%22%3Atrue%7D%7D%7D%0A%60%60%60%0A&title=Could+not+figure+out+an+ID+in+create&template=bug_report.yml
+
+If you want the Prisma team to look into it, please open the link above 🙏
+To increase the chance of success, please post your schema and a snippet of
+how you used Prisma Client in the issue. 
+
+2026-04-21T03:36:32.007Z error: [QUEUE] Error handling error: 
+Invalid `prismaMainService.migration_queue.findUnique()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:159:60
+
+  156  */
+  157 async markError(id: number, errorMessage: string) {
+  158   try {
+→ 159     const item = await prismaMainService.migration_queue.findUnique(
+Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: 10, connection limit: 13)
+2026-04-21T03:37:33.008Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `prisma.$executeRawUnsafe()` invocation:
+
+
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 7086 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:37:34.485Z error: [COMENTARIOS] ❌ Error en transacción de comentarios: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 7761 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:37:34.486Z error: [ComentariosConsumer] ❌ Error procesando documento=28781363: Transaction error: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 7761 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:37:34.491Z error: [QUEUE] Error marking completed: 
+Invalid `prismaMainService.migration_queue.findUnique()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:119:60
+
+  116 async markCompleted(id: number) {
+  117   try {
+  118     // Verificar que el item existe antes de actualizar
+→ 119     const item = await prismaMainService.migration_queue.findUnique(
+Server has closed the connection.
+2026-04-21T03:37:34.492Z error: [ComentariosConsumer] Error procesando: 
+Invalid `prismaMainService.migration_queue.findUnique()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:119:60
+
+  116 async markCompleted(id: number) {
+  117   try {
+  118     // Verificar que el item existe antes de actualizar
+→ 119     const item = await prismaMainService.migration_queue.findUnique(
+Server has closed the connection.
+2026-04-21T03:37:36.979Z error: [QUEUE] Error handling error: 
+Invalid `prismaMainService.migration_queue.findUnique()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:159:60
+
+  156  */
+  157 async markError(id: number, errorMessage: string) {
+  158   try {
+→ 159     const item = await prismaMainService.migration_queue.findUnique(
+Server has closed the connection.
+2026-04-21T03:37:44.663Z error: [ClientesConsumer] ❌ Error: Error during client migration: 
+Invalid `tx.info_referencias.create()` invocation in
+/home/node/app/src/modules/main-data/main-data.service.ts:522:59
+
+  519 });
+  520 
+  521 // 10. Crear info_referencias
+→ 522 const infoReferencias = await tx.info_referencias.create(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 6123 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T03:37:46.817Z error: [QUEUE] Error handling error: 
+Invalid `prismaMainService.migration_queue.findUnique()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:159:60
+
+  156  */
+  157 async markError(id: number, errorMessage: string) {
+  158   try {
+→ 159     const item = await prismaMainService.migration_queue.findUnique(
+Server has closed the connection.
+2026-04-21T04:12:27.965Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T04:12:28.117Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T04:12:28.339Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T04:12:28.343Z error: [QUEUE] Max retries reached: 5964797
+2026-04-21T14:16:46.975Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:16:47.048Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:16:47.124Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:16:47.128Z error: [QUEUE] Max retries reached: 1088312312
+2026-04-21T14:29:49.710Z error: [ClientesConsumer] ❌ Error: Error during client migration: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 13924 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T14:29:49.773Z error: [QUEUE] Error dequeuing: 
+Invalid `prismaMainService.migration_queue.update()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:96:47
+
+  93 }
+  94 
+  95 // Marca como PROCESANDO para evitar que otro worker lo agarre
+→ 96 await prismaMainService.migration_queue.update(
+Server has closed the connection.
+2026-04-21T14:30:15.515Z error: [ClientesConsumer] ❌ Error: Error during client migration: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5079 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T14:30:15.532Z error: [QUEUE] Error dequeuing: 
+Invalid `prismaMainService.migration_queue.update()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:96:47
+
+  93 }
+  94 
+  95 // Marca como PROCESANDO para evitar que otro worker lo agarre
+→ 96 await prismaMainService.migration_queue.update(
+Server has closed the connection.
+2026-04-21T14:40:03.475Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:40:03.545Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:40:03.613Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088312312
+2026-04-21T14:40:03.618Z error: [QUEUE] Max retries reached: 1088312312
+2026-04-21T15:06:59.679Z error: [FACTORY-SVC] ❌ Fase 1 fallida: Información del crédito inválida - Errores: Valor del préstamo inválido
+2026-04-21T15:09:52.273Z error: [FACTORY-SVC] ❌ Fase 1 fallida: Información del crédito inválida - Errores: Valor del préstamo inválido
+2026-04-21T15:12:08.322Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-04-21T15:12:08.471Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-04-21T15:12:08.602Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 93236230
+2026-04-21T15:12:08.606Z error: [QUEUE] Max retries reached: 93236230
+2026-04-21T15:57:50.605Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-04-21T15:57:50.800Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-04-21T15:57:51.005Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1088013618
+2026-04-21T15:57:51.007Z error: [QUEUE] Max retries reached: 1088013618
+2026-04-21T16:09:19.267Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T16:09:19.421Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T16:09:19.583Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-21T16:09:19.586Z error: [QUEUE] Max retries reached: 5964797
+2026-04-21T16:25:43.805Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1192793801
+2026-04-21T16:25:43.958Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1192793801
+2026-04-21T16:25:44.117Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 1192793801
+2026-04-21T16:25:44.119Z error: [QUEUE] Max retries reached: 1192793801
+2026-04-21T16:29:21.121Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 123456789
+2026-04-21T16:29:21.387Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 123456789
+2026-04-21T16:29:21.673Z error: [ClientesConsumer] ❌ Error: Cliente ya existe en base de datos MAIN: 123456789
+2026-04-21T16:29:21.676Z error: [QUEUE] Max retries reached: 123456789
+2026-04-21T17:02:32.532Z error: [COMENTARIOS] ❌ Error en transacción de comentarios: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 6784 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T17:02:32.533Z error: [ComentariosConsumer] ❌ Error procesando documento=1073324238: Transaction error: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 6784 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-21T17:02:32.549Z error: [QUEUE] Error enqueuing: 
+Invalid `prismaMainService.migration_queue.create()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:41:60
+
+  38  */
+  39 async enqueue(documento: string, fase: string) {
+  40   try {
+→ 41     const item = await prismaMainService.migration_queue.create(
+Could not figure out an ID in create
+
+This is a non-recoverable error which probably happens when the Prisma Query Engine has a panic.
+
+https://github.com/prisma/prisma/issues/new?body=Hi+Prisma+Team%21+My+Prisma+Client+just+crashed.+This+is+the+report%3A%0A%23%23+Versions%0A%0A%7C+Name++++++++++++%7C+Version++++++++++++%7C%0A%7C-----------------%7C--------------------%7C%0A%7C+Node++++++++++++%7C+v22.22.2+++++++++++%7C+%0A%7C+OS++++++++++++++%7C+debian-openssl-3.0.x%7C%0A%7C+Prisma+Client+++%7C+6.19.2+++++++++++++%7C%0A%7C+Query+Engine++++%7C+c2990dca591cba766e3b7ef5d9e8a84796e47ab7%7C%0A%7C+Database++++++++%7C+mysql++++++++++++++%7C%0A%0A%0A%0A%23%23+Logs%0A%60%60%60%0Ast%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0Aprisma%3Aclient%3AlibraryEngine+sending+request%2C+this.libraryStarted%3A+true%0A%60%60%60%0A%0A%23%23+Client+Snippet%0A%60%60%60ts%0A%2F%2F+PLEASE+FILL+YOUR+CODE+SNIPPET+HERE%0A%60%60%60%0A%0A%23%23+Schema%0A%60%60%60prisma%0A%2F%2F+PLEASE+ADD+YOUR+SCHEMA+HERE+IF+POSSIBLE%0A%60%60%60%0A%0A%23%23+Prisma+Engine+Query%0A%60%60%60%0A%7B%22X%22%3Atrue%7D%7D%7D%0A%60%60%60%0A&title=Could+not+figure+out+an+ID+in+create&template=bug_report.yml
+
+If you want the Prisma team to look into it, please open the link above 🙏
+To increase the chance of success, please post your schema and a snippet of
+how you used Prisma Client in the issue. 
+
+2026-04-21T17:02:32.606Z error: [QUEUE] Error dequeuing: 
+Invalid `prismaMainService.migration_queue.update()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:96:47
+
+  93 }
+  94 
+  95 // Marca como PROCESANDO para evitar que otro worker lo agarre
+→ 96 await prismaMainService.migration_queue.update(
+Server has closed the connection.
+2026-04-22T14:58:59.208Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-22T14:58:59.267Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-22T14:58:59.326Z error: [ClientesConsumer] ❌ Error: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+Raw query failed. Code: `N/A`. Message: `Value out of range error. The column `fecha_vinculacion` contained an invalid datetime value with either day or month set to zero.`
+2026-04-22T14:58:59.330Z error: [QUEUE] Max retries reached: 5964797
+2026-04-22T15:00:52.358Z error: [COMENTARIOS] ❌ Error en transacción de comentarios: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5495 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-22T15:00:52.359Z error: [ComentariosConsumer] ❌ Error procesando documento=1082979674: Transaction error: Transaction API error: Transaction already closed: A commit cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5495 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+2026-04-22T15:00:52.386Z error: [QUEUE] Error marking completed: 
+Invalid `prismaMainService.migration_queue.update()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:128:63
+
+  125   return;
+  126 }
+  127 
+→ 128 const updated = await prismaMainService.migration_queue.update(
+Server has closed the connection.
+2026-04-22T15:00:52.386Z error: [PagosConsumer] Error procesando: 
+Invalid `prismaMainService.migration_queue.update()` invocation in
+/home/node/app/src/domain/class/queue.service.ts:128:63
+
+  125   return;
+  126 }
+  127 
+→ 128 const updated = await prismaMainService.migration_queue.update(
+Server has closed the connection.

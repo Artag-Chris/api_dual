@@ -138,9 +138,9 @@ model cifin {
 
 model codeudor {
   id             Int       @id @default(autoincrement())
-  titular        String    @dbMain.VarChar(15)
-  codeudor       String    @dbMain.VarChar(15)
-  estado         String    @dbMain.VarChar(15)
+  titular        String    @dbMain.VarChar(50)
+  codeudor       String    @dbMain.VarChar(50)
+  estado         String    @dbMain.VarChar(50)
   fecha_registro DateTime? @default(now()) @dbMain.Timestamp(0)
 }
 
@@ -194,8 +194,8 @@ model conyuge {
   documento         String           @unique(map: "documento") @dbMain.VarChar(50)
   telefono          String           @dbMain.VarChar(20)
   fecha_registro    DateTime         @default(now()) @dbMain.DateTime(0)
-  user_cliente      user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_cliente")
   lista_documentos  lista_documentos @relation(fields: [tipo_documento], references: [tipo], map: "id_lista_documento")
+  user_cliente      user_cliente     @relation(fields: [documento], references: [documento], onDelete: Cascade, onUpdate: Restrict, map: "fk_user_cliente")
 
   @@index([documento], map: "documento_2")
   @@index([tipo_documento], map: "id_lista_documento")
@@ -276,6 +276,7 @@ model detalle_credito {
   id_estrategia                                                                          Int?
   id_cartera                                                                             Int?
   amortizacion                                                                           amortizacion[]
+  asignacion_cartera                                                                     asignacion_cartera?
   creditos_reenganche_creditos_reenganche_id_credito_originalTodetalle_credito           creditos_reenganche[]       @relation("creditos_reenganche_id_credito_originalTodetalle_credito")
   creditos_reenganche_creditos_reenganche_id_credito_reengancheTodetalle_credito         creditos_reenganche[]       @relation("creditos_reenganche_id_credito_reengancheTodetalle_credito")
   creditos_refinanciados_creditos_refinanciados_prestamo_id_canceladoTodetalle_credito   creditos_refinanciados[]    @relation("creditos_refinanciados_prestamo_id_canceladoTodetalle_credito")
@@ -422,7 +423,7 @@ model gastos_cartera {
   juridico            Int
   fecha_creacion      DateTime        @default(now()) @dbMain.Timestamp(0)
   fecha_actualizacion DateTime        @default(now()) @dbMain.Timestamp(0)
-  detalle_credito     detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onUpdate: Restrict, map: "fk_detalle_gastos")
+  detalle_credito     detalle_credito @relation(fields: [prestamo_id], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "fk_detalle_gastos")
 
   @@index([prestamo_id], map: "fk_detalle_gastos")
 }
@@ -1073,26 +1074,31 @@ model pagos_payvalida {
 }
 
 model pedido {
-  id                  Int               @id @default(autoincrement())
-  user_cliente_id     Int
-  fecha               DateTime          @default(now()) @dbMain.Timestamp(0)
-  id_asesor           Int?
-  estado              pedido_estado     @default(CREADO)
-  cuota_inicial       Int
-  valor_total         Int
-  prestamo_ID         Int?
-  fecha_actualizacion DateTime?         @default(now()) @dbMain.Timestamp(0)
-  actualizado_por     Int?
-  user_admin          user_admin?       @relation(fields: [id_asesor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_asesor")
-  detalle_credito     detalle_credito?  @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_prestamo")
-  user_cliente        user_cliente      @relation(fields: [user_cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_1")
-  pedido_producto     pedido_producto[]
+  id                      Int                      @id @default(autoincrement())
+  user_cliente_id         Int
+  fecha                   DateTime                 @default(now()) @dbMain.Timestamp(0)
+  id_asesor               Int?
+  estado                  pedido_estado            @default(CREADO)
+  cuota_inicial           Int
+  valor_total             Int
+  prestamo_ID             Int?
+  fecha_actualizacion     DateTime?                @default(now()) @dbMain.Timestamp(0)
+  actualizado_por         Int?
+  numero_consecutivo      String?                  @unique(map: "numero_consecutivo") @dbMain.VarChar(50)
+  zona_id                 Int?
+  historial_numero_pedido historial_numero_pedido?
+  user_admin              user_admin?              @relation(fields: [id_asesor], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_asesor")
+  detalle_credito         detalle_credito?         @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: NoAction, onUpdate: NoAction, map: "fk_pedido_prestamo")
+  user_cliente            user_cliente             @relation(fields: [user_cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_1")
+  pedido_producto         pedido_producto[]
 
   @@index([id_asesor], map: "fk_pedido_asesor")
   @@index([user_cliente_id], map: "idx_pedido_cliente")
   @@index([estado], map: "idx_pedido_estado")
   @@index([prestamo_ID], map: "idx_pedido_prestamo")
   @@index([user_cliente_id], map: "user_cliente_id")
+  @@index([numero_consecutivo], map: "idx_numero_consecutivo")
+  @@index([zona_id], map: "idx_zona_id")
 }
 
 model pedido_producto {
@@ -1291,28 +1297,32 @@ model transferencias {
 }
 
 model user_admin {
-  id                       Int                        @id @default(autoincrement())
-  nombre                   String                     @dbMain.VarChar(50)
-  apellido                 String                     @dbMain.VarChar(30)
-  tipo                     String                     @dbMain.VarChar(20)
-  documento                String                     @unique(map: "documento") @dbMain.VarChar(50)
-  telefono                 String                     @dbMain.VarChar(20)
-  email                    String                     @dbMain.Text
-  password                 String                     @dbMain.Text
-  fecha_reistro            DateTime                   @default(now()) @dbMain.Timestamp(0)
-  estado                   user_admin_estado          @default(ACTIVO)
-  nombre_completo          String?                    @unique(map: "nombre_completo") @dbMain.VarChar(120)
-  id_permiso               Int                        @default(5)
-  zona_id                  Int?
-  comentarios              comentarios[]
-  documentos_estudio       documentos_estudio[]
-  linea_credito_categoria  linea_credito_categoria[]
-  pedido                   pedido[]
-  porcentaje_inicial       porcentaje_inicial[]
-  saldo_anterior_proveedor saldo_anterior_proveedor[]
-  sanciones_condonadas     sanciones_condonadas[]
-  lista_permisos           lista_permisos             @relation(fields: [id_permiso], references: [id], map: "fk_useradmin_permiso")
-  zonas                    zonas?                     @relation(fields: [zona_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_useradmin_zona")
+  id                           Int                        @id @default(autoincrement())
+  nombre                       String                     @dbMain.VarChar(50)
+  apellido                     String                     @dbMain.VarChar(30)
+  tipo                         String                     @dbMain.VarChar(20)
+  documento                    String                     @unique(map: "documento") @dbMain.VarChar(50)
+  telefono                     String                     @dbMain.VarChar(20)
+  email                        String                     @dbMain.Text
+  password                     String                     @dbMain.Text
+  fecha_reistro                DateTime                   @default(now()) @dbMain.Timestamp(0)
+  estado                       user_admin_estado          @default(ACTIVO)
+  nombre_completo              String?                    @unique(map: "nombre_completo") @dbMain.VarChar(120)
+  id_permiso                   Int                        @default(5)
+  zona_id                      Int?
+  asignacion_cartera_asignador asignacion_cartera[]       @relation("asignacion_cartera_asignador")
+  asignacion_cartera_asignado  asignacion_cartera[]       @relation("asignacion_cartera_asignado")
+  comentarios                  comentarios[]
+  documentos_estudio           documentos_estudio[]
+  historial_pagos_masivos      historial_pagos_masivos[]
+  linea_credito_categoria      linea_credito_categoria[]
+  pedido                       pedido[]
+  porcentaje_inicial           porcentaje_inicial[]
+  saldo_anterior_proveedor     saldo_anterior_proveedor[]
+  sanciones_condonadas         sanciones_condonadas[]
+  lista_permisos               lista_permisos             @relation(fields: [id_permiso], references: [id], map: "fk_useradmin_permiso")
+  zonas                        zonas?                     @relation(fields: [zona_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_useradmin_zona")
+  user_cliente                 user_cliente[]
 
   @@index([id_permiso], map: "fk_useradmin_permiso")
   @@index([zona_id], map: "fk_useradmin_zona")
@@ -1330,6 +1340,7 @@ model user_cliente {
   fecha_registro            DateTime                      @default(now()) @dbMain.Timestamp(0)
   nombre_completo           String                        @dbMain.VarChar(100)
   estado_registro           user_cliente_estado_registro? @default(incompleto)
+  creador                   Int?
   comentarios               comentarios[]
   conyuge                   conyuge?
   detalle_credito           detalle_credito[]
@@ -1344,9 +1355,11 @@ model user_cliente {
   pedido                    pedido[]
   pre_productos             pre_productos[]
   redes_sociales            redes_sociales[]
+  user_admin                user_admin?                   @relation(fields: [creador], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "id_creador_user_admin")
   lista_documentos          lista_documentos              @relation(fields: [tipo], references: [tipo], map: "id_tipo_documento")
 
   @@index([tipo], map: "id_tipo_documento")
+  @@index([creador], map: "id_creador_user_admin")
 }
 
 model zonas {
@@ -1414,6 +1427,122 @@ model migration_queue_dlq {
   @@index([createdAt])
 }
 
+/// Asignación de créditos de gestion_cartera a agentes de cobro (user_admin)
+/// - FK apunta a detalle_credito (tabla estable), NO a gestion_cartera (tabla volátil)
+/// - Así las asignaciones sobreviven cuando gestion_cartera se trunca y recarga
+/// - Un crédito tiene máximo una asignación activa a la vez (prestamo_ID @unique)
+/// - Para reasignar: actualizar el registro existente (campo estado + user_admin_id)
+model asignacion_cartera {
+  id                   Int                       @id @default(autoincrement())
+  prestamo_ID          Int                       @unique
+  user_admin_id        Int
+  asignado_por         Int?
+  fecha_asignacion     DateTime                  @default(now()) @dbMain.Timestamp(0)
+  fecha_actualizacion  DateTime                  @default(now()) @dbMain.Timestamp(0)
+  estado               asignacion_cartera_estado @default(ACTIVA)
+  observacion          String?                   @dbMain.Text
+  user_admin_asignador user_admin?               @relation("asignacion_cartera_asignador", fields: [asignado_por], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "fk_asignacion_asignado_por")
+  detalle_credito      detalle_credito           @relation(fields: [prestamo_ID], references: [prestamo_ID], onDelete: Cascade, onUpdate: Restrict, map: "fk_asignacion_detalle_credito")
+  user_admin_asignado  user_admin                @relation("asignacion_cartera_asignado", fields: [user_admin_id], references: [id], onUpdate: Restrict, map: "fk_asignacion_user_admin")
+
+  @@index([user_admin_id], map: "fk_asignacion_user_admin")
+  @@index([asignado_por], map: "fk_asignacion_asignado_por")
+  @@index([estado], map: "idx_asignacion_estado")
+  @@index([fecha_asignacion], map: "idx_asignacion_fecha")
+}
+
+model contador_zona_pedido {
+  id             Int      @id @default(autoincrement())
+  zona_id        Int
+  nombre_serie   String   @dbMain.VarChar(50)
+  contador       Int      @default(0)
+  fecha_creacion DateTime @default(now()) @dbMain.Timestamp(0)
+
+  @@unique([zona_id, nombre_serie], map: "uk_zona_serie")
+  @@index([zona_id], map: "idx_contador_zona_id")
+}
+
+model historial_numero_pedido {
+  id                 Int                                   @id @default(autoincrement())
+  pedido_id          Int                                   @unique(map: "uk_pedido_id")
+  numero_consecutivo String                                @unique(map: "uk_numero_consecutivo") @dbMain.VarChar(50)
+  zona_id            Int
+  fecha_asignacion   DateTime                              @default(now()) @dbMain.Timestamp(0)
+  estado_actual      historial_numero_pedido_estado_actual @default(ASIGNADO)
+  fecha_cancelacion  DateTime?
+  pedido             pedido                                @relation(fields: [pedido_id], references: [id], onDelete: Cascade, map: "fk_historial_pedido")
+
+  @@index([estado_actual], map: "idx_historial_estado")
+  @@index([numero_consecutivo], map: "idx_historial_numero")
+  @@index([zona_id], map: "idx_historial_zona")
+}
+
+model historial_pagos_masivos {
+  id                 Int                             @id @default(autoincrement())
+  nombre_archivo     String?                         @dbMain.VarChar(255)
+  ruta_relativa      String?                         @dbMain.VarChar(500)
+  creador            Int
+  total_filas        Int?
+  filas_exitosas     Int?
+  filas_fallidas     Int?
+  estado             historial_pagos_masivos_estado?
+  observaciones      Json?
+  fecha_creacion     DateTime?                       @default(now()) @dbMain.Timestamp(0)
+  fecha_finalizacion DateTime?                       @dbMain.Timestamp(0)
+  user_admin         user_admin                      @relation(fields: [creador], references: [id], onUpdate: Restrict, map: "ibfkid_user_admin")
+
+  @@index([creador], map: "ibfkid_user_admin")
+}
+
+model lista_aliado {
+  id                Int                @id @default(autoincrement())
+  codigo            String             @dbMain.VarChar(50)
+  activa            Boolean            @default(true)
+  canal             String             @dbMain.VarChar(50)
+  codigo_zona_id    Int?
+  lista_codigo_zona lista_codigo_zona? @relation(fields: [codigo_zona_id], references: [id], onDelete: Cascade, map: "fk_aliado_codigo_zona")
+
+  @@index([codigo_zona_id], map: "fk_aliado_codigo_zona")
+}
+
+model lista_cencos {
+  id                  Int      @id @default(autoincrement())
+  codigo              String   @dbMain.VarChar(50)
+  nombre              String   @dbMain.VarChar(100)
+  bono_poblacion      String   @dbMain.Text
+  fecha_registro      DateTime @default(now()) @dbMain.DateTime(0)
+  porcentaje_comision String   @dbMain.VarChar(100)
+}
+
+model lista_codigo_por_sucursal {
+  id                Int               @id @default(autoincrement())
+  nombre            String            @dbMain.VarChar(50)
+  codigo            String            @dbMain.VarChar(50)
+  fecha_registro    DateTime          @default(now()) @dbMain.DateTime(0)
+  codigo_zona_id    Int
+  lista_codigo_zona lista_codigo_zona @relation(fields: [codigo_zona_id], references: [id], onDelete: Cascade, map: "fk_codigo_sucursal_zona")
+
+  @@index([codigo_zona_id], map: "fk_codigo_sucursal_zona")
+}
+
+model lista_codigo_zona {
+  id                        Int                         @id @default(autoincrement())
+  nombre                    String                      @dbMain.VarChar(50)
+  codigo                    String                      @dbMain.VarChar(50)
+  activa                    Boolean                     @default(true)
+  fecha_registro            DateTime                    @default(now()) @dbMain.DateTime(0)
+  lista_aliado              lista_aliado[]
+  lista_codigo_por_sucursal lista_codigo_por_sucursal[]
+}
+
+model lista_prefijos_zona {
+  id             Int      @id @default(autoincrement())
+  nombre         String   @dbMain.VarChar(50)
+  prefijo        String   @unique(map: "prefijo") @dbMain.VarChar(10)
+  fecha_registro DateTime @default(now()) @dbMain.DateTime(0)
+  activa         Boolean  @default(true)
+}
+
 enum historial_reservas_estado_anterior {
   DISPONIBLE
   RESERVADO
@@ -1437,16 +1566,6 @@ enum historial_reservas_estado_nuevo {
   RESERVADO
   VENDIDO
   INACTIVO
-}
-
-enum pedido_estado {
-  CREADO
-  RECHAZADO
-  COODEUDOR
-  PENDIENTE_REMISIONAR @map("PENDIENTE REMISIONAR")
-  PENDIENTE_ENTREGAR   @map("PENDIENTE ENTREGAR")
-  ENTREGADO
-  CANCELADO
 }
 
 enum pagos_canal_pago {
@@ -1499,4 +1618,30 @@ enum historial_pagos_detallado_tipo_pago {
 enum detalle_credito_castigo {
   SI
   NO
+}
+
+enum pedido_estado {
+  CREADO
+  RECHAZADO
+  PENDIENTE_REMISIONAR @map("PENDIENTE REMISIONAR")
+  PENDIENTE_ENTREGAR   @map("PENDIENTE ENTREGAR")
+  ENTREGADO
+  CANCELADO
+  DESISTIMIENTO
+}
+
+enum historial_numero_pedido_estado_actual {
+  ASIGNADO
+  CANCELADO
+}
+
+enum historial_pagos_masivos_estado {
+  COMPLETED
+  COMPLETED_WITH_ERRORS
+  FAILED
+}
+
+enum asignacion_cartera_estado {
+  ACTIVA
+  LIBERADA
 }
