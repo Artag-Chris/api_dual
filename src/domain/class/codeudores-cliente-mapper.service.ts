@@ -302,7 +302,7 @@ class CodeudoresClienteMapperService {
           movilc,
           direccionc,
           created_at
-        FROM \`FACIL-2026-03-06\`.codeudores
+        FROM \`FACILITO2\`.codeudores
         WHERE num_docc IS NOT NULL AND num_docc != ''
         ORDER BY id ASC
       `;
@@ -362,8 +362,8 @@ class CodeudoresClienteMapperService {
         SELECT 
           c.num_doc as cliente_documento,
           cod.num_docc as codeudor_documento
-        FROM \`FACIL-2026-03-06\`.clientes c
-        INNER JOIN \`FACIL-2026-03-06\`.codeudores cod ON c.codeudor_id = cod.id
+        FROM \`FACILITO2\`.clientes c
+        INNER JOIN \`FACILITO2\`.codeudores cod ON c.codeudor_id = cod.id
         WHERE c.num_doc IS NOT NULL 
           AND cod.num_docc IS NOT NULL
           AND cod.num_docc != ''

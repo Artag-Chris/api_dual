@@ -2,7 +2,7 @@ import { prismaMainService } from '../../database/main/prisma-main.service';
 import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
-const LEGACY_DB = '`FACIL-2026-03-06`';
+const LEGACY_DB = '`FACILITO2`'; // Cambia según tu configuración real de base de datos legacy
 
 /**
  * CommentsAndCallsMigrationService

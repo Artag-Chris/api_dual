@@ -3,7 +3,7 @@ import { prismaLegacyService } from '../../database/legacy/prisma-legacy.service
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 import { v4 as uuidv4 } from 'uuid';
 
-const LEGACY_DB = '`FACIL-2026-03-06`';
+const LEGACY_DB = '`FACILITO2`'; // Cambia según tu configuración real de base de datos legacy
 
 /**
  * UsersMigrationService

@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import UsersMigrationService from '../../domain/class/users-migration.service';
 import updateService from '../../domain/class/user-admin-update.service';
+import docUpdateService from '../../domain/class/user-admin-doc-update.service';
 import WinstonAdapter from '../../config/adapters/winstonAdapter';
 
 class UsuariosMigrationController {
   private migrationService = UsersMigrationService.getInstance();
   private updateService = updateService;
+  private docUpdateService = docUpdateService;
   private logger = WinstonAdapter;
 
   async migrateUsersAdmin(req: Request, res: Response) {
@@ -137,6 +139,83 @@ class UsuariosMigrationController {
       return res.status(500).json({
         success: false,
         status: "ERROR",
+        message: msg
+      });
+    }
+  }
+
+  /**
+   * POST /api/admin/update-docs-from-csv
+   * Actualiza documentos y passwords de usuarios admin desde archivo CSV
+   * 
+   * Búsqueda por prioridad:
+   * 1. telefono (CSV) en campo documento (BD)
+   * 2. cedula (CSV) en campo documento (BD)
+   * 3. name (CSV) fuzzy match en nombre_completo/nombre/apellido (BD)
+   * 
+   * Acciones al encontrar:
+   * - Si documento=telefono → reemplaza por cedula
+   * - Hashea cedula como password (bcrypt)
+   * - Mapea rol_ con fuzzy match → id_permiso
+   */
+  async updateDocsFromCsv(req: Request, res: Response) {
+    try {
+      if (!req.file) {
+        this.logger.warn('[API] POST /api/admin/update-docs-from-csv - No file provided');
+        return res.status(400).json({
+          success: false,
+          status: 'ERROR',
+          message: 'No file provided. Use multipart/form-data with field name "file"'
+        });
+      }
+
+      const filename = req.file.originalname || 'file.csv';
+      const validExtensions = ['.csv', '.xlsx'];
+      const hasValidExtension = validExtensions.some((ext) => filename.toLowerCase().endsWith(ext));
+
+      if (!hasValidExtension) {
+        this.logger.warn(
+          `[API] POST /api/admin/update-docs-from-csv - Invalid file type: ${req.file.mimetype}`
+        );
+        return res.status(400).json({
+          success: false,
+          status: 'ERROR',
+          message: 'File must be .csv or .xlsx format'
+        });
+      }
+
+      this.logger.info(
+        `[API] POST /api/admin/update-docs-from-csv - Iniciando actualización desde ${filename}`
+      );
+
+      const result = await this.docUpdateService.updateUsersDocFromCsv(req.file.buffer, filename);
+
+      this.logger.info(
+        `[API] Resultado actualización docs: ${result.status} (${result.totalActualizados}/${result.totalProcesados})`
+      );
+
+      return res.status(200).json({
+        success: result.status === 'SUCCESS' || result.status === 'PARTIAL',
+        status: result.status,
+        data: {
+          totalProcesados: result.totalProcesados,
+          totalActualizados: result.totalActualizados,
+          totalNoEncontrados: result.totalNoEncontrados,
+          totalErrores: result.totalErrores,
+          resumen: result.resumen,
+          actualizados: result.actualizados,
+          noEncontrados: result.noEncontrados,
+          errores: result.errores
+        }
+      });
+
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[API] Error en updateDocsFromCsv: ${msg}`);
+
+      return res.status(500).json({
+        success: false,
+        status: 'ERROR',
         message: msg
       });
     }

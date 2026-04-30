@@ -15,6 +15,19 @@ const upload = multer({
   }
 });
 
+// Configuración de multer para CSV/XLSX
+const uploadCsv = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
+  fileFilter: (req, file, cb) => {
+    if (file.originalname.endsWith('.csv') || file.originalname.endsWith('.xlsx')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only .csv or .xlsx files are allowed'));
+    }
+  }
+});
+
 export class UsuariosRoutes {
   static get routes(): Router {
     const router = Router();
@@ -98,6 +111,47 @@ export class UsuariosRoutes {
       '/update-users-from-excel',
       upload.single('file'),
       usuariosMigrationController.updateUsersAdminFromExcel.bind(usuariosMigrationController)
+    );
+
+    /**
+     * POST /api/admin/update-docs-from-csv
+     * Actualiza documentos y passwords de usuarios admin desde archivo CSV
+     * 
+     * Búsqueda por prioridad:
+     * 1. telefono (CSV) → busca en user_admin.documento
+     * 2. cedula (CSV) → busca en user_admin.documento
+     * 3. name (CSV) → fuzzy match en nombre_completo/nombre/apellido
+     * 
+     * Acciones al encontrar:
+     * - Si documento=telefono → reemplaza documento por cedula
+     * - Hashea cedula como password (bcrypt, 10 salt rounds)
+     * - Mapea rol_ con fuzzy match → id_permiso
+     * 
+     * Cabeceras CSV (case-insensitive):
+     * LABORA | CEDULA | name | estado | rol_ | email | telefono | num_cuenta | banco_id | punto | aliado
+     * 
+     * Request: multipart/form-data, campo "file" con archivo .csv o .xlsx
+     * 
+     * Respuesta:
+     * {
+     *   success: boolean,
+     *   status: "SUCCESS" | "PARTIAL" | "FAILED",
+     *   data: {
+     *     totalProcesados: number,
+     *     totalActualizados: number,
+     *     totalNoEncontrados: number,
+     *     totalErrores: number,
+     *     resumen: { matchesPorTelefono, matchesPorCedula, matchesPorNombre, sinCoincidencia, passwordsHasheados, rolesAsignados },
+     *     actualizados: UserDocUpdateResult[],
+     *     noEncontrados: UserDocUpdateResult[],
+     *     errores: UserDocUpdateResult[]
+     *   }
+     * }
+     */
+    router.post(
+      '/update-docs-from-csv',
+      uploadCsv.single('file'),
+      usuariosMigrationController.updateDocsFromCsv.bind(usuariosMigrationController)
     );
 
     return router;

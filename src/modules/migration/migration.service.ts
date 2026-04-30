@@ -103,37 +103,37 @@ class MigrationService {
             );
             
             // Query optimizada: Obtiene documentos de clientes con créditos activos/mora
-            // const batch = await prismaLegacyService.$queryRaw<any[]>`
-            //   SELECT CAST(c.num_doc AS CHAR) as documento
-            //   FROM clientes c
-            //   WHERE c.id IN (
-            //     SELECT DISTINCT c.id
-            //     FROM clientes c
-            //     INNER JOIN precreditos pr ON pr.cliente_id = c.id
-            //     INNER JOIN creditos cr ON cr.precredito_id = pr.id
-            //     WHERE c.num_doc IS NOT NULL 
-            //       AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
-            //       AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
-            //   )
-            //   ORDER BY c.id ASC
-            //   LIMIT ${batchSize}
-            //   OFFSET ${skip}
-            // `;
+            const batch = await prismaLegacyService.$queryRaw<any[]>`
+              SELECT CAST(c.num_doc AS CHAR) as documento
+              FROM clientes c
+              WHERE c.id IN (
+                SELECT DISTINCT c.id
+                FROM clientes c
+                INNER JOIN precreditos pr ON pr.cliente_id = c.id
+                INNER JOIN creditos cr ON cr.precredito_id = pr.id
+                WHERE c.num_doc IS NOT NULL 
+                  AND CHAR_LENGTH(TRIM(c.num_doc)) > 0
+                  AND cr.estado IN ('Al día', 'Mora', 'Prejurídico', 'Jurídico')
+              )
+              ORDER BY c.id ASC
+              LIMIT ${batchSize}
+              OFFSET ${skip}
+            `;
             
             
             // QUERY ANTERIOR (archivada):
             // Esta query simple obtenía TODOS los documentos sin filtrar por créditos
             
-            const batch = await prismaLegacyService.$queryRaw<any[]>`
-              SELECT CAST(num_doc AS CHAR) as documento
-              FROM clientes
-              WHERE num_doc IS NOT NULL 
-                AND num_doc != ''
-                AND TRIM(num_doc) != ''
-              ORDER BY id ASC
-              LIMIT ${batchSize}
-              OFFSET ${skip} 
-            `;
+            // const batch = await prismaLegacyService.$queryRaw<any[]>`
+            //   SELECT CAST(num_doc AS CHAR) as documento
+            //   FROM clientes
+            //   WHERE num_doc IS NOT NULL 
+            //     AND num_doc != ''
+            //     AND TRIM(num_doc) != ''
+            //   ORDER BY id ASC
+            //   LIMIT ${batchSize}
+            //   OFFSET ${skip} 
+            // `;
             
             if (!batch || batch.length === 0) {
               this.logger.info(`[MIGRATION] Batch ${i + 1} vacío, terminando`);

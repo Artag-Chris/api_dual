@@ -9,3 +9,5 @@ coverage/
 *.log
 !error.log
 !combined.log
+
+CLAUDE.md
